@@ -1,23 +1,35 @@
 # trove.pw
 
-Share curated lists of links at mnemonic urls. `trove.pw/puzzles` is a list of puzzles.
+This trove of links is a record of things that are interesting, or meaningful, or relevant in some context.
 
-## Constraints
+It's a fairly basic one-page-app webpage, and hopefully straightforward to implement with modest effort and modern tools.
+By virtue of being a static website, it should require virtually no ongoing cost or maintenance.
 
-- Tags create lists spontaneously; links can have multiple tags (<20 per link)
-- Tags can have thousands of items, but the full set is always downloaded (<10MB)
-- Low write volume (~100 links/day max), possible read spikes
-- Only an allowlist of <100 users can edit; anyone can view
-- Minimal JS, small amount of CSS, compact list layout available
+- User submit links along with tags.
+- `trove.pw/puzzles` is a list of links tagged '#puzzles'.
+- User can view lists of links by tags, sorted any number of ways.
+- The interface feels really snappy because all filtering and data manipulation is done in the user's browser.
 
 ## Features
 
-- Sort by curator index, date tagged, or random
+- Sort by trove algorithm, most recent tag date, or random
+- Trove Algorithm: #submissions + votes
 - Local upvote/downvote/hide for sites, links, or link-tags (stored client-side)
 - Filter by tag intersection (has/doesn't have another tag)
-- Per-list item templates
-- Browser plugin to submit current page with a text selection pullout
+- Tags can have different link templates/styling
+- Browser plugin to submit current page with selected text as pullout
 - Long-term link archival via archive.org
+
+## Constraints
+
+- The existence of a Tag implies a List; Links can have multiple Tags (likely fewer than 20 per link)
+- The same tag can be on thousands of items.
+- The full set of links is always downloaded (should be less than 10MB)
+- Allowlist of users (less than 100) will be able to submit links and tags initially.
+- Anyone on the internet can view.
+- Low write volume (max ~100 links/day).
+- Read spikes (e.g. if it goes viral) are handled by static hosting.
+- Minimal JS, small amount of CSS, compact list layout available.
 
 ## Architecture
 
