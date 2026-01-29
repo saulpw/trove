@@ -21,14 +21,42 @@
   <div id="links"></div>
 
   <script>
+    // Parse path or hash to get tag filters: /foo/bar or #foo/bar → ['foo', 'bar']
+    function getTagFilters() {
+      const hash = window.location.hash.replace(/^#\/?/, '');
+      if (hash) {
+        return hash.split('/').filter(s => s.length > 0);
+      }
+      return window.location.pathname
+        .split('/')
+        .filter(segment => segment.length > 0 && segment !== 'index.html');
+    }
+
     async function loadLinks() {
       const container = document.getElementById('links');
+      const tagFilters = getTagFilters();
+
+      // Update heading to show active filters
+      if (tagFilters.length > 0) {
+        document.querySelector('h1').textContent = tagFilters.map(t => `#${t}`).join(' + ');
+        document.title = tagFilters.join('/') + ' - trove';
+      }
+
       try {
         const response = await fetch('trove.json');
         const data = await response.json();
 
-        if (data.links.length === 0) {
-          container.innerHTML = '<div class="empty">No links yet.</div>';
+        // Filter links by tags (must have ALL specified tags)
+        let links = data.links;
+        if (tagFilters.length > 0) {
+          links = links.filter(link => {
+            const linkTags = link.tags || [];
+            return tagFilters.every(filter => linkTags.includes(filter));
+          });
+        }
+
+        if (links.length === 0) {
+          container.innerHTML = '<div class="empty">No links found.</div>';
           return;
         }
 
@@ -38,7 +66,7 @@
           return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
         };
 
-        container.innerHTML = data.links.map(link => {
+        container.innerHTML = links.map(link => {
           const tags = link.tags || [];
           const domain = new URL(link.url).hostname.replace(/^www\./, '');
           return `

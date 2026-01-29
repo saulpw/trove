@@ -1,8 +1,12 @@
-.PHONY: serve add test
+.PHONY: setup serve add test
+
+# Install dependencies
+setup:
+	npm install -g netlify-cli
 
 # Start a local server to view the site
 serve:
-	python3 -m http.server 8000
+	netlify dev
 
 # Add a link: make add URL="https://example.com" TITLE="Example" TAGS="tag1 tag2"
 add:

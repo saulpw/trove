@@ -1,16 +1,13 @@
 # TODO
 
-- [ ] Static page that loads `trove.json` and renders link list
-- [ ] Python script that processes a link from cli arg
-   - [ ] Trigger archive.org snapshot
-   - [ ] Append valid entries to canonical `trove.json`
-   - [ ] Commit and push changes
-- [ ] Netlify site linked to repo with auto-deploy on push
-
-- [ ] Route handling: `trove.pw/<tag>` filters to that tag
+- [x] Route handling: `trove.pw/<tag>` filters to that tag
 - [ ] Client-side sort: curator index, date tagged, random
 - [ ] Client-side filter: include/exclude by additional tags
 - [ ] Minimal CSS, compact list layout toggle
+
+- [ ] Netlify site linked to repo with auto-deploy on push
+
+- add tags to existing link
 
 ## Risks
 
