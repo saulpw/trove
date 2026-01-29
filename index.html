@@ -6,16 +6,19 @@
   <title>trove</title>
   <style>
     body { font-family: system-ui, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
-    ul { list-style: none; padding: 0; }
-    li { margin: 0.5rem 0; }
-    a { color: #0066cc; }
-    .tags { color: #666; font-size: 0.9em; margin-left: 0.5rem; }
+    #links { list-style: none; padding: 0; }
+    .link { margin: 0.5rem 0; }
+    .link .title { color: #0066cc; }
+    .link .url { color: #888; font-size: 0.85em; margin-left: 0.5rem; }
+    .link .added { color: #999; font-size: 0.85em; }
+    .link .tags { margin-left: 0.5rem; }
+    .link .tag { color: #666; font-size: 0.9em; }
     .empty { color: #999; font-style: italic; }
   </style>
 </head>
 <body>
   <h1>trove</h1>
-  <ul id="links"></ul>
+  <div id="links"></div>
 
   <script>
     async function loadLinks() {
@@ -25,18 +28,35 @@
         const data = await response.json();
 
         if (data.links.length === 0) {
-          container.innerHTML = '<li class="empty">No links yet.</li>';
+          container.innerHTML = '<div class="empty">No links yet.</div>';
           return;
         }
 
-        container.innerHTML = data.links.map(link => `
-          <li>
-            <a href="${link.url}" target="_blank">${link.title || link.url}</a>
-            ${link.tags ? `<span class="tags">${link.tags.map(t => '#' + t).join(' ')}</span>` : ''}
-          </li>
-        `).join('');
+        const formatDate = (iso) => {
+          const d = new Date(iso);
+          const pad = n => String(n).padStart(2, '0');
+          return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        };
+
+        container.innerHTML = data.links.map(link => {
+          const tags = link.tags || [];
+          const domain = new URL(link.url).hostname.replace(/^www\./, '');
+          return `
+          <div class="link"
+               data-url="${link.url}"
+               data-added="${link.added || ''}"
+               ${link.title ? `data-title="${link.title.replace(/"/g, '&quot;')}"` : ''}
+               ${tags.length ? `data-tags="${tags.join(' ')}"` : ''}>
+            <a href="${link.url}" target="_blank">
+              <span class="title">${link.title || link.url}</span>
+            </a>
+            <span class="url">${domain}</span>
+            ${link.added ? `<span class="added">${formatDate(link.added)}</span>` : ''}
+            ${tags.length ? `<span class="tags">${tags.map(t => `<span class="tag">#${t}</span>`).join(' ')}</span>` : ''}
+          </div>`;
+        }).join('');
       } catch (err) {
-        container.innerHTML = '<li class="empty">Failed to load links.</li>';
+        container.innerHTML = '<div class="empty">Failed to load links.</div>';
         console.error(err);
       }
     }
