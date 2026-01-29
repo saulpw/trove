@@ -2,6 +2,15 @@
 
 ## 2026-01-29
 
+- Enhanced `add_link.py`: auto-fetches page title if not provided, triggers archive.org snapshot, auto-commits to git
+- Added `--no-archive` and `--no-commit` flags to skip those steps
+- Added `make test` target for Python syntax checking
+- Updated CLAUDE.md with project structure overview
+
+---
+
+## 2026-01-29
+
 - Created minimal prototype: static page + CLI add script
 - `index.html`: loads `trove.json` and renders links with tags to DOM
 - `add_link.py`: CLI script to add URLs with optional title and tags
