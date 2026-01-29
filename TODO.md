@@ -1,11 +1,11 @@
 # TODO
 
-- [x] Route handling: `trove.pw/<tag>` filters to that tag
-- [ ] Client-side sort: curator index, date tagged, random
-- [ ] Client-side filter: include/exclude by additional tags
-- [ ] Minimal CSS, compact list layout toggle
+- [ ] add input textbox to add link with current set of tags to google sheet ONLY for now.
 
 - [ ] Netlify site linked to repo with auto-deploy on push
+
+- [ ] Client-side sort: curator index, date tagged, random
+
 
 - add tags to existing link
 

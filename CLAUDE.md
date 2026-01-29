@@ -3,12 +3,14 @@
 A simple static website to share lists of links at a public mnemonic url.  e.g. trove.pw/games is a list of games
 
 ## Project Structure
-- `index.html` - Static frontend (loads trove.json, displays links with tag filtering)
+- `index.html` - Static frontend (loads trove.json, displays links with tag filtering, Google OAuth for submissions)
 - `trove.json` - Canonical link data: `{"links": [{url, added, title?, tags?}]}`
-- `add_link.py` - CLI to add links (auto-fetches title, triggers archive.org, commits)
-- `Makefile` - Targets: `setup` (install netlify-cli), `serve` (netlify dev), `add` (add link via CLI)
+- `add_link.py` - CLI to add links (auto-fetches title, triggers archive.org, commits). Use `--sheet` to submit to Google Sheets instead.
+- `Makefile` - Targets: `setup`, `serve`, `add`, `add-sheet`, `build`, `test`
+- `requirements.txt` - Python dependencies for Google Sheets API
 - `netlify.toml` - Netlify config (SPA fallback routing)
-- `ARCHITECTURE.md` - Future design: Google Sheets submissions + GitHub Actions processor
+- `ARCHITECTURE.md` - Design: Google Sheets submissions + GitHub Actions processor
+- `README.md` - Setup instructions including Google OAuth configuration
 - `TODO.md` - Feature checklist
 
 ## Meta Rules
@@ -23,3 +25,4 @@ A simple static website to share lists of links at a public mnemonic url.  e.g. 
 - NEVER run raw pytest/python/etc commands - always use `make test`, `make run`, etc.  Create a new Makefile target FIRST if one doesn't exist, then use it.
 - When summarizing completed work, append to CHANGELOG.md with ISO date heading. Use --- between each set of changes. Edit CHANGELOG.md BEFORE committing and stage it with the code changes.
 - When writing tests, ask the human to verify test expectations rather than guessing values. Show them the test scenario and ask if the expected behavior is correct.
+- Document all setup steps (API keys, external services, environment variables) in README.md in a dedicated section.

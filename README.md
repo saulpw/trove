@@ -49,6 +49,55 @@ python3 add_link.py "https://example.com" -t "Example Site" --tags games puzzles
 - Read spikes (e.g. if it goes viral) are handled by static hosting.
 - Minimal JS, small amount of CSS, compact list layout available.
 
+## Setup
+
+### Google OAuth (for link submissions)
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project (or select existing)
+3. Enable the **Google Sheets API**:
+   - Go to APIs & Services → Library
+   - Search "Google Sheets API" → Enable
+4. Configure OAuth consent screen:
+   - Go to APIs & Services → OAuth consent screen
+   - Choose "External" user type
+   - Fill in app name, user support email, developer email
+   - Add scope: `https://www.googleapis.com/auth/spreadsheets`
+   - Add your email as a test user (required while app is unverified)
+5. Create OAuth credentials:
+   - Go to APIs & Services → Credentials
+   - Create Credentials → OAuth client ID
+   - Application type: **Web application**
+   - Add Authorized JavaScript origins:
+     - `http://localhost:8888` (for local dev)
+     - `https://trove.pw` (for production)
+   - Copy the **Client ID**
+
+6. For CLI usage, also create a **Desktop** OAuth client:
+   - Create Credentials → OAuth client ID
+   - Application type: **Desktop app**
+   - Copy both **Client ID** and **Client Secret**
+   - Set environment variables:
+     ```bash
+     export GOOGLE_CLIENT_ID="your-desktop-client-id"
+     export GOOGLE_CLIENT_SECRET="your-desktop-client-secret"
+     ```
+
+7. Configure the frontend:
+   - In Netlify: Site settings → Build & deploy → Post processing → Snippet injection
+   - Add snippet to `<head>` of all pages:
+     ```html
+     <script>window.GOOGLE_CLIENT_ID = "your-web-client-id";</script>
+     ```
+   - For local dev, add the same snippet to index.html temporarily (don't commit)
+
+8. Share the Google Sheet with users who need write access (or make it public with link)
+
+### Netlify Deployment
+
+The site auto-deploys from the main branch. Environment variables:
+- `GOOGLE_CLIENT_ID` - Web OAuth client ID for frontend submissions
+
 ## Architecture
 
 See [ARCHITECTURE.md](ARCHITECTURE.md).
