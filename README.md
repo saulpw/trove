@@ -10,6 +10,24 @@ By virtue of being a static website, it should require virtually no ongoing cost
 - User can view lists of links by tags, sorted any number of ways.
 - The interface feels really snappy because all filtering and data manipulation is done in the user's browser.
 
+## Usage
+
+```bash
+# Start local server
+make serve
+
+# Add a link
+make add URL="https://example.com"
+
+# Add a link with title and tags
+make add URL="https://example.com" TITLE="Example Site" TAGS="games puzzles"
+```
+
+Or use the script directly:
+```bash
+python3 add_link.py "https://example.com" -t "Example Site" --tags games puzzles
+```
+
 ## Features
 
 - Sort by trove algorithm, most recent tag date, or random

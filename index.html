@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>trove</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+    ul { list-style: none; padding: 0; }
+    li { margin: 0.5rem 0; }
+    a { color: #0066cc; }
+    .tags { color: #666; font-size: 0.9em; margin-left: 0.5rem; }
+    .empty { color: #999; font-style: italic; }
+  </style>
+</head>
+<body>
+  <h1>trove</h1>
+  <ul id="links"></ul>
+
+  <script>
+    async function loadLinks() {
+      const container = document.getElementById('links');
+      try {
+        const response = await fetch('trove.json');
+        const data = await response.json();
+
+        if (data.links.length === 0) {
+          container.innerHTML = '<li class="empty">No links yet.</li>';
+          return;
+        }
+
+        container.innerHTML = data.links.map(link => `
+          <li>
+            <a href="${link.url}" target="_blank">${link.title || link.url}</a>
+            ${link.tags ? `<span class="tags">${link.tags.map(t => '#' + t).join(' ')}</span>` : ''}
+          </li>
+        `).join('');
+      } catch (err) {
+        container.innerHTML = '<li class="empty">Failed to load links.</li>';
+        console.error(err);
+      }
+    }
+
+    loadLinks();
+  </script>
+</body>
+</html>
