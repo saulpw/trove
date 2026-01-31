@@ -2,34 +2,34 @@
 {"url": "https://ubercross.com/", "added": "2026-01-29T18:42:52.673267+00:00", "title": "Ubercross by T Campbell"}
 {"url": "https://store.hiby.com/products/hiby-rs8-ii", "added": "2026-01-29T18:47:03.453893+00:00", "title": "HiBy RS8 II - New Generation Ultra-flagship Portable HiFi DAP", "tags": "mp3 mewanty"}
 {"url": "https://www.nsl.com/k/xy/xy.txt", "added": "2026-01-29T19:47:19.525628+00:00", "tags": "apl array"}
-{"url": "https://tailscale.com/blog/absolute-scale", "title": "Absolute scale corrupts absolutely", "tags": "links-from-august-2024 writing", "added": "2024-08-15T12:00:00+00:00"}
-{"url": "https://www.workingtheorys.com/p/pursuits-that-cant-scale", "title": "Pursuits That Can't Scale", "tags": "links-from-august-2024 writing", "added": "2024-08-15T12:00:00+00:00"}
-{"url": "https://www.raptitude.com/2024/08/do-quests-not-goals/", "title": "Do Quests Not Goals", "tags": "links-from-august-2024 writing", "added": "2024-08-15T12:00:00+00:00"}
-{"url": "https://www.henrikkarlsson.xyz/p/unfolding", "title": "Unfolding", "notes": "by Henrik Karlsson", "tags": "links-from-august-2024 writing", "added": "2024-08-15T12:00:00+00:00"}
-{"url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2130424/", "title": "An outbreak of common colds at an Antarctic base after seventeen weeks of complete isolation", "notes": "(1973)", "tags": "links-from-august-2024 writing", "added": "2024-08-15T12:00:00+00:00"}
-{"url": "https://clarkesworldmagazine.com/ha_08_23/", "title": "Window Boy", "notes": "by Thomas Ha (short story)", "tags": "links-from-august-2024 writing fiction", "added": "2024-08-15T12:00:00+00:00"}
-{"url": "https://clarkesworldmagazine.com/kritzer_05_23/", "title": "Better Living Through Algorithms", "notes": "by Naomi Kritzer (short story)", "tags": "links-from-august-2024 writing fiction", "added": "2024-08-15T12:00:00+00:00"}
-{"url": "https://usefulcharts.com/", "title": "UsefulCharts.com", "notes": "Vancouver store with posters like Timeline of World History.", "tags": "links-from-august-2024 writing graphic-design", "added": "2024-08-15T12:00:00+00:00"}
-{"url": "https://coincidence.games/chemistry-set/rules/", "title": "CHEMISTRY SET", "notes": "Zach Barth (of Zachtronics) is now making board/card games.", "tags": "links-from-august-2024 boardcard-games", "added": "2024-08-15T12:00:00+00:00"}
-{"url": "https://www.rprod.com/en/games/so-clover", "title": "So Clover!", "notes": "party game", "tags": "links-from-august-2024 boardcard-games", "added": "2024-08-15T12:00:00+00:00"}
-{"url": "https://jaycarlson.net/embedded-linux/", "title": "So you want to build an embedded Linux system? - Jay Carlson", "tags": "links-from-august-2024 embedded", "added": "2024-08-15T12:00:00+00:00"}
-{"url": "https://www.adafruit.com/qtpy", "title": "Adafruit Qt Py", "notes": "simplest form factor for embedded development", "tags": "links-from-august-2024 embedded", "added": "2024-08-15T12:00:00+00:00"}
-{"url": "https://microbit.org/", "title": "BBC micro:bit", "notes": "pocket-sized [ ^5 computer](/mag/computer)", "tags": "links-from-august-2024 embedded", "added": "2024-08-15T12:00:00+00:00"}
-{"url": "https://www.pjrc.com/teensy/", "title": "Teensy USB Development Board", "tags": "links-from-august-2024 embedded", "added": "2024-08-15T12:00:00+00:00"}
-{"url": "https://tinycircuits.com/", "title": "TinyCircuits.com", "notes": "cool electronic miniature products", "tags": "links-from-august-2024 embedded", "added": "2024-08-15T12:00:00+00:00"}
-{"url": "https://pico.sh/", "title": "pico.sh", "notes": "Use rsync, scp, or sftp to publish a blog post, website, or code snippet", "tags": "links-from-august-2024 lower-fi-software", "added": "2024-08-15T12:00:00+00:00"}
-{"url": "https://0data.app/", "title": "Zero Data App", "notes": "131 (and counting) apps that let you control your data.", "tags": "links-from-august-2024 lower-fi-software", "added": "2024-08-15T12:00:00+00:00"}
-{"url": "https://letsdisco.dev/", "title": "disco | deploy web projects", "notes": "Like Heroku but open-source and self-hosted.", "tags": "links-from-august-2024 lower-fi-software", "added": "2024-08-15T12:00:00+00:00"}
-{"url": "https://owickstrom.github.io/the-monospace-web/", "title": "The Monospace Web", "notes": "Character-grid web design", "tags": "links-from-august-2024 lower-fi-software terminal-on-the-web", "added": "2024-08-15T12:00:00+00:00"}
-{"url": "https://panr.github.io/terminal-css/", "title": "Terminal.css", "notes": "semantic styles derived from Terminal theme", "tags": "links-from-august-2024 lower-fi-software terminal-on-the-web", "added": "2024-08-15T12:00:00+00:00"}
-{"url": "https://github.com/kciter/ascii-3d-renderer.js", "title": "3D Renderer using ASCII", "tags": "links-from-august-2024 lower-fi-software terminal-on-the-web js textart", "added": "2024-08-15T12:00:00+00:00"}
-{"url": "https://www.youtube.com/watch?v=NxsaHxON350]", "title": "I'm Re-Imagining the Command Line Interpreter", "notes": "(10m video)", "tags": "links-from-august-2024 lower-fi-software actual-terminal cli", "added": "2024-08-15T12:00:00+00:00"}
-{"url": "https://github.com/ArthurSonzogni/FTXUI", "title": "C++ Functional TUI", "tags": "links-from-august-2024 lower-fi-software actual-terminal tui", "added": "2024-08-15T12:00:00+00:00"}
-{"url": "https://mitchellh.com/writing/grapheme-clusters-in-terminals", "title": "Grapheme Clusters and Terminal Emulators", "tags": "links-from-august-2024 lower-fi-software actual-terminal terminal", "added": "2024-08-15T12:00:00+00:00"}
-{"url": "https://mitchellh.com/ghostty", "title": "Ghostty", "notes": "Mitchell Hashimoto terminal devlog (not open-source)", "tags": "links-from-august-2024 lower-fi-software actual-terminal terminal", "added": "2024-08-15T12:00:00+00:00"}
-{"url": "https://vim-racer.com/", "title": "Vim Racer - An Online Game for VIM Navigation", "tags": "links-from-august-2024 lower-fi-software actual-terminal", "added": "2024-08-15T12:00:00+00:00"}
-{"url": "https://www.textualize.io/blog/7-things-ive-learned-building-a-modern-tui-framework/", "title": "7 Things I've learned building a modern TUI Framework", "tags": "links-from-august-2024 lower-fi-software actual-terminal tui", "added": "2024-08-15T12:00:00+00:00"}
-{"url": "https://furnacecreek.org/hanon/", "title": "Hanon Pro", "notes": "recommended to get into regular piano practice", "tags": "links-from-august-2024 lower-fi-software music", "added": "2024-08-15T12:00:00+00:00"}
+{"url": "https://tailscale.com/blog/absolute-scale", "title": "Absolute scale corrupts absolutely", "tags": "writing", "added": "2024-08-15T12:00:00+00:00"}
+{"url": "https://www.workingtheorys.com/p/pursuits-that-cant-scale", "title": "Pursuits That Can't Scale", "tags": "writing", "added": "2024-08-15T12:00:00+00:00"}
+{"url": "https://www.raptitude.com/2024/08/do-quests-not-goals/", "title": "Do Quests Not Goals", "tags": "writing", "added": "2024-08-15T12:00:00+00:00"}
+{"url": "https://www.henrikkarlsson.xyz/p/unfolding", "title": "Unfolding", "notes": "by Henrik Karlsson", "tags": "writing", "added": "2024-08-15T12:00:00+00:00"}
+{"url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2130424/", "title": "An outbreak of common colds at an Antarctic base after seventeen weeks of complete isolation", "notes": "(1973)", "tags": "writing", "added": "2024-08-15T12:00:00+00:00"}
+{"url": "https://clarkesworldmagazine.com/ha_08_23/", "title": "Window Boy", "notes": "by Thomas Ha (short story)", "tags": "writing fiction", "added": "2024-08-15T12:00:00+00:00"}
+{"url": "https://clarkesworldmagazine.com/kritzer_05_23/", "title": "Better Living Through Algorithms", "notes": "by Naomi Kritzer (short story)", "tags": "writing fiction", "added": "2024-08-15T12:00:00+00:00"}
+{"url": "https://usefulcharts.com/", "title": "UsefulCharts.com", "notes": "Vancouver store with posters like Timeline of World History.", "tags": "writing graphic-design", "added": "2024-08-15T12:00:00+00:00"}
+{"url": "https://coincidence.games/chemistry-set/rules/", "title": "CHEMISTRY SET", "notes": "Zach Barth (of Zachtronics) is now making board/card games.", "tags": "boardcard-games", "added": "2024-08-15T12:00:00+00:00"}
+{"url": "https://www.rprod.com/en/games/so-clover", "title": "So Clover!", "notes": "party game", "tags": "boardcard-games", "added": "2024-08-15T12:00:00+00:00"}
+{"url": "https://jaycarlson.net/embedded-linux/", "title": "So you want to build an embedded Linux system? - Jay Carlson", "tags": "embedded", "added": "2024-08-15T12:00:00+00:00"}
+{"url": "https://www.adafruit.com/qtpy", "title": "Adafruit Qt Py", "notes": "simplest form factor for embedded development", "tags": "embedded", "added": "2024-08-15T12:00:00+00:00"}
+{"url": "https://microbit.org/", "title": "BBC micro:bit", "notes": "pocket-sized [ ^5 computer](/mag/computer)", "tags": "embedded", "added": "2024-08-15T12:00:00+00:00"}
+{"url": "https://www.pjrc.com/teensy/", "title": "Teensy USB Development Board", "tags": "embedded", "added": "2024-08-15T12:00:00+00:00"}
+{"url": "https://tinycircuits.com/", "title": "TinyCircuits.com", "notes": "cool electronic miniature products", "tags": "embedded", "added": "2024-08-15T12:00:00+00:00"}
+{"url": "https://pico.sh/", "title": "pico.sh", "notes": "Use rsync, scp, or sftp to publish a blog post, website, or code snippet", "tags": "lower-fi-software", "added": "2024-08-15T12:00:00+00:00"}
+{"url": "https://0data.app/", "title": "Zero Data App", "notes": "131 (and counting) apps that let you control your data.", "tags": "lower-fi-software", "added": "2024-08-15T12:00:00+00:00"}
+{"url": "https://letsdisco.dev/", "title": "disco | deploy web projects", "notes": "Like Heroku but open-source and self-hosted.", "tags": "lower-fi-software", "added": "2024-08-15T12:00:00+00:00"}
+{"url": "https://owickstrom.github.io/the-monospace-web/", "title": "The Monospace Web", "notes": "Character-grid web design", "tags": "lower-fi-software terminal-on-the-web", "added": "2024-08-15T12:00:00+00:00"}
+{"url": "https://panr.github.io/terminal-css/", "title": "Terminal.css", "notes": "semantic styles derived from Terminal theme", "tags": "lower-fi-software terminal-on-the-web", "added": "2024-08-15T12:00:00+00:00"}
+{"url": "https://github.com/kciter/ascii-3d-renderer.js", "title": "3D Renderer using ASCII", "tags": "lower-fi-software terminal-on-the-web js textart", "added": "2024-08-15T12:00:00+00:00"}
+{"url": "https://www.youtube.com/watch?v=NxsaHxON350]", "title": "I'm Re-Imagining the Command Line Interpreter", "notes": "(10m video)", "tags": "lower-fi-software actual-terminal cli", "added": "2024-08-15T12:00:00+00:00"}
+{"url": "https://github.com/ArthurSonzogni/FTXUI", "title": "C++ Functional TUI", "tags": "lower-fi-software actual-terminal tui", "added": "2024-08-15T12:00:00+00:00"}
+{"url": "https://mitchellh.com/writing/grapheme-clusters-in-terminals", "title": "Grapheme Clusters and Terminal Emulators", "tags": "lower-fi-software actual-terminal terminal", "added": "2024-08-15T12:00:00+00:00"}
+{"url": "https://mitchellh.com/ghostty", "title": "Ghostty", "notes": "Mitchell Hashimoto terminal devlog (not open-source)", "tags": "lower-fi-software actual-terminal terminal", "added": "2024-08-15T12:00:00+00:00"}
+{"url": "https://vim-racer.com/", "title": "Vim Racer - An Online Game for VIM Navigation", "tags": "lower-fi-software actual-terminal", "added": "2024-08-15T12:00:00+00:00"}
+{"url": "https://www.textualize.io/blog/7-things-ive-learned-building-a-modern-tui-framework/", "title": "7 Things I've learned building a modern TUI Framework", "tags": "lower-fi-software actual-terminal tui", "added": "2024-08-15T12:00:00+00:00"}
+{"url": "https://furnacecreek.org/hanon/", "title": "Hanon Pro", "notes": "recommended to get into regular piano practice", "tags": "lower-fi-software music", "added": "2024-08-15T12:00:00+00:00"}
 {"url": "https://www.semianalysis.com/p/the-memory-wall", "title": "The Memory Wall: Past, Present, and Future of DRAM", "tags": "computing", "added": "2024-09-15T12:00:00+00:00"}
 {"url": "https://eatonphil.com/consensus.html", "title": "Consensus Algorithm Resources", "tags": "computing", "added": "2024-09-15T12:00:00+00:00"}
 {"url": "https://dscf.co.uk/index.html", "title": "x86 Immediate Mode OpenGL", "notes": "graphically oriented stack-based programming language", "tags": "computing", "added": "2024-09-15T12:00:00+00:00"}

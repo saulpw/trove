@@ -1,13 +1,12 @@
 # TODO
 
-- [ ] add input textbox to add link with current set of tags to google sheet ONLY for now.
-
-- [ ] Netlify site linked to repo with auto-deploy on push
+- [ ] the sorting Algorithm
+- [ ] cli: remove --tags argument; everything after url is tags
 
 - [ ] Client-side sort: curator index, date tagged, random
 
-
-- add tags to existing link
+- [ ] add tags to existing link (resubmit with new tags)
+- [ ] combine same links in compile step
 
 ## Risks
 
@@ -19,14 +18,12 @@
 
 ## Processing Script
 
-- [ ] Python script: read unprocessed rows from sheet via Sheets API
+- [ ] Python script: read unprocessed rows from github repo
 - [ ] Validate submitter email against allowlist; delete unauthorized rows
-- [ ] Mark rows processed (or delete) in sheet
+- [ ] close the issue
 
 ## Frontend
 
-- [ ] Google OAuth login flow (Google Identity Services)
-- [ ] Authenticated submit form: append row to Google Sheet via Sheets API
 - [ ] Local upvote/downvote/hide (localStorage)
 
 ## Later

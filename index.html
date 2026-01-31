@@ -12,7 +12,8 @@
     .link .url { color: #888; font-size: 0.85em; margin-left: 0.5rem; }
     .link .added { color: #999; font-size: 0.85em; }
     .link .tags { margin-left: 0.5rem; }
-    .link .tag { color: #666; font-size: 0.9em; }
+    .link .tag { color: #666; font-size: 0.9em; text-decoration: none; }
+    .link .tag:hover { text-decoration: underline; }
     .empty { color: #999; font-style: italic; }
     .tag-list { list-style: none; padding: 0; }
     .tag-list li { margin: 0.5rem 0; }
@@ -140,7 +141,7 @@
             </a>
             <span class="url">${domain}</span>
             ${link.added ? `<span class="added">${formatDate(link.added)}</span>` : ''}
-            ${tags.length ? `<span class="tags">${tags.map(t => `<span class="tag">#${t}</span>`).join(' ')}</span>` : ''}
+            ${tags.length ? `<span class="tags">${tags.map(t => `<a href="/${t}" class="tag">#${t}</a>`).join(' ')}</span>` : ''}
           </div>`;
         }).join('');
       } catch (err) {
