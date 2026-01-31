@@ -1,4 +1,4 @@
-.PHONY: setup serve add add-sheet build test
+.PHONY: setup serve add add-sheet build test import
 
 # Install dependencies
 setup:
@@ -21,9 +21,13 @@ add-sheet:
 build:
 	rm -rf _build
 	mkdir -p _build
-	cp index.html trove.json _build/
+	cp index.html trove.jsonl _build/
 	cp config.js _build/ 2>/dev/null || touch _build/config.js
 
 # Syntax check all Python files
 test:
 	python3 -m py_compile *.py && echo "Syntax OK"
+
+# Import links from markdown files
+import:
+	python3 import_md_links.py ~/git/saul.pw/posts/links

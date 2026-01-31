@@ -3,9 +3,9 @@
 A simple static website to share lists of links at a public mnemonic url.  e.g. trove.pw/games is a list of games
 
 ## Project Structure
-- `index.html` - Static frontend (loads trove.json, displays links with tag filtering, Google OAuth for submissions)
-- `trove.json` - Canonical link data: `{"links": [{url, added, title?, tags?}]}`
-- `add_link.py` - CLI to add links (auto-fetches title, triggers archive.org, commits). Use `--sheet` to submit to Google Sheets instead.
+- `index.html` - Static frontend (loads trove.jsonl, displays links with tag filtering, Google OAuth for submissions)
+- `trove.jsonl` - Canonical link data in JSONL format (one JSON object per line): `{url, added, title?, tags?}`
+- `add_link.py` - CLI to add links to trove.jsonl (auto-fetches title, triggers archive.org, commits). Use `--sheet` to submit to Google Sheets instead.
 - `Makefile` - Targets: `setup`, `serve`, `add`, `add-sheet`, `build`, `test`
 - `requirements.txt` - Python dependencies for Google Sheets API
 - `netlify.toml` - Netlify config (SPA fallback routing)

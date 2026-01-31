@@ -115,4 +115,4 @@ See [ARCHITECTURE.md](ARCHITECTURE.md).
 
 I find a puzzle site, go to `trove.pw/puzzles`, and submit the link.
 I'm authenticated via Google OAuth, so the submission goes to a Netlify Function that creates a GitHub Issue.
-The next GitHub Action run processes it into `trove.json` and commits, triggering a rebuild.
+The next GitHub Action run processes it into `trove.jsonl` and commits, triggering a rebuild.

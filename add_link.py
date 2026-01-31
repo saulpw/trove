@@ -11,20 +11,27 @@ import urllib.error
 from pathlib import Path
 from datetime import datetime, timezone
 
-TROVE_FILE = Path(__file__).parent / "trove.json"
+TROVE_FILE = Path(__file__).parent / "trove.jsonl"
 TOKEN_FILE = Path.home() / ".trove_token.json"
 SHEET_ID = "1KY1xS72V7stxCKGOEYeg8w7lYjbsZ45ls_lHtY1l1fY"
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
 
 def load_trove():
+    """Load all links from JSONL file."""
+    links = []
     if TROVE_FILE.exists():
-        return json.loads(TROVE_FILE.read_text())
-    return {"links": []}
+        for line in TROVE_FILE.read_text().strip().split('\n'):
+            if line:
+                links.append(json.loads(line))
+    return links
 
 
-def save_trove(data):
-    TROVE_FILE.write_text(json.dumps(data, indent=2) + "\n")
+def save_trove(links):
+    """Save all links to JSONL file (one JSON object per line)."""
+    with open(TROVE_FILE, 'w') as f:
+        for link in links:
+            f.write(json.dumps(link) + '\n')
 
 
 def fetch_title(url):
@@ -145,7 +152,7 @@ def add_link(url, title=None, tags=None, no_archive=False, no_commit=False, to_s
         submit_to_sheet(url, title, tags)
         return
 
-    data = load_trove()
+    links = load_trove()
 
     link = {
         "url": url,
@@ -156,8 +163,8 @@ def add_link(url, title=None, tags=None, no_archive=False, no_commit=False, to_s
     if tags:
         link["tags"] = tags
 
-    data["links"].append(link)
-    save_trove(data)
+    links.append(link)
+    save_trove(links)
     print(f"Added: {url}")
 
     # Trigger archive.org snapshot
