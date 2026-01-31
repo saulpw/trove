@@ -29,6 +29,7 @@
 
   <div id="add-form">
     <input type="text" id="link-url" placeholder="https://..." />
+    <input type="text" id="link-notes" placeholder="Notes (optional)" />
     <button id="submit-btn" onclick="submitLink()">Add</button>
     <button id="auth-btn" onclick="handleAuth()">Sign in</button>
     <span id="submit-status"></span>
@@ -114,7 +115,6 @@
   <!-- Google Identity Services -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script>
-    const SHEET_ID = '1KY1xS72V7stxCKGOEYeg8w7lYjbsZ45ls_lHtY1l1fY';
     let accessToken = null;
     let tokenClient = null;
 
@@ -127,7 +127,7 @@
       }
       tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: clientId,
-        scope: 'https://www.googleapis.com/auth/spreadsheets',
+        scope: 'email',
         callback: (response) => {
           if (response.access_token) {
             accessToken = response.access_token;
@@ -146,8 +146,10 @@
 
     async function submitLink() {
       const urlInput = document.getElementById('link-url');
+      const notesInput = document.getElementById('link-notes');
       const status = document.getElementById('submit-status');
       const url = urlInput.value.trim();
+      const notes = notesInput.value.trim();
 
       if (!url) {
         status.textContent = 'Enter a URL';
@@ -162,33 +164,27 @@
       }
 
       const tagFilters = getTagFilters();
-      const tags = tagFilters.join(', ');
+      const tags = tagFilters.join(' ');
 
       status.textContent = 'Submitting...';
       status.className = '';
 
       try {
-        const response = await fetch(
-          `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/A:D:append?valueInputOption=USER_ENTERED`,
-          {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${accessToken}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              values: [[new Date().toISOString(), url, tags, '']]
-            }),
-          }
-        );
+        const response = await fetch('/.netlify/functions/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url, tags, notes, googleToken: accessToken }),
+        });
+
+        const result = await response.json();
 
         if (response.ok) {
           status.textContent = 'Submitted!';
           status.className = 'status-success';
           urlInput.value = '';
+          notesInput.value = '';
         } else {
-          const err = await response.json();
-          status.textContent = err.error?.message || 'Failed';
+          status.textContent = result.error || 'Failed';
           status.className = 'status-error';
         }
       } catch (e) {

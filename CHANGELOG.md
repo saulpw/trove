@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## 2026-01-31
+
+- Replaced Google Sheets submission with GitHub Issues via Netlify Function
+- Created `netlify/functions/submit.js` to handle submissions
+- Google OAuth now only requests `email` scope (identity only, no Sheets access)
+- Added notes input field for user-provided summary/pullout quote
+- Submissions create GitHub Issues with url, tags, notes, and submitter email
+- Updated README with GitHub token setup instructions
+
+---
+
 ## 2026-01-29
 
 - Added path-based tag filtering: `/foo` shows #foo links, `/foo/bar` shows links with both #foo AND #bar tags

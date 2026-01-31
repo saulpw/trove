@@ -22,7 +22,7 @@ build:
 	rm -rf _build
 	mkdir -p _build
 	cp index.html trove.json _build/
-	touch _build/config.js
+	cp config.js _build/ 2>/dev/null || touch _build/config.js
 
 # Syntax check all Python files
 test:

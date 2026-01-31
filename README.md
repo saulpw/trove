@@ -51,20 +51,19 @@ python3 add_link.py "https://example.com" -t "Example Site" --tags games puzzles
 
 ## Setup
 
-### Google OAuth (for link submissions)
+### Google OAuth (for user identity)
+
+Google OAuth is used to identify users submitting links. Only the `email` scope is requested.
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com/)
 2. Create a new project (or select existing)
-3. Enable the **Google Sheets API**:
-   - Go to APIs & Services → Library
-   - Search "Google Sheets API" → Enable
-4. Configure OAuth consent screen:
+3. Configure OAuth consent screen:
    - Go to APIs & Services → OAuth consent screen
    - Choose "External" user type
    - Fill in app name, user support email, developer email
-   - Add scope: `https://www.googleapis.com/auth/spreadsheets`
+   - Add scope: `email`
    - Add your email as a test user (required while app is unverified)
-5. Create OAuth credentials:
+4. Create OAuth credentials:
    - Go to APIs & Services → Credentials
    - Create Credentials → OAuth client ID
    - Application type: **Web application**
@@ -73,17 +72,7 @@ python3 add_link.py "https://example.com" -t "Example Site" --tags games puzzles
      - `https://trove.pw` (for production)
    - Copy the **Client ID**
 
-6. For CLI usage, also create a **Desktop** OAuth client:
-   - Create Credentials → OAuth client ID
-   - Application type: **Desktop app**
-   - Copy both **Client ID** and **Client Secret**
-   - Set environment variables:
-     ```bash
-     export GOOGLE_CLIENT_ID="your-desktop-client-id"
-     export GOOGLE_CLIENT_SECRET="your-desktop-client-secret"
-     ```
-
-7. Configure the frontend:
+5. Configure the frontend:
    - **Production (Netlify):** Project configuration → Post processing → Snippet injection
      - Add snippet to `<head>` of all pages:
        ```html
@@ -91,24 +80,39 @@ python3 add_link.py "https://example.com" -t "Example Site" --tags games puzzles
        ```
    - **Local dev:** Copy `config.js.example` to `config.js` and fill in your client ID
 
-8. Share the Google Sheet with users who need write access (or make it public with link)
+### GitHub Token (for submissions)
+
+Submissions create GitHub Issues via a Netlify Function.
+
+1. Go to [GitHub Settings → Developer settings → Personal access tokens](https://github.com/settings/tokens)
+2. Generate a new token (classic) with `repo` scope (or `public_repo` if public repo)
+3. In Netlify Dashboard → Site settings → Environment variables, add:
+   - `GITHUB_TOKEN`: Your personal access token
+   - `GITHUB_REPO`: `owner/repo` format (e.g., `saul/26-trove`)
+4. For local dev, create `.env` file:
+   ```
+   GITHUB_TOKEN=ghp_your_token_here
+   GITHUB_REPO=saul/26-trove
+   ```
 
 ### Netlify Deployment
 
 The site auto-deploys from the main branch. Environment variables:
 - `GOOGLE_CLIENT_ID` - Web OAuth client ID for frontend submissions
+- `GITHUB_TOKEN` - GitHub PAT for creating issues
+- `GITHUB_REPO` - Repository in `owner/repo` format
 
 ## Architecture
 
 See [ARCHITECTURE.md](ARCHITECTURE.md).
 
-1. **Google Sheets** — authenticated users submit links from the frontend via Sheets API
-2. **GitHub Action** (cron) — python script fetches unprocessed rows, calls archive.org, writes to canonical JSON/RSS, commits
+1. **Netlify Function** — authenticated users submit links, creating GitHub Issues
+2. **GitHub Action** (cron) — python script processes issues, calls archive.org, writes to canonical JSON/RSS, commits
 3. **Netlify** — rebuilds static site on commit
 4. **Frontend** — static HTML/CSS/JS loads JSON, populates DOM
 
 ## Example: trove.pw/puzzles
 
 I find a puzzle site, go to `trove.pw/puzzles`, and submit the link.
-I'm authenticated via Google OAuth, so the link is appended to a Google Sheet.
+I'm authenticated via Google OAuth, so the submission goes to a Netlify Function that creates a GitHub Issue.
 The next GitHub Action run processes it into `trove.json` and commits, triggering a rebuild.
