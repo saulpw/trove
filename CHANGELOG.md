@@ -2,6 +2,12 @@
 
 ## 2026-01-31
 
+- Added GitHub Actions workflow to auto-process submissions when issues are created
+
+---
+
+## 2026-01-31
+
 - Added `process_issues.py` to read GitHub issue submissions and append to trove.jsonl
 - Fetches titles, triggers archive.org, closes issues after processing
 - Added `make process-issues` target
