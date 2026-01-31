@@ -13,6 +13,7 @@ A simple static website to share lists of links at a public mnemonic url.  e.g. 
 - `docs/auth.md` - Auth approach options and tradeoffs
 - `README.md` - Setup instructions including Google OAuth configuration
 - `TODO.md` - Feature checklist
+- `version.txt` - Version number shown in frontend footer; bump on major code changes
 
 ## Meta Rules
 - When the user asks a question, answer it. Don't start implementing a solution without asking first.
@@ -28,3 +29,4 @@ A simple static website to share lists of links at a public mnemonic url.  e.g. 
 - When summarizing completed work, append to CHANGELOG.md with ISO date heading. Use --- between each set of changes. Edit CHANGELOG.md BEFORE committing and stage it with the code changes.
 - When writing tests, ask the human to verify test expectations rather than guessing values. Show them the test scenario and ask if the expected behavior is correct.
 - Document all setup steps (API keys, external services, environment variables) in README.md in a dedicated section.
+- Bump version.txt on major code changes (new features, significant fixes). Always bump minor version for until major is >0.

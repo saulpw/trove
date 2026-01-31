@@ -21,7 +21,7 @@ add-sheet:
 build:
 	rm -rf _build
 	mkdir -p _build
-	cp index.html trove.jsonl _build/
+	cp index.html trove.jsonl version.txt _build/
 	cp config.js _build/ 2>/dev/null || touch _build/config.js
 
 # Syntax check all Python files

@@ -2,6 +2,13 @@
 
 ## 2026-01-31
 
+- Added version number (v0.1) displayed in frontend footer
+- Version stored in `version.txt`, loaded async by frontend
+
+---
+
+## 2026-01-31
+
 - Added GitHub Actions workflow to auto-process submissions when issues are created
 
 ---
