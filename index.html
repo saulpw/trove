@@ -31,6 +31,8 @@
     #version { position: fixed; bottom: 0.5rem; right: 0.5rem; font-size: 0.75em; color: #999; }
     #sort-controls { margin-bottom: 1rem; font-size: 0.9em; }
     #sort-controls select { padding: 0.25rem; font-size: 0.9em; }
+    .link .hide-btn { color: #ccc; cursor: pointer; margin-left: 0.5rem; font-size: 0.85em; }
+    .link .hide-btn:hover { color: #c22; }
   </style>
 </head>
 <body>
@@ -70,6 +72,17 @@
 
     // Parse tags from space-separated string to array
     const parseTags = (tags) => tags ? tags.split(' ').filter(t => t) : [];
+
+    // Hidden links stored in localStorage
+    const HIDDEN_KEY = 'trove_hidden_links';
+    const getHiddenLinks = () => JSON.parse(localStorage.getItem(HIDDEN_KEY) || '[]');
+    const hideLink = (url) => {
+      const hidden = getHiddenLinks();
+      if (!hidden.includes(url)) {
+        hidden.push(url);
+        localStorage.setItem(HIDDEN_KEY, JSON.stringify(hidden));
+      }
+    };
 
     // Store current filtered links for re-sorting
     let currentLinks = [];
@@ -123,6 +136,7 @@
           <span class="url">${domain}</span>
           ${link.added ? `<span class="added">${formatDate(link.added)}</span>` : ''}
           ${tags.length ? `<span class="tags">${tags.map(t => `<a href="/${t}" class="tag">#${t}</a>`).join(' ')}</span>` : ''}
+          <span class="hide-btn" onclick="handleHide('${link.url.replace(/'/g, "\\'")}', this)">x</span>
         </div>`;
       }).join('');
     }
@@ -131,6 +145,12 @@
       const sortBy = document.getElementById('sort-select').value;
       const sorted = sortLinks(currentLinks, sortBy);
       renderLinks(sorted);
+    }
+
+    function handleHide(url, btn) {
+      hideLink(url);
+      btn.closest('.link').remove();
+      currentLinks = currentLinks.filter(l => l.url !== url);
     }
 
     async function loadLinks() {
@@ -182,7 +202,9 @@
 
         // Filter links by tags (must have ALL included tags, none of excluded tags)
         const excludeTags = tagFilters.filter(t => t.startsWith('-')).map(t => t.slice(1));
+        const hiddenLinks = getHiddenLinks();
         const links = allLinks.filter(link => {
+          if (hiddenLinks.includes(link.url)) return false;
           const linkTags = parseTags(link.tags);
           const hasAllIncluded = includeTags.every(tag => linkTags.includes(tag));
           const hasNoneExcluded = excludeTags.every(tag => !linkTags.includes(tag));
