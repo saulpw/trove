@@ -2,6 +2,14 @@
 
 ## 2026-01-31
 
+- Front page now shows tag directory with counts (sorted by most links first)
+- Added tags input field to submit form, pre-populated with current page's tags
+- Bumped version to 0.2
+
+---
+
+## 2026-01-31
+
 - Added version number (v0.1) displayed in frontend footer
 - Version stored in `version.txt`, loaded async by frontend
 
