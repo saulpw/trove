@@ -92,7 +92,8 @@
 
         container.innerHTML = links.map(link => {
           const tags = link.tags || [];
-          const domain = new URL(link.url).hostname.replace(/^www\./, '');
+          let domain = link.url;
+          try { domain = new URL(link.url).hostname.replace(/^www\./, ''); } catch {}
           return `
           <div class="link"
                data-url="${link.url}"
