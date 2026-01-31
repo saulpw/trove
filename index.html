@@ -39,6 +39,7 @@
 
   <script>
     // Parse path or hash to get tag filters: /foo/bar or #foo/bar → ['foo', 'bar']
+    // Tags starting with '-' are exclusions: /foo/-bar → include 'foo', exclude 'bar'
     function getTagFilters() {
       const hash = window.location.hash.replace(/^#\/?/, '');
       if (hash) {
@@ -55,20 +56,26 @@
 
       // Update heading to show active filters
       if (tagFilters.length > 0) {
-        document.querySelector('h1').textContent = tagFilters.map(t => `#${t}`).join(' + ');
+        document.querySelector('h1').textContent = tagFilters.map(t =>
+          t.startsWith('-') ? `-#${t.slice(1)}` : `#${t}`
+        ).join(' ');
         document.title = tagFilters.join('/') + ' - trove';
       }
 
       try {
-        const response = await fetch('trove.json');
+        const response = await fetch('/trove.json');
         const data = await response.json();
 
-        // Filter links by tags (must have ALL specified tags)
+        // Filter links by tags (must have ALL included tags, none of excluded tags)
         let links = data.links;
         if (tagFilters.length > 0) {
+          const includeTags = tagFilters.filter(t => !t.startsWith('-'));
+          const excludeTags = tagFilters.filter(t => t.startsWith('-')).map(t => t.slice(1));
           links = links.filter(link => {
             const linkTags = link.tags || [];
-            return tagFilters.every(filter => linkTags.includes(filter));
+            const hasAllIncluded = includeTags.every(tag => linkTags.includes(tag));
+            const hasNoneExcluded = excludeTags.every(tag => !linkTags.includes(tag));
+            return hasAllIncluded && hasNoneExcluded;
           });
         }
 
@@ -110,7 +117,7 @@
   </script>
 
   <!-- config for local dev; empty file in production -->
-  <script src="config.js" onerror=""></script>
+  <script src="/config.js" onerror=""></script>
 
   <!-- Google Identity Services -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -164,7 +171,7 @@
       }
 
       const tagFilters = getTagFilters();
-      const tags = tagFilters.join(' ');
+      const tags = tagFilters.filter(t => !t.startsWith('-')).join(' ');
 
       status.textContent = 'Submitting...';
       status.className = '';
