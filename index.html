@@ -50,6 +50,7 @@
       <option value="newest">Newest first</option>
       <option value="oldest">Oldest first</option>
       <option value="alpha">Alphabetical</option>
+      <option value="random">Random</option>
     </select>
   </div>
   <div id="links"></div>
@@ -87,6 +88,12 @@
           break;
         case 'alpha':
           sorted.sort((a, b) => (a.title || a.url).toLowerCase().localeCompare((b.title || b.url).toLowerCase()));
+          break;
+        case 'random':
+          for (let i = sorted.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [sorted[i], sorted[j]] = [sorted[j], sorted[i]];
+          }
           break;
         case 'newest':
         default:

@@ -2,7 +2,7 @@
 
 ## 2026-01-31
 
-- Added sort options to link list: newest first, oldest first, alphabetical
+- Added sort options to link list: newest first, oldest first, alphabetical, random
 - Sort controls appear when viewing filtered links (not on tag directory)
 - Bumped version to 0.3
 
