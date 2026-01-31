@@ -73,6 +73,8 @@
 
     // Store current filtered links for re-sorting
     let currentLinks = [];
+    // Store current page tags to exclude from display
+    let currentPageTags = [];
 
     const formatDate = (iso) => {
       const d = new Date(iso);
@@ -106,7 +108,7 @@
     function renderLinks(links) {
       const container = document.getElementById('links');
       container.innerHTML = links.map(link => {
-        const tags = parseTags(link.tags);
+        const tags = parseTags(link.tags).filter(t => !currentPageTags.includes(t));
         let domain = link.url;
         try { domain = new URL(link.url).hostname.replace(/^www\./, ''); } catch {}
         return `
@@ -196,6 +198,7 @@
         // Show sort controls and render sorted links
         sortControls.style.display = 'block';
         currentLinks = links;
+        currentPageTags = includeTags;
         const sortBy = document.getElementById('sort-select').value;
         const sorted = sortLinks(links, sortBy);
         renderLinks(sorted);
