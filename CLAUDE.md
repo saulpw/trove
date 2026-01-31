@@ -10,6 +10,7 @@ A simple static website to share lists of links at a public mnemonic url.  e.g. 
 - `requirements.txt` - Python dependencies for Google Sheets API
 - `netlify.toml` - Netlify config (SPA fallback routing)
 - `ARCHITECTURE.md` - Design: Google Sheets submissions + GitHub Actions processor
+- `docs/auth.md` - Auth approach options and tradeoffs
 - `README.md` - Setup instructions including Google OAuth configuration
 - `TODO.md` - Feature checklist
 

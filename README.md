@@ -84,12 +84,12 @@ python3 add_link.py "https://example.com" -t "Example Site" --tags games puzzles
      ```
 
 7. Configure the frontend:
-   - In Netlify: Site settings → Build & deploy → Post processing → Snippet injection
-   - Add snippet to `<head>` of all pages:
-     ```html
-     <script>window.GOOGLE_CLIENT_ID = "your-web-client-id";</script>
-     ```
-   - For local dev, add the same snippet to index.html temporarily (don't commit)
+   - **Production (Netlify):** Project configuration → Post processing → Snippet injection
+     - Add snippet to `<head>` of all pages:
+       ```html
+       <script>window.GOOGLE_CLIENT_ID = "your-web-client-id";</script>
+       ```
+   - **Local dev:** Copy `config.js.example` to `config.js` and fill in your client ID
 
 8. Share the Google Sheet with users who need write access (or make it public with link)
 

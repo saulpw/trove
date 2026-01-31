@@ -108,22 +108,25 @@
     loadLinks();
   </script>
 
+  <!-- config for local dev; empty file in production -->
+  <script src="config.js" onerror=""></script>
+
   <!-- Google Identity Services -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script>
-    const GOOGLE_CLIENT_ID = window.GOOGLE_CLIENT_ID || '';
     const SHEET_ID = '1KY1xS72V7stxCKGOEYeg8w7lYjbsZ45ls_lHtY1l1fY';
     let accessToken = null;
     let tokenClient = null;
 
     function initGoogleAuth() {
-      if (!GOOGLE_CLIENT_ID) {
+      const clientId = window.GOOGLE_CLIENT_ID || '';
+      if (!clientId) {
         document.getElementById('auth-btn').textContent = 'No OAuth configured';
         document.getElementById('auth-btn').disabled = true;
         return;
       }
       tokenClient = google.accounts.oauth2.initTokenClient({
-        client_id: GOOGLE_CLIENT_ID,
+        client_id: clientId,
         scope: 'https://www.googleapis.com/auth/spreadsheets',
         callback: (response) => {
           if (response.access_token) {
