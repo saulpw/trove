@@ -1,4 +1,4 @@
-.PHONY: setup serve add add-sheet build test import
+.PHONY: setup serve add add-sheet build test import process-issues
 
 # Install dependencies
 setup:
@@ -31,3 +31,7 @@ test:
 # Import links from markdown files
 import:
 	python3 import_md_links.py ~/git/saul.pw/posts/links
+
+# Process GitHub issue submissions and add to trove.jsonl
+process-issues:
+	python3 process_issues.py
