@@ -29,6 +29,8 @@
     .status-success { color: #2a2; }
     .status-error { color: #c22; }
     #version { position: fixed; bottom: 0.5rem; right: 0.5rem; font-size: 0.75em; color: #999; }
+    #sort-controls { margin-bottom: 1rem; font-size: 0.9em; }
+    #sort-controls select { padding: 0.25rem; font-size: 0.9em; }
   </style>
 </head>
 <body>
@@ -43,6 +45,13 @@
     <span id="submit-status"></span>
   </div>
 
+  <div id="sort-controls" style="display: none;">
+    Sort: <select id="sort-select" onchange="applySort()">
+      <option value="newest">Newest first</option>
+      <option value="oldest">Oldest first</option>
+      <option value="alpha">Alphabetical</option>
+    </select>
+  </div>
   <div id="links"></div>
 
   <script>
@@ -61,8 +70,63 @@
     // Parse tags from space-separated string to array
     const parseTags = (tags) => tags ? tags.split(' ').filter(t => t) : [];
 
+    // Store current filtered links for re-sorting
+    let currentLinks = [];
+
+    const formatDate = (iso) => {
+      const d = new Date(iso);
+      const pad = n => String(n).padStart(2, '0');
+      return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    };
+
+    function sortLinks(links, sortBy) {
+      const sorted = [...links];
+      switch (sortBy) {
+        case 'oldest':
+          sorted.sort((a, b) => (a.added || '').localeCompare(b.added || ''));
+          break;
+        case 'alpha':
+          sorted.sort((a, b) => (a.title || a.url).toLowerCase().localeCompare((b.title || b.url).toLowerCase()));
+          break;
+        case 'newest':
+        default:
+          sorted.sort((a, b) => (b.added || '').localeCompare(a.added || ''));
+          break;
+      }
+      return sorted;
+    }
+
+    function renderLinks(links) {
+      const container = document.getElementById('links');
+      container.innerHTML = links.map(link => {
+        const tags = parseTags(link.tags);
+        let domain = link.url;
+        try { domain = new URL(link.url).hostname.replace(/^www\./, ''); } catch {}
+        return `
+        <div class="link"
+             data-url="${link.url}"
+             data-added="${link.added || ''}"
+             ${link.title ? `data-title="${link.title.replace(/"/g, '&quot;')}"` : ''}
+             ${tags.length ? `data-tags="${tags.join(' ')}"` : ''}>
+          <a href="${link.url}" target="_blank">
+            <span class="title">${link.title || link.url}</span>
+          </a>
+          <span class="url">${domain}</span>
+          ${link.added ? `<span class="added">${formatDate(link.added)}</span>` : ''}
+          ${tags.length ? `<span class="tags">${tags.map(t => `<a href="/${t}" class="tag">#${t}</a>`).join(' ')}</span>` : ''}
+        </div>`;
+      }).join('');
+    }
+
+    function applySort() {
+      const sortBy = document.getElementById('sort-select').value;
+      const sorted = sortLinks(currentLinks, sortBy);
+      renderLinks(sorted);
+    }
+
     async function loadLinks() {
       const container = document.getElementById('links');
+      const sortControls = document.getElementById('sort-controls');
       const tagFilters = getTagFilters();
 
       // Pre-populate tags input with current filters (exclude negated tags)
@@ -83,8 +147,9 @@
         const text = await response.text();
         const allLinks = text.trim().split('\n').filter(line => line).map(line => JSON.parse(line));
 
-        // Front page: show tag list with counts
+        // Front page: show tag list with counts (no sort controls)
         if (tagFilters.length === 0) {
+          sortControls.style.display = 'none';
           const tagCounts = {};
           allLinks.forEach(link => {
             parseTags(link.tags).forEach(tag => {
@@ -116,34 +181,17 @@
         });
 
         if (links.length === 0) {
+          sortControls.style.display = 'none';
           container.innerHTML = '<div class="empty">No links found.</div>';
           return;
         }
 
-        const formatDate = (iso) => {
-          const d = new Date(iso);
-          const pad = n => String(n).padStart(2, '0');
-          return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-        };
-
-        container.innerHTML = links.map(link => {
-          const tags = parseTags(link.tags);
-          let domain = link.url;
-          try { domain = new URL(link.url).hostname.replace(/^www\./, ''); } catch {}
-          return `
-          <div class="link"
-               data-url="${link.url}"
-               data-added="${link.added || ''}"
-               ${link.title ? `data-title="${link.title.replace(/"/g, '&quot;')}"` : ''}
-               ${tags.length ? `data-tags="${tags.join(' ')}"` : ''}>
-            <a href="${link.url}" target="_blank">
-              <span class="title">${link.title || link.url}</span>
-            </a>
-            <span class="url">${domain}</span>
-            ${link.added ? `<span class="added">${formatDate(link.added)}</span>` : ''}
-            ${tags.length ? `<span class="tags">${tags.map(t => `<a href="/${t}" class="tag">#${t}</a>`).join(' ')}</span>` : ''}
-          </div>`;
-        }).join('');
+        // Show sort controls and render sorted links
+        sortControls.style.display = 'block';
+        currentLinks = links;
+        const sortBy = document.getElementById('sort-select').value;
+        const sorted = sortLinks(links, sortBy);
+        renderLinks(sorted);
       } catch (err) {
         container.innerHTML = '<div class="empty">Failed to load links.</div>';
         console.error(err);

@@ -2,6 +2,14 @@
 
 ## 2026-01-31
 
+- Added sort options to link list: newest first, oldest first, alphabetical
+- Sort controls appear when viewing filtered links (not on tag directory)
+- Bumped version to 0.3
+
+---
+
+## 2026-01-31
+
 - Front page now shows tag directory with counts (sorted by most links first)
 - Added tags input field to submit form, pre-populated with current page's tags
 - Bumped version to 0.2
