@@ -161,7 +161,7 @@ def add_link(url, title=None, tags=None, no_archive=False, no_commit=False, to_s
     if title:
         link["title"] = title
     if tags:
-        link["tags"] = tags
+        link["tags"] = " ".join(tags)
 
     links.append(link)
     save_trove(links)

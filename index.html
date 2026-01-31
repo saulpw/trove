@@ -67,13 +67,16 @@
         const text = await response.text();
         const allLinks = text.trim().split('\n').filter(line => line).map(line => JSON.parse(line));
 
+        // Parse tags from space-separated string to array
+        const parseTags = (tags) => tags ? tags.split(' ').filter(t => t) : [];
+
         // Filter links by tags (must have ALL included tags, none of excluded tags)
         let links = allLinks;
         if (tagFilters.length > 0) {
           const includeTags = tagFilters.filter(t => !t.startsWith('-'));
           const excludeTags = tagFilters.filter(t => t.startsWith('-')).map(t => t.slice(1));
           links = links.filter(link => {
-            const linkTags = link.tags || [];
+            const linkTags = parseTags(link.tags);
             const hasAllIncluded = includeTags.every(tag => linkTags.includes(tag));
             const hasNoneExcluded = excludeTags.every(tag => !linkTags.includes(tag));
             return hasAllIncluded && hasNoneExcluded;
@@ -92,7 +95,7 @@
         };
 
         container.innerHTML = links.map(link => {
-          const tags = link.tags || [];
+          const tags = parseTags(link.tags);
           let domain = link.url;
           try { domain = new URL(link.url).hostname.replace(/^www\./, ''); } catch {}
           return `

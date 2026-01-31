@@ -15,10 +15,6 @@
 
 ## Setup
 
-- [ ] Google Cloud project: enable Sheets API, configure OAuth consent screen, create OAuth client ID
-- [ ] Google service account + key for GitHub Actions to read/write the sheet
-- [ ] Create the Google Sheet with columns: timestamp, user email, url, tags, pullout, processed
-- [ ] GitHub repo secrets for service account credentials
 - [ ] GitHub Action workflow (cron schedule, checkout, run processor, commit/push)
 
 ## Processing Script

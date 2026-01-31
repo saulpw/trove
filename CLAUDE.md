@@ -4,7 +4,7 @@ A simple static website to share lists of links at a public mnemonic url.  e.g. 
 
 ## Project Structure
 - `index.html` - Static frontend (loads trove.jsonl, displays links with tag filtering, Google OAuth for submissions)
-- `trove.jsonl` - Canonical link data in JSONL format (one JSON object per line): `{url, added, title?, tags?}`
+- `trove.jsonl` - Canonical link data in JSONL format (one JSON object per line): `{url, added, title?, tags?, notes?}`. Tags are space-separated strings (e.g., `"tags": "games retro"`), not JSON arrays.
 - `add_link.py` - CLI to add links to trove.jsonl (auto-fetches title, triggers archive.org, commits). Use `--sheet` to submit to Google Sheets instead.
 - `Makefile` - Targets: `setup`, `serve`, `add`, `add-sheet`, `build`, `test`
 - `requirements.txt` - Python dependencies for Google Sheets API
