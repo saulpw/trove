@@ -117,7 +117,7 @@ def get_sheets_credentials():
     return creds
 
 
-def submit_to_sheet(url, title=None, tags=None):
+def submit_to_sheet(url, title=None, tags=None, notes=None):
     """Submit link to Google Sheets."""
     from googleapiclient.discovery import build
 
@@ -129,6 +129,7 @@ def submit_to_sheet(url, title=None, tags=None):
         url,
         ", ".join(tags) if tags else "",
         "",  # user_email placeholder
+        notes or "",
     ]
 
     service.spreadsheets().values().append(
@@ -140,7 +141,7 @@ def submit_to_sheet(url, title=None, tags=None):
     print(f"Submitted to Google Sheet: {url}")
 
 
-def add_link(url, title=None, tags=None, no_archive=False, no_commit=False, to_sheet=False):
+def add_link(url, title=None, tags=None, notes=None, no_archive=False, no_commit=False, to_sheet=False):
     # Auto-fetch title if not provided
     if not title:
         print(f"Fetching title from {url}...")
@@ -149,7 +150,7 @@ def add_link(url, title=None, tags=None, no_archive=False, no_commit=False, to_s
             print(f"Found title: {title}")
 
     if to_sheet:
-        submit_to_sheet(url, title, tags)
+        submit_to_sheet(url, title, tags, notes)
         return
 
     links = load_trove()
@@ -162,6 +163,8 @@ def add_link(url, title=None, tags=None, no_archive=False, no_commit=False, to_s
         link["title"] = title
     if tags:
         link["tags"] = " ".join(tags)
+    if notes:
+        link["notes"] = notes
 
     links.append(link)
     save_trove(links)
@@ -179,14 +182,15 @@ def add_link(url, title=None, tags=None, no_archive=False, no_commit=False, to_s
 def main():
     parser = argparse.ArgumentParser(description="Add a link to trove.json")
     parser.add_argument("url", help="URL to add")
+    parser.add_argument("tags", nargs="*", help="Tags for the link")
     parser.add_argument("-t", "--title", help="Title for the link (auto-fetched if omitted)")
-    parser.add_argument("--tags", nargs="+", help="Tags for the link")
+    parser.add_argument("-n", "--notes", help="Notes for the link")
     parser.add_argument("--no-archive", action="store_true", help="Skip archive.org snapshot")
     parser.add_argument("--no-commit", action="store_true", help="Skip git commit")
     parser.add_argument("--sheet", action="store_true", help="Submit to Google Sheet instead of trove.json")
 
     args = parser.parse_args()
-    add_link(args.url, args.title, args.tags, args.no_archive, args.no_commit, args.sheet)
+    add_link(args.url, args.title, args.tags or None, args.notes, args.no_archive, args.no_commit, args.sheet)
 
 
 if __name__ == "__main__":
