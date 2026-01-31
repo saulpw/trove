@@ -2,6 +2,14 @@
 
 ## 2026-01-31
 
+- Added `process_issues.py` to read GitHub issue submissions and append to trove.jsonl
+- Fetches titles, triggers archive.org, closes issues after processing
+- Added `make process-issues` target
+
+---
+
+## 2026-01-31
+
 - Replaced Google Sheets submission with GitHub Issues via Netlify Function
 - Created `netlify/functions/submit.js` to handle submissions
 - Google OAuth now only requests `email` scope (identity only, no Sheets access)
