@@ -6,7 +6,13 @@
   <title>trove</title>
   <style>
     body { font-family: system-ui, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+    header h1 { margin: 0; }
+    header h1 a { color: inherit; text-decoration: none; }
+    header h1 a:hover { text-decoration: underline; }
+    #auth-container { font-size: 0.9em; }
     #links { list-style: none; padding: 0; }
+    #link-count { color: #666; font-size: 0.9em; margin-bottom: 0.5rem; }
     .link { margin: 0.5rem 0; }
     .link .title { color: #0066cc; }
     .link .url { color: #888; font-size: 0.85em; margin-left: 0.5rem; }
@@ -20,15 +26,16 @@
     .tag-list a { color: #0066cc; text-decoration: none; font-size: 1.1em; }
     .tag-list a:hover { text-decoration: underline; }
     .tag-list .count { color: #888; margin-left: 0.5rem; }
-    #add-form { margin-bottom: 1.5rem; display: flex; gap: 0.5rem; align-items: center; }
-    #add-form input[type="text"] { flex: 1; padding: 0.5rem; font-size: 1rem; border: 1px solid #ccc; border-radius: 4px; }
+    #add-form { margin-bottom: 1.5rem; display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+    #add-form input[type="text"] { flex: 1; padding: 0.5rem; font-size: 1rem; border: 1px solid #ccc; border-radius: 4px; min-width: 150px; }
     #add-form button { padding: 0.5rem 1rem; font-size: 1rem; cursor: pointer; border: 1px solid #ccc; border-radius: 4px; background: #f5f5f5; }
     #add-form button:hover { background: #e5e5e5; }
-    #auth-status { font-size: 0.85em; color: #666; }
     #submit-status { font-size: 0.85em; margin-left: 0.5rem; }
     .status-success { color: #2a2; }
     .status-error { color: #c22; }
-    #version { position: fixed; bottom: 0.5rem; right: 0.5rem; font-size: 0.75em; color: #999; }
+    footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #eee; font-size: 0.85em; color: #666; display: flex; justify-content: space-between; }
+    footer a { color: #666; }
+    #version { font-size: 0.75em; color: #999; }
     #sort-controls { margin-bottom: 1rem; font-size: 0.9em; }
     #sort-controls select { padding: 0.25rem; font-size: 0.9em; }
     .link .hide-btn { color: #ccc; cursor: pointer; margin-left: 0.5rem; font-size: 0.85em; }
@@ -36,14 +43,18 @@
   </style>
 </head>
 <body>
-  <h1>trove</h1>
+  <header>
+    <h1><a href="/">trove</a></h1>
+    <div id="auth-container">
+      <button id="auth-btn" onclick="handleAuth()">Sign in</button>
+    </div>
+  </header>
 
   <div id="add-form">
     <input type="text" id="link-url" placeholder="https://..." />
     <input type="text" id="link-tags" placeholder="Tags (space-separated)" />
     <input type="text" id="link-notes" placeholder="Notes (optional)" />
     <button id="submit-btn" onclick="submitLink()">Add</button>
-    <button id="auth-btn" onclick="handleAuth()">Sign in</button>
     <span id="submit-status"></span>
   </div>
 
@@ -55,6 +66,7 @@
       <option value="random">Random</option>
     </select>
   </div>
+  <div id="link-count"></div>
   <div id="links"></div>
 
   <script>
@@ -91,8 +103,32 @@
 
     const formatDate = (iso) => {
       const d = new Date(iso);
+      const now = new Date();
       const pad = n => String(n).padStart(2, '0');
-      return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+
+      // Smart date formatting: show only as much precision as needed
+      if (d.getFullYear() !== now.getFullYear()) {
+        // Different year: show YYYY
+        return String(d.getFullYear());
+      } else if (d.getMonth() !== now.getMonth()) {
+        // Same year, different month: show MMM DD
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        return `${months[d.getMonth()]} ${d.getDate()}`;
+      } else if (d.getDate() !== now.getDate()) {
+        // Same month, different day: show DD
+        return String(d.getDate());
+      } else {
+        // Same day: show HH:MM
+        return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+      }
+    };
+
+    // Normalize URL: prepend https:// if missing protocol
+    const normalizeUrl = (url) => {
+      if (url && !url.includes('://')) {
+        return 'https://' + url;
+      }
+      return url;
     };
 
     function sortLinks(links, sortBy) {
@@ -165,7 +201,7 @@
 
       // Update heading to show active filters
       if (tagFilters.length > 0) {
-        document.querySelector('h1').textContent = tagFilters.map(t =>
+        document.querySelector('h1 a').textContent = tagFilters.map(t =>
           t.startsWith('-') ? `-#${t.slice(1)}` : `#${t}`
         ).join(' ');
         document.title = tagFilters.join('/') + ' - trove';
@@ -174,7 +210,11 @@
       try {
         const response = await fetch('/trove.jsonl');
         const text = await response.text();
-        const allLinks = text.trim().split('\n').filter(line => line).map(line => JSON.parse(line));
+        const allLinks = text.trim().split('\n').filter(line => line).map(line => {
+          const link = JSON.parse(line);
+          link.url = normalizeUrl(link.url);
+          return link;
+        });
 
         // Front page: show tag list with counts (no sort controls)
         if (tagFilters.length === 0) {
@@ -217,8 +257,9 @@
           return;
         }
 
-        // Show sort controls and render sorted links
+        // Show sort controls, link count, and render sorted links
         sortControls.style.display = 'block';
+        document.getElementById('link-count').textContent = `${links.length} link${links.length === 1 ? '' : 's'}`;
         currentLinks = links;
         currentPageTags = includeTags;
         const sortBy = document.getElementById('sort-select').value;
@@ -335,7 +376,10 @@
     });
   </script>
 
-  <div id="version"></div>
+  <footer>
+    <div>a <a href="https://saul.pw">saul.pw</a> project | <a href="/privacy">privacy policy</a></div>
+    <div id="version"></div>
+  </footer>
   <script>
     fetch('/version.txt')
       .then(r => r.text())

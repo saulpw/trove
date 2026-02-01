@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 2026-02-01
+
+- Reorganized header: home link on left, sign in button on right
+- Added link count above link list when viewing filtered links
+- Smart date formatting: shows only YYYY if different year, MMM DD if different month, DD if same month, HH:MM if same day
+- Added footer with "a saul.pw project" link and privacy policy link
+- URLs missing :// are auto-prepended with https:// when loading
+- Imported 50 links from onetab.txt
+- Bumped version to 0.4
+
+---
+
 ## 2026-01-31
 
 - Added sort options to link list: newest first, oldest first, alphabetical, random

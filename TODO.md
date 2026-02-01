@@ -1,14 +1,14 @@
 # TODO
 
 - straighten up frontend page layout
-   - put link to / in header upper left
-   - put login/logout in upper right
-   - put number of links above links
-   - add footer with "a saul.pw project" link to saul.pw and "privacy policy" link to /privacy.
+   - DONE: put link to / in header upper left
+   - DONE: put login/logout in upper right
+   - DONE: put number of links above links
+   - DONE: add footer with "a saul.pw project" link to saul.pw and "privacy policy" link to /privacy.
 
 - visually make each link more like a 'card'.  title front and center, notes below, date in the upper left, tags in the lower left.  click anywhere to go to link.
 
-- [ ] date should be as precise as recent
+- DONE: date should be as precise as recent
    - only YYYY if different year, YYYY-MM if different month, etc
 
 - use PRs against trove.jsonl instead of issues
@@ -29,12 +29,12 @@
 
 - fixup script:
    - note invalid links
-     - on import in general, prepend 'https://' to links that don't have '://' in them
+     - DONE: on import in general, prepend 'https://' to links that don't have '://' in them
    - note links that are 404 (replace with archive.org links in frontend, but show original link in interface)
    - fold duplicate links by adding their tags
 
 - add sort links by # of tags (so /-xyz will show untagged links first)
-- import onetab links from onetab.txt
+- DONE: import onetab links from onetab.txt
 
 - make link clicks JS actions instead of server fetches
 
