@@ -1,18 +1,6 @@
 # TODO
 
-- straighten up frontend page layout
-   - DONE: put link to / in header upper left
-   - DONE: put login/logout in upper right
-   - DONE: put number of links above links
-   - DONE: add footer with "a saul.pw project" link to saul.pw and "privacy policy" link to /privacy.
-
-- visually make each link more like a 'card'.  title front and center, notes below, date in the upper left, tags in the lower left.  click anywhere to go to link.
-
-- DONE: date should be as precise as recent
-   - only YYYY if different year, YYYY-MM if different month, etc
-
-- use PRs against trove.jsonl instead of issues
-   - netlify action should just do direct adding of json
+- can the css be simplified?  what can be simplified?
 
 - actions that can be taken on a link:
    - visit link: click anywhere in box ("default" action)
@@ -27,16 +15,16 @@
    - jump to a -subtag intersection (goes to /fiction/-society)
    - add local notes (when present, a unicode "note" character is a link to edit them)
 
-- fixup script:
+- add fixup to import script:
    - note invalid links
-     - DONE: on import in general, prepend 'https://' to links that don't have '://' in them
    - note links that are 404 (replace with archive.org links in frontend, but show original link in interface)
-   - fold duplicate links by adding their tags
+   - fold duplicate links by combining their tags
+
+- fixup existing trove with these same fixup rules
+- use PRs against trove.jsonl instead of issues
+   - netlify action should just do direct adding of json
 
 - add sort links by # of tags (so /-xyz will show untagged links first)
-- DONE: import onetab links from onetab.txt
-
-- make link clicks JS actions instead of server fetches
 
 - any tag with only one link becomes a redirect to netlify
 

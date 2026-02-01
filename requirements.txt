@@ -1,2 +1,2 @@
-google-api-python-client
-google-auth-oauthlib
+# No external dependencies required
+# Python standard library only

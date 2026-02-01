@@ -3,9 +3,9 @@
 
 import json
 import subprocess
-from datetime import datetime, timezone
 
-from add_link import load_trove, save_trove, fetch_title, trigger_archive, TROVE_FILE
+from trove_utils import TROVE_FILE, load_trove, save_trove, create_link_entry
+from add_link import fetch_title, trigger_archive
 
 
 def get_submission_issues():
@@ -70,16 +70,7 @@ def process_issues():
             print(f"  Found title: {title}")
 
         # Build link entry
-        link = {
-            "url": url,
-            "added": datetime.now(timezone.utc).isoformat(),
-        }
-        if title:
-            link["title"] = title
-        if fields.get("tags"):
-            link["tags"] = fields["tags"]
-        if fields.get("notes"):
-            link["notes"] = fields["notes"]
+        link = create_link_entry(url, title, fields.get("tags"), fields.get("notes"))
 
         links.append(link)
         existing_urls.add(url)

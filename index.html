@@ -13,13 +13,27 @@
     #auth-container { font-size: 0.9em; }
     #links { list-style: none; padding: 0; }
     #link-count { color: #666; font-size: 0.9em; margin-bottom: 0.5rem; }
-    .link { margin: 0.5rem 0; }
-    .link .title { color: #0066cc; }
-    .link .url { color: #888; font-size: 0.85em; margin-left: 0.5rem; }
-    .link .added { color: #999; font-size: 0.85em; }
-    .link .tags { margin-left: 0.5rem; }
-    .link .tag { color: #666; font-size: 0.9em; text-decoration: none; }
-    .link .tag:hover { text-decoration: underline; }
+    .link {
+      margin: 0.75rem 0;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      cursor: pointer;
+      position: relative;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .link:hover { border-color: #0066cc; box-shadow: 0 2px 8px rgba(0,102,204,0.1); }
+    .link .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.25rem; }
+    .link .added { color: #999; font-size: 0.8em; flex-shrink: 0; }
+    .link .hide-btn { color: #ccc; cursor: pointer; font-size: 0.85em; margin-left: 0.5rem; flex-shrink: 0; }
+    .link .hide-btn:hover { color: #c22; }
+    .link .title-row { text-align: center; margin: 0.5rem 0; }
+    .link .title { color: #0066cc; font-size: 1.1em; font-weight: 500; }
+    .link .url { color: #888; font-size: 0.8em; display: block; text-align: center; margin-bottom: 0.25rem; }
+    .link .notes { color: #555; font-size: 0.9em; text-align: center; margin: 0.5rem 0; font-style: italic; }
+    .link .card-bottom { display: flex; justify-content: flex-start; }
+    .link .tag { color: #666; font-size: 0.85em; text-decoration: none; }
+    .link .tag:hover { text-decoration: underline; color: #0066cc; }
     .empty { color: #999; font-style: italic; }
     .tag-list { list-style: none; padding: 0; }
     .tag-list li { margin: 0.5rem 0; }
@@ -38,8 +52,6 @@
     #version { font-size: 0.75em; color: #999; }
     #sort-controls { margin-bottom: 1rem; font-size: 0.9em; }
     #sort-controls select { padding: 0.25rem; font-size: 0.9em; }
-    .link .hide-btn { color: #ccc; cursor: pointer; margin-left: 0.5rem; font-size: 0.85em; }
-    .link .hide-btn:hover { color: #c22; }
   </style>
 </head>
 <body>
@@ -105,21 +117,21 @@
       const d = new Date(iso);
       const now = new Date();
       const pad = n => String(n).padStart(2, '0');
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-      // Smart date formatting: show only as much precision as needed
+      // Always include a "grosser" unit for context
       if (d.getFullYear() !== now.getFullYear()) {
-        // Different year: show YYYY
-        return String(d.getFullYear());
+        // Different year: show MMM YYYY
+        return `${months[d.getMonth()]} ${d.getFullYear()}`;
       } else if (d.getMonth() !== now.getMonth()) {
         // Same year, different month: show MMM DD
-        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         return `${months[d.getMonth()]} ${d.getDate()}`;
       } else if (d.getDate() !== now.getDate()) {
-        // Same month, different day: show DD
-        return String(d.getDate());
+        // Same month, different day: show MMM DD
+        return `${months[d.getMonth()]} ${d.getDate()}`;
       } else {
-        // Same day: show HH:MM
-        return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        // Same day: show MMM DD HH:MM
+        return `${months[d.getMonth()]} ${d.getDate()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
       }
     };
 
@@ -160,21 +172,36 @@
         const tags = parseTags(link.tags).filter(t => !currentPageTags.includes(t));
         let domain = link.url;
         try { domain = new URL(link.url).hostname.replace(/^www\./, ''); } catch {}
+        const escapedUrl = link.url.replace(/'/g, "\\'");
         return `
         <div class="link"
+             onclick="handleLinkClick(event, '${escapedUrl}')"
              data-url="${link.url}"
              data-added="${link.added || ''}"
              ${link.title ? `data-title="${link.title.replace(/"/g, '&quot;')}"` : ''}
              ${tags.length ? `data-tags="${tags.join(' ')}"` : ''}>
-          <a href="${link.url}" target="_blank">
+          <div class="card-top">
+            ${link.added ? `<span class="added">${formatDate(link.added)}</span>` : '<span></span>'}
+            <span>
+              <span class="hide-btn" onclick="handleHide('${escapedUrl}', this); event.stopPropagation();">x</span>
+            </span>
+          </div>
+          <div class="title-row">
             <span class="title">${link.title || link.url}</span>
-          </a>
+          </div>
           <span class="url">${domain}</span>
-          ${link.added ? `<span class="added">${formatDate(link.added)}</span>` : ''}
-          ${tags.length ? `<span class="tags">${tags.map(t => `<a href="/${t}" class="tag">#${t}</a>`).join(' ')}</span>` : ''}
-          <span class="hide-btn" onclick="handleHide('${link.url.replace(/'/g, "\\'")}', this)">x</span>
+          ${link.notes ? `<div class="notes">${link.notes}</div>` : ''}
+          ${tags.length ? `<div class="card-bottom"><span class="tags">${tags.map(t => `<a href="/${t}" class="tag" onclick="event.stopPropagation()">#${t}</a>`).join(' ')}</span></div>` : ''}
         </div>`;
       }).join('');
+    }
+
+    function handleLinkClick(event, url) {
+      // Don't navigate if clicking on interactive elements
+      if (event.target.closest('.hide-btn') || event.target.closest('.tag')) {
+        return;
+      }
+      window.open(url, '_blank');
     }
 
     function applySort() {
@@ -278,7 +305,7 @@
   <script src="/config.js" onerror=""></script>
 
   <!-- Google Identity Services -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="https://accounts.google.com/gsi/client" async defer onload="initGoogleAuth()"></script>
   <script>
     let accessToken = null;
     let tokenClient = null;
@@ -360,20 +387,6 @@
       }
     }
 
-    // Initialize auth when Google library loads
-    window.addEventListener('load', () => {
-      if (typeof google !== 'undefined') {
-        initGoogleAuth();
-      } else {
-        // Library not loaded yet, wait for it
-        const checkGoogle = setInterval(() => {
-          if (typeof google !== 'undefined') {
-            clearInterval(checkGoogle);
-            initGoogleAuth();
-          }
-        }, 100);
-      }
-    });
   </script>
 
   <footer>
