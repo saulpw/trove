@@ -1,5 +1,7 @@
 .PHONY: setup serve add build test import process-issues
 
+all: build
+
 # Install dependencies
 setup:
 	npm install -g netlify-cli
@@ -16,7 +18,6 @@ add:
 # Note: config.js provides GOOGLE_CLIENT_ID for local dev only.
 # In production, Netlify injects the client ID via snippet injection.
 build:
-	rm -rf _build
 	mkdir -p _build
 	cp index.html style.css frontend.js trove.jsonl version.txt _build/
 	cp config.js _build/ 2>/dev/null || touch _build/config.js

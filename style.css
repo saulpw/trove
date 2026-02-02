@@ -6,6 +6,10 @@ header h1 a:hover { text-decoration: underline; }
 #auth-container { font-size: 0.9em; }
 #links { list-style: none; padding: 0; }
 #link-count { color: #666; font-size: 0.9em; margin-bottom: 0.5rem; }
+.link-anchor {
+  text-decoration: none;
+  color: inherit;
+}
 .link {
   margin: 0.75rem 0;
   padding: 0.75rem;
@@ -25,7 +29,7 @@ header h1 a:hover { text-decoration: underline; }
 .link .url { color: #888; font-size: 0.8em; display: block; text-align: center; margin-bottom: 0.25rem; }
 .link .notes { color: #555; font-size: 0.9em; text-align: center; margin: 0.5rem 0; font-style: italic; }
 .link .card-bottom { display: flex; justify-content: flex-start; }
-.link .tag { color: #666; font-size: 0.85em; text-decoration: none; }
+.link .tag { color: #666; font-size: 0.85em; cursor: pointer; }
 .link .tag:hover { text-decoration: underline; color: #0066cc; }
 .empty { color: #999; font-style: italic; }
 .tag-list { list-style: none; padding: 0; }

@@ -90,34 +90,27 @@ function renderLinks(links) {
     try { domain = new URL(link.url).hostname.replace(/^www\./, ''); } catch {}
     const escapedUrl = link.url.replace(/'/g, "\\'");
     return `
-    <div class="link"
-         onclick="handleLinkClick(event, '${escapedUrl}')"
-         data-url="${link.url}"
-         data-added="${link.added || ''}"
-         ${link.title ? `data-title="${link.title.replace(/"/g, '&quot;')}"` : ''}
-         ${tags.length ? `data-tags="${tags.join(' ')}"` : ''}>
-      <div class="card-top">
-        ${link.added ? `<span class="added">${formatDate(link.added)}</span>` : '<span></span>'}
-        <span>
-          <span class="hide-btn" onclick="handleHide('${escapedUrl}', this); event.stopPropagation();">x</span>
-        </span>
+    <a class="link-anchor" href="${link.url}" target="_blank" rel="noopener">
+      <div class="link"
+           data-url="${link.url}"
+           data-added="${link.added || ''}"
+           ${link.title ? `data-title="${link.title.replace(/"/g, '&quot;')}"` : ''}
+           ${tags.length ? `data-tags="${tags.join(' ')}"` : ''}>
+        <div class="card-top">
+          ${link.added ? `<span class="added">${formatDate(link.added)}</span>` : '<span></span>'}
+          <span>
+            <span class="hide-btn" onclick="handleHide(event, '${escapedUrl}', this)">x</span>
+          </span>
+        </div>
+        <div class="title-row">
+          <span class="title">${link.title || link.url}</span>
+        </div>
+        <span class="url">${domain}</span>
+        ${link.notes ? `<div class="notes">${link.notes}</div>` : ''}
+        ${tags.length ? `<div class="card-bottom"><span class="tags">${tags.map(t => `<span class="tag" onclick="event.preventDefault(); location.href='/${t}'">#${t}</span>`).join(' ')}</span></div>` : ''}
       </div>
-      <div class="title-row">
-        <span class="title">${link.title || link.url}</span>
-      </div>
-      <span class="url">${domain}</span>
-      ${link.notes ? `<div class="notes">${link.notes}</div>` : ''}
-      ${tags.length ? `<div class="card-bottom"><span class="tags">${tags.map(t => `<a href="/${t}" class="tag" onclick="event.stopPropagation()">#${t}</a>`).join(' ')}</span></div>` : ''}
-    </div>`;
+    </a>`;
   }).join('');
-}
-
-function handleLinkClick(event, url) {
-  // Don't navigate if clicking on interactive elements
-  if (event.target.closest('.hide-btn') || event.target.closest('.tag')) {
-    return;
-  }
-  window.open(url, '_blank');
 }
 
 function applySort() {
@@ -126,9 +119,11 @@ function applySort() {
   renderLinks(sorted);
 }
 
-function handleHide(url, btn) {
+function handleHide(event, url, btn) {
+  event.preventDefault();
+  event.stopPropagation();
   hideLink(url);
-  btn.closest('.link').remove();
+  btn.closest('.link-anchor').remove();
   currentLinks = currentLinks.filter(l => l.url !== url);
 }
 
