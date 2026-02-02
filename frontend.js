@@ -86,11 +86,13 @@ function sortLinks(links, sortBy) {
 
 function renderLinks(links) {
   const container = document.getElementById('links');
+  const currentPath = '/' + currentPageTags.join('/');
   container.innerHTML = links.map(link => {
     const tags = parseTags(link.tags).filter(t => !currentPageTags.includes(t));
     let domain = link.url;
     try { domain = new URL(link.url).hostname.replace(/^www\./, ''); } catch {}
     const escapedUrl = link.url.replace(/'/g, "\\'");
+    const renderTag = (t) => `<span class="tag-wrap"><span class="tag" data-tag="${t}">#${t}</span><span class="tag-menu"><span data-href="/${t}">→ /${t}</span><span data-href="${currentPath}/${t}">+ ${currentPath}/${t}</span><span data-href="${currentPath}/-${t}">− ${currentPath}/-${t}</span></span></span>`;
     return `
     <a class="link-anchor" href="${link.url}" target="_blank" rel="noopener">
       <div class="link"
@@ -109,7 +111,7 @@ function renderLinks(links) {
         </div>
         <span class="url">${domain}</span>
         ${link.notes ? `<div class="notes">${link.notes}</div>` : ''}
-        ${tags.length ? `<div class="card-bottom"><span class="tags">${tags.map(t => `<span class="tag" onclick="event.preventDefault(); event.stopPropagation(); navigateToTag('${t}')">#${t}</span>`).join(' ')}</span></div>` : ''}
+        ${tags.length ? `<div class="card-bottom"><span class="tags">${tags.map(renderTag).join(' ')}</span></div>` : ''}
       </div>
     </a>`;
   }).join('');
@@ -125,6 +127,24 @@ function applySort() {
 function navigateToTag(tag) {
   history.pushState(null, '', '/' + tag);
   filterAndRender();
+}
+
+// Set up tag click handlers (delegated)
+function initTagMenu() {
+  document.getElementById('links').addEventListener('click', (e) => {
+    const menuItem = e.target.closest('.tag-menu [data-href]');
+    const tag = e.target.closest('.tag[data-tag]');
+    if (menuItem) {
+      e.preventDefault();
+      e.stopPropagation();
+      history.pushState(null, '', menuItem.dataset.href);
+      filterAndRender();
+    } else if (tag) {
+      e.preventDefault();
+      e.stopPropagation();
+      navigateToTag(tag.dataset.tag);
+    }
+  });
 }
 
 // Filter allLinks by current URL and render
@@ -168,7 +188,7 @@ function filterAndRender() {
     }
 
     container.innerHTML = '<ul class="tag-list">' + sortedTags.map(([tag, count]) =>
-      `<li><a href="/${tag}" onclick="event.preventDefault(); navigateToTag('${tag}')">#${tag}</a><span class="count">(${count})</span></li>`
+      `<li><span class="tag-wrap"><a href="/${tag}" class="tag" data-tag="${tag}">#${tag}</a><span class="tag-menu"><a href="/${tag}">→ /${tag}</a></span></span><span class="count">(${count})</span></li>`
     ).join('') + '</ul>';
     return;
   }
@@ -316,4 +336,5 @@ window.addEventListener('popstate', () => {
 });
 
 // Initialize on page load
+initTagMenu();
 loadLinks();

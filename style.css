@@ -49,3 +49,14 @@ footer a { color: #666; }
 #version { font-size: 0.75em; color: #999; }
 #sort-controls { margin-bottom: 1rem; font-size: 0.9em; }
 #sort-controls select { padding: 0.25rem; font-size: 0.9em; }
+
+/* Tag hover menu (inline with each tag) */
+.tag-wrap { position: relative; display: inline-block; }
+.tag-menu {
+  display: none; position: absolute; left: 0; top: 100%;
+  background: #fff; border: 1px solid #ddd; border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1); z-index: 100; white-space: nowrap;
+}
+.tag-wrap:hover .tag-menu { display: block; }
+.tag-menu span { display: block; padding: 0.4rem 0.6rem; color: #333; cursor: pointer; }
+.tag-menu span:hover { background: #f0f6ff; }

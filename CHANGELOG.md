@@ -2,6 +2,31 @@
 
 ## 2026-02-02
 
+- Simplified tag hover menu: inline CSS-only show/hide
+  - Menu renders inline with each tag (no global menu element)
+  - CSS `:hover` controls visibility (no JS timeouts/positioning)
+  - Shows immediately on hover (no 300ms delay)
+  - Click tag → replace navigation, click menu option → that path
+  - Removed touch long-press support (tap navigates directly)
+- Bumped version to 0.10
+
+---
+
+## 2026-02-02
+
+- Added tag hover menu with navigation options:
+  - Click tag → immediate replace navigation (`/tag`)
+  - Hover 300ms → menu appears with Replace, Add, Exclude options
+  - Add → intersection (`/currentFilters/tag`)
+  - Exclude → negation (`/currentFilters/-tag`)
+  - Mobile: tap = replace, long-press (500ms) = show menu
+- Menu hides on scroll or click outside
+- Bumped version to 0.9
+
+---
+
+## 2026-02-02
+
 - Date formatting now uses strict ISO format (YYYY-MM-DD), with HH:MM appended for same-day
 
 ---
