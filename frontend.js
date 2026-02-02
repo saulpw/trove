@@ -308,14 +308,6 @@ async function submitLink() {
   }
 }
 
-// Version display
-function loadVersion() {
-  fetch('/version.txt')
-    .then(r => r.text())
-    .then(v => document.getElementById('version').textContent = 'v' + v.trim())
-    .catch(() => {});
-}
-
 // Handle browser back/forward navigation
 window.addEventListener('popstate', () => {
   if (allLinks.length > 0) {
@@ -325,4 +317,3 @@ window.addEventListener('popstate', () => {
 
 // Initialize on page load
 loadLinks();
-loadVersion();
