@@ -2,6 +2,12 @@
 
 ## 2026-02-02
 
+- Date formatting now uses strict ISO format (YYYY-MM-DD), with HH:MM appended for same-day
+
+---
+
+## 2026-02-02
+
 - Client-side tag navigation: clicking tags updates URL via History API without page reload
   - Links data loaded once, filtered/rendered client-side
   - Browser back/forward buttons work via popstate listener

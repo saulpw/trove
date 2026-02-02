@@ -38,3 +38,4 @@ A simple static website to share lists of links at a public mnemonic url.  e.g. 
 - When writing tests, ask the human to verify test expectations rather than guessing values. Show them the test scenario and ask if the expected behavior is correct.
 - Document all setup steps (API keys, external services, environment variables) in README.md in a dedicated section.
 - Bump version in `index.html` footer (`<div id="version">vX.X</div>`) on major code changes (new features, significant fixes). Always bump minor version until major is >0.
+- When the user swears at you, they're frustrated about a deeper issue. Identify the root cause and create a META RULE to prevent similar mistakes, not a narrow fix for the specific case.

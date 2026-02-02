@@ -35,22 +35,12 @@ const formatDate = (iso) => {
   const d = new Date(iso);
   const now = new Date();
   const pad = n => String(n).padStart(2, '0');
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const date = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 
-  // Always include a "grosser" unit for context
-  if (d.getFullYear() !== now.getFullYear()) {
-    // Different year: show MMM YYYY
-    return `${months[d.getMonth()]} ${d.getFullYear()}`;
-  } else if (d.getMonth() !== now.getMonth()) {
-    // Same year, different month: show MMM DD
-    return `${months[d.getMonth()]} ${d.getDate()}`;
-  } else if (d.getDate() !== now.getDate()) {
-    // Same month, different day: show MMM DD
-    return `${months[d.getMonth()]} ${d.getDate()}`;
-  } else {
-    // Same day: show MMM DD HH:MM
-    return `${months[d.getMonth()]} ${d.getDate()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  if (d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate()) {
+    return `${date} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
   }
+  return date;
 };
 
 // Normalize URL: prepend https:// if missing protocol
