@@ -1,6 +1,10 @@
 # TODO
 
-- can the css be simplified?  what can be simplified?
+- date should always be partial ISO: 2026, 2026-01, 2026-01-01, 2026-01-01 13:43.
+- make the div be a proper href so the link shows on the bottom bar
+- changing sort drop-down resorts immediately
+- fix github action failure
+- show full link on hover (at least)
 
 - actions that can be taken on a link:
    - visit link: click anywhere in box ("default" action)
@@ -26,7 +30,7 @@
 
 - add sort links by # of tags (so /-xyz will show untagged links first)
 
-- any tag with only one link becomes a redirect to netlify
+- any tag with only one link becomes a redirect by netlify
 
 ## Later
 
