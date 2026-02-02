@@ -3,7 +3,9 @@
 A simple static website to share lists of links at a public mnemonic url.  e.g. trove.pw/games is a list of games
 
 ## Project Structure
-- `index.html` - Static frontend (loads trove.jsonl, displays links with tag filtering, Google OAuth for submissions)
+- `index.html` - Static frontend HTML structure
+- `style.css` - Frontend CSS styles
+- `frontend.js` - Frontend JavaScript (link loading, filtering, sorting, auth, submission)
 - `trove.jsonl` - Canonical link data in JSONL format (one JSON object per line): `{url, added, title?, tags?, notes?}`. Tags are space-separated strings (e.g., `"tags": "games retro"`), not JSON arrays.
 - `trove_utils.py` - Shared utilities: `load_trove()`, `save_trove()`, `create_link_entry()`
 - `add_link.py` - CLI to add links to trove.jsonl (auto-fetches title, triggers archive.org, commits)

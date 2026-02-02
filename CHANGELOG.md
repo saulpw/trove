@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## 2026-02-02
+
+- Split `index.html` into separate files:
+  - `style.css` - CSS styles extracted from `<style>` tag
+  - `frontend.js` - JavaScript extracted from `<script>` tags
+  - `index.html` - now just HTML structure
+- Updated Makefile `build` target to copy new files
+- Bumped version to 0.7
+
+---
+
 ## 2026-02-01
 
 - Codebase simplification:
