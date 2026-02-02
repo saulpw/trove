@@ -31,16 +31,26 @@ let currentLinks = [];
 // Store current page tags to exclude from display
 let currentPageTags = [];
 
+// Format date with progressive detail based on recency:
+// - Different year    → "2025"
+// - Same year         → "2026-01"
+// - Same month        → "2026-02-01"
+// - Same day          → "2026-02-02 14:30"
 const formatDate = (iso) => {
   const d = new Date(iso);
   const now = new Date();
   const pad = n => String(n).padStart(2, '0');
-  const date = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 
-  if (d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate()) {
-    return `${date} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  if (d.getFullYear() !== now.getFullYear()) {
+    return `${d.getFullYear()}`;
   }
-  return date;
+  if (d.getMonth() !== now.getMonth()) {
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}`;
+  }
+  if (d.getDate() !== now.getDate()) {
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  }
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 };
 
 // Normalize URL: prepend https:// if missing protocol
