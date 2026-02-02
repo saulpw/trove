@@ -2,6 +2,16 @@
 
 ## 2026-02-02
 
+- Client-side tag navigation: clicking tags updates URL via History API without page reload
+  - Links data loaded once, filtered/rendered client-side
+  - Browser back/forward buttons work via popstate listener
+  - Front page tag list also uses client-side navigation
+- Bumped version to 0.8
+
+---
+
+## 2026-02-02
+
 - Split `index.html` into separate files:
   - `style.css` - CSS styles extracted from `<style>` tag
   - `frontend.js` - JavaScript extracted from `<script>` tags

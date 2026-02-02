@@ -24,6 +24,8 @@ const hideLink = (url) => {
   }
 };
 
+// Store all loaded links for client-side filtering
+let allLinks = [];
 // Store current filtered links for re-sorting
 let currentLinks = [];
 // Store current page tags to exclude from display
@@ -107,7 +109,7 @@ function renderLinks(links) {
         </div>
         <span class="url">${domain}</span>
         ${link.notes ? `<div class="notes">${link.notes}</div>` : ''}
-        ${tags.length ? `<div class="card-bottom"><span class="tags">${tags.map(t => `<span class="tag" onclick="event.preventDefault(); location.href='/${t}'">#${t}</span>`).join(' ')}</span></div>` : ''}
+        ${tags.length ? `<div class="card-bottom"><span class="tags">${tags.map(t => `<span class="tag" onclick="event.preventDefault(); event.stopPropagation(); navigateToTag('${t}')">#${t}</span>`).join(' ')}</span></div>` : ''}
       </div>
     </a>`;
   }).join('');
@@ -119,15 +121,14 @@ function applySort() {
   renderLinks(sorted);
 }
 
-function handleHide(event, url, btn) {
-  event.preventDefault();
-  event.stopPropagation();
-  hideLink(url);
-  btn.closest('.link-anchor').remove();
-  currentLinks = currentLinks.filter(l => l.url !== url);
+// Navigate to a tag without full page reload
+function navigateToTag(tag) {
+  history.pushState(null, '', '/' + tag);
+  filterAndRender();
 }
 
-async function loadLinks() {
+// Filter allLinks by current URL and render
+function filterAndRender() {
   const container = document.getElementById('links');
   const sortControls = document.getElementById('sort-controls');
   const tagFilters = getTagFilters();
@@ -143,66 +144,83 @@ async function loadLinks() {
       t.startsWith('-') ? `-#${t.slice(1)}` : `#${t}`
     ).join(' ');
     document.title = tagFilters.join('/') + ' - trove';
+  } else {
+    document.querySelector('h1 a').textContent = 'trove';
+    document.title = 'trove';
   }
+
+  // Front page: show tag list with counts (no sort controls)
+  if (tagFilters.length === 0) {
+    sortControls.style.display = 'none';
+    const tagCounts = {};
+    allLinks.forEach(link => {
+      parseTags(link.tags).forEach(tag => {
+        tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+      });
+    });
+
+    const sortedTags = Object.entries(tagCounts)
+      .sort((a, b) => b[1] - a[1]);
+
+    if (sortedTags.length === 0) {
+      container.innerHTML = '<div class="empty">No tags found.</div>';
+      return;
+    }
+
+    container.innerHTML = '<ul class="tag-list">' + sortedTags.map(([tag, count]) =>
+      `<li><a href="/${tag}" onclick="event.preventDefault(); navigateToTag('${tag}')">#${tag}</a><span class="count">(${count})</span></li>`
+    ).join('') + '</ul>';
+    return;
+  }
+
+  // Filter links by tags (must have ALL included tags, none of excluded tags)
+  const excludeTags = tagFilters.filter(t => t.startsWith('-')).map(t => t.slice(1));
+  const hiddenLinks = getHiddenLinks();
+  const links = allLinks.filter(link => {
+    if (hiddenLinks.includes(link.url)) return false;
+    const linkTags = parseTags(link.tags);
+    const hasAllIncluded = includeTags.every(tag => linkTags.includes(tag));
+    const hasNoneExcluded = excludeTags.every(tag => !linkTags.includes(tag));
+    return hasAllIncluded && hasNoneExcluded;
+  });
+
+  if (links.length === 0) {
+    sortControls.style.display = 'none';
+    container.innerHTML = '<div class="empty">No links found.</div>';
+    return;
+  }
+
+  // Show sort controls, link count, and render sorted links
+  sortControls.style.display = 'block';
+  document.getElementById('link-count').textContent = `${links.length} link${links.length === 1 ? '' : 's'}`;
+  currentLinks = links;
+  currentPageTags = includeTags;
+  const sortBy = document.getElementById('sort-select').value;
+  const sorted = sortLinks(links, sortBy);
+  renderLinks(sorted);
+}
+
+function handleHide(event, url, btn) {
+  event.preventDefault();
+  event.stopPropagation();
+  hideLink(url);
+  btn.closest('.link-anchor').remove();
+  currentLinks = currentLinks.filter(l => l.url !== url);
+}
+
+async function loadLinks() {
+  const container = document.getElementById('links');
 
   try {
     const response = await fetch('/trove.jsonl');
     const text = await response.text();
-    const allLinks = text.trim().split('\n').filter(line => line).map(line => {
+    allLinks = text.trim().split('\n').filter(line => line).map(line => {
       const link = JSON.parse(line);
       link.url = normalizeUrl(link.url);
       return link;
     });
 
-    // Front page: show tag list with counts (no sort controls)
-    if (tagFilters.length === 0) {
-      sortControls.style.display = 'none';
-      const tagCounts = {};
-      allLinks.forEach(link => {
-        parseTags(link.tags).forEach(tag => {
-          tagCounts[tag] = (tagCounts[tag] || 0) + 1;
-        });
-      });
-
-      const sortedTags = Object.entries(tagCounts)
-        .sort((a, b) => b[1] - a[1]);
-
-      if (sortedTags.length === 0) {
-        container.innerHTML = '<div class="empty">No tags found.</div>';
-        return;
-      }
-
-      container.innerHTML = '<ul class="tag-list">' + sortedTags.map(([tag, count]) =>
-        `<li><a href="/${tag}">#${tag}</a><span class="count">(${count})</span></li>`
-      ).join('') + '</ul>';
-      return;
-    }
-
-    // Filter links by tags (must have ALL included tags, none of excluded tags)
-    const excludeTags = tagFilters.filter(t => t.startsWith('-')).map(t => t.slice(1));
-    const hiddenLinks = getHiddenLinks();
-    const links = allLinks.filter(link => {
-      if (hiddenLinks.includes(link.url)) return false;
-      const linkTags = parseTags(link.tags);
-      const hasAllIncluded = includeTags.every(tag => linkTags.includes(tag));
-      const hasNoneExcluded = excludeTags.every(tag => !linkTags.includes(tag));
-      return hasAllIncluded && hasNoneExcluded;
-    });
-
-    if (links.length === 0) {
-      sortControls.style.display = 'none';
-      container.innerHTML = '<div class="empty">No links found.</div>';
-      return;
-    }
-
-    // Show sort controls, link count, and render sorted links
-    sortControls.style.display = 'block';
-    document.getElementById('link-count').textContent = `${links.length} link${links.length === 1 ? '' : 's'}`;
-    currentLinks = links;
-    currentPageTags = includeTags;
-    const sortBy = document.getElementById('sort-select').value;
-    const sorted = sortLinks(links, sortBy);
-    renderLinks(sorted);
+    filterAndRender();
   } catch (err) {
     container.innerHTML = '<div class="empty">Failed to load links.</div>';
     console.error(err);
@@ -297,6 +315,13 @@ function loadVersion() {
     .then(v => document.getElementById('version').textContent = 'v' + v.trim())
     .catch(() => {});
 }
+
+// Handle browser back/forward navigation
+window.addEventListener('popstate', () => {
+  if (allLinks.length > 0) {
+    filterAndRender();
+  }
+});
 
 // Initialize on page load
 loadLinks();

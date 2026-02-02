@@ -33,7 +33,8 @@ A simple static website to share lists of links at a public mnemonic url.  e.g. 
 - Keep implementations minimal - prototype first, polish later.
 - Use Makefile targets for any repeatable command, including setup, tests, and builds.
 - NEVER run raw pytest/python/etc commands - always use `make test`, `make run`, etc.  Create a new Makefile target FIRST if one doesn't exist, then use it.
-- After editing source files, run `make build` before testing with `make serve` (netlify dev serves from `_build/`, not source).
+- After editing source files, run `make build`. The user runs `make serve` themselves (never run it).
+- NEVER run `make serve` - the user manages the dev server themselves.
 - When summarizing completed work, append to CHANGELOG.md with ISO date heading. Use --- between each set of changes. Edit CHANGELOG.md BEFORE committing and stage it with the code changes.
 - When writing tests, ask the human to verify test expectations rather than guessing values. Show them the test scenario and ask if the expected behavior is correct.
 - Document all setup steps (API keys, external services, environment variables) in README.md in a dedicated section.
