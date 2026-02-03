@@ -2,6 +2,13 @@
 
 ## 2026-02-02
 
+- Auto sign-in: silently authenticates on page load if previously authorized (no click needed)
+- Auto token refresh: schedules refresh 5 minutes before expiry to maintain session
+
+---
+
+## 2026-02-02
+
 - Added '+' button to links for adding tags inline:
   - Only visible when signed in
   - Click '+' → shows inline input field

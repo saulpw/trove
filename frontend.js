@@ -326,6 +326,16 @@ async function loadLinks() {
 // Google Auth
 let accessToken = null;
 let tokenClient = null;
+let tokenRefreshTimer = null;
+
+function scheduleTokenRefresh(expiresIn) {
+  if (tokenRefreshTimer) clearTimeout(tokenRefreshTimer);
+  // Refresh 5 minutes before expiry (or halfway if less than 10 min)
+  const refreshIn = expiresIn > 600 ? (expiresIn - 300) * 1000 : (expiresIn / 2) * 1000;
+  tokenRefreshTimer = setTimeout(() => {
+    tokenClient.requestAccessToken({ prompt: '' });
+  }, refreshIn);
+}
 
 function initGoogleAuth() {
   const clientId = window.GOOGLE_CLIENT_ID || '';
@@ -337,11 +347,16 @@ function initGoogleAuth() {
   tokenClient = google.accounts.oauth2.initTokenClient({
     client_id: clientId,
     scope: 'email',
+    prompt: '',
     callback: (response) => {
       if (response.access_token) {
         accessToken = response.access_token;
         document.getElementById('auth-btn').textContent = 'Signed in';
         document.getElementById('auth-btn').disabled = true;
+        // Schedule refresh before token expires
+        if (response.expires_in) {
+          scheduleTokenRefresh(response.expires_in);
+        }
         // Re-render to show + buttons
         if (currentLinks.length > 0) {
           applySort();
@@ -349,6 +364,8 @@ function initGoogleAuth() {
       }
     },
   });
+  // Auto-trigger auth to silently sign in if user already authorized
+  tokenClient.requestAccessToken({ prompt: '' });
 }
 
 function handleAuth() {
