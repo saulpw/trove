@@ -20,7 +20,7 @@ add:
 build:
 	mkdir -p _build
 	cp index.html style.css frontend.js trove.jsonl _build/
-	sed -i '' 's/BUILD_TIMESTAMP/$(shell date +%s)/' _build/index.html
+	sed -i'' 's/BUILD_TIMESTAMP/$(shell date +%s)/' _build/index.html
 	cp config.js _build/ 2>/dev/null || touch _build/config.js
 
 # Syntax check all Python files
