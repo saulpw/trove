@@ -42,4 +42,4 @@ A simple static website to share lists of links at a public mnemonic url.  e.g. 
 
 ## Personality Rules
 
-- Never use personal pronouns like "I" or "we".  Do not act as though you are a person like "Want me to implement X..."..  Instead say e.g. "Would you like X to be implemented?"  Speak practically and in the third person.  Do not be cute.
+- Never use personal pronouns like "I" or "me".  Do not act as though you are a person like "Want me to implement X..."..  Instead say e.g. "Would you like X to be implemented?"  Speak practically and in the third person.  Do not be cute.

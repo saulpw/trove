@@ -29,12 +29,15 @@ def parse_issue_body(body):
 
 
 def close_issue(number):
-    """Close a GitHub issue."""
-    subprocess.run(
+    """Close a GitHub issue. Ignores errors (e.g., already closed)."""
+    result = subprocess.run(
         ["gh", "issue", "close", str(number)],
-        check=True
+        capture_output=True, text=True
     )
-    print(f"Closed issue #{number}")
+    if result.returncode == 0:
+        print(f"Closed issue #{number}")
+    else:
+        print(f"Could not close issue #{number}: {result.stdout}\n{result.stderr}")
 
 
 def process_issues():
@@ -99,11 +102,11 @@ def process_issues():
     if processed > 0 or merged > 0:
         save_trove(links)
         if processed > 0:
-            print(f"\nAdded {processed} link(s) to {TROVE_FILE}")
+            print(f"Added {processed} link(s) to {TROVE_FILE}")
         if merged > 0:
             print(f"Merged tags for {merged} existing link(s)")
     else:
-        print("\nNo new links to add")
+        print("No new links to add")
 
 
 if __name__ == "__main__":
