@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Import links from markdown files into trove.json."""
+"""Import links from markdown files into trove.jsonl."""
 
-import json
 import re
 import sys
 from pathlib import Path
+
+from trove_utils import TROVE_FILE, load_trove, save_trove
 
 def slugify(text):
     """Convert header text to tag slug."""
@@ -82,15 +83,8 @@ def parse_md_file(filepath):
 
 def main():
     links_dir = Path(sys.argv[1]) if len(sys.argv) > 1 else Path.home() / 'git/saul.pw/posts/links'
-    trove_path = Path(__file__).parent / 'trove.jsonl'
 
-    # Load existing trove (JSONL format)
-    existing_links = []
-    if trove_path.exists():
-        for line in trove_path.read_text().strip().split('\n'):
-            if line:
-                existing_links.append(json.loads(line))
-
+    existing_links = load_trove()
     existing_urls = {link['url'] for link in existing_links}
 
     # Parse all md files
@@ -111,10 +105,8 @@ def main():
 
     if new_links:
         existing_links.extend(new_links)
-        with open(trove_path, 'w') as f:
-            for link in existing_links:
-                f.write(json.dumps(link) + '\n')
-        print(f"Updated {trove_path}")
+        save_trove(existing_links)
+        print(f"Updated {TROVE_FILE}")
 
 if __name__ == '__main__':
     main()

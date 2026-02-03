@@ -25,8 +25,19 @@ make add URL="https://example.com" TITLE="Example Site" TAGS="games puzzles"
 
 Or use the script directly:
 ```bash
-python3 add_link.py "https://example.com" -t "Example Site" --tags games puzzles
+python3 add_link.py "https://example.com" games puzzles -t "Example Site"
 ```
+
+## Project Structure
+
+- `index.html` - Static frontend
+- `trove.jsonl` - Canonical link data (JSONL format)
+- `trove_utils.py` - Shared Python utilities (load/save/create entries)
+- `add_link.py` - CLI to add links locally
+- `process_issues.py` - Process GitHub issue submissions
+- `import_md_links.py` - One-time bulk import from markdown files
+- `Makefile` - Build and dev commands
+- `config.js` - Local dev config (Google client ID); not used in production
 
 ## Features
 
@@ -73,12 +84,16 @@ Google OAuth is used to identify users submitting links. Only the `email` scope 
    - Copy the **Client ID**
 
 5. Configure the frontend:
-   - **Production (Netlify):** Project configuration → Post processing → Snippet injection
+   - **Production (Netlify):** Site configuration → Post processing → Snippet injection
      - Add snippet to `<head>` of all pages:
        ```html
        <script>window.GOOGLE_CLIENT_ID = "your-web-client-id";</script>
        ```
-   - **Local dev:** Copy `config.js.example` to `config.js` and fill in your client ID
+   - **Local dev:** Create `config.js` with your client ID:
+       ```javascript
+       window.GOOGLE_CLIENT_ID = "your-web-client-id";
+       ```
+     This file is gitignored and only used for local development. In production, Netlify injects the client ID via snippet injection.
 
 ### GitHub Token (for submissions)
 

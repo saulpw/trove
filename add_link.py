@@ -1,37 +1,13 @@
 #!/usr/bin/env python3
-"""Add a link to trove.json from the command line."""
+"""Add a link to trove.jsonl from the command line."""
 
 import argparse
-import json
-import os
 import re
 import subprocess
 import urllib.request
 import urllib.error
-from pathlib import Path
-from datetime import datetime, timezone
 
-TROVE_FILE = Path(__file__).parent / "trove.jsonl"
-TOKEN_FILE = Path.home() / ".trove_token.json"
-SHEET_ID = "1KY1xS72V7stxCKGOEYeg8w7lYjbsZ45ls_lHtY1l1fY"
-SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
-
-
-def load_trove():
-    """Load all links from JSONL file."""
-    links = []
-    if TROVE_FILE.exists():
-        for line in TROVE_FILE.read_text().strip().split('\n'):
-            if line:
-                links.append(json.loads(line))
-    return links
-
-
-def save_trove(links):
-    """Save all links to JSONL file (one JSON object per line)."""
-    with open(TROVE_FILE, 'w') as f:
-        for link in links:
-            f.write(json.dumps(link) + '\n')
+from trove_utils import TROVE_FILE, load_trove, save_trove, create_link_entry
 
 
 def fetch_title(url):
@@ -70,7 +46,7 @@ def trigger_archive(url):
 
 
 def git_commit(url, title):
-    """Commit trove.json with a descriptive message."""
+    """Commit trove.jsonl with a descriptive message."""
     msg = f"Add link: {title or url}"
     try:
         subprocess.run(["git", "add", str(TROVE_FILE)], check=True, cwd=TROVE_FILE.parent)
@@ -80,68 +56,7 @@ def git_commit(url, title):
         print(f"Warning: Git commit failed: {e}")
 
 
-def get_sheets_credentials():
-    """Get Google Sheets API credentials via OAuth flow."""
-    from google.oauth2.credentials import Credentials
-    from google_auth_oauthlib.flow import InstalledAppFlow
-    from google.auth.transport.requests import Request
-
-    creds = None
-    if TOKEN_FILE.exists():
-        creds = Credentials.from_authorized_user_file(str(TOKEN_FILE), SCOPES)
-
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            client_id = os.environ.get("GOOGLE_CLIENT_ID")
-            client_secret = os.environ.get("GOOGLE_CLIENT_SECRET")
-            if not client_id or not client_secret:
-                raise RuntimeError(
-                    "Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment variables"
-                )
-            flow = InstalledAppFlow.from_client_config(
-                {
-                    "installed": {
-                        "client_id": client_id,
-                        "client_secret": client_secret,
-                        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                        "token_uri": "https://oauth2.googleapis.com/token",
-                        "redirect_uris": ["http://localhost"],
-                    }
-                },
-                SCOPES,
-            )
-            creds = flow.run_local_server(port=0)
-        TOKEN_FILE.write_text(creds.to_json())
-    return creds
-
-
-def submit_to_sheet(url, title=None, tags=None, notes=None):
-    """Submit link to Google Sheets."""
-    from googleapiclient.discovery import build
-
-    creds = get_sheets_credentials()
-    service = build("sheets", "v4", credentials=creds)
-
-    row = [
-        datetime.now(timezone.utc).isoformat(),
-        url,
-        ", ".join(tags) if tags else "",
-        "",  # user_email placeholder
-        notes or "",
-    ]
-
-    service.spreadsheets().values().append(
-        spreadsheetId=SHEET_ID,
-        range="A:D",
-        valueInputOption="USER_ENTERED",
-        body={"values": [row]},
-    ).execute()
-    print(f"Submitted to Google Sheet: {url}")
-
-
-def add_link(url, title=None, tags=None, notes=None, no_archive=False, no_commit=False, to_sheet=False):
+def add_link(url, title=None, tags=None, notes=None, no_archive=False, no_commit=False):
     # Auto-fetch title if not provided
     if not title:
         print(f"Fetching title from {url}...")
@@ -149,23 +64,8 @@ def add_link(url, title=None, tags=None, notes=None, no_archive=False, no_commit
         if title:
             print(f"Found title: {title}")
 
-    if to_sheet:
-        submit_to_sheet(url, title, tags, notes)
-        return
-
     links = load_trove()
-
-    link = {
-        "url": url,
-        "added": datetime.now(timezone.utc).isoformat(),
-    }
-    if title:
-        link["title"] = title
-    if tags:
-        link["tags"] = " ".join(tags)
-    if notes:
-        link["notes"] = notes
-
+    link = create_link_entry(url, title, tags, notes)
     links.append(link)
     save_trove(links)
     print(f"Added: {url}")
@@ -180,17 +80,16 @@ def add_link(url, title=None, tags=None, notes=None, no_archive=False, no_commit
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Add a link to trove.json")
+    parser = argparse.ArgumentParser(description="Add a link to trove.jsonl")
     parser.add_argument("url", help="URL to add")
     parser.add_argument("tags", nargs="*", help="Tags for the link")
     parser.add_argument("-t", "--title", help="Title for the link (auto-fetched if omitted)")
     parser.add_argument("-n", "--notes", help="Notes for the link")
     parser.add_argument("--no-archive", action="store_true", help="Skip archive.org snapshot")
     parser.add_argument("--no-commit", action="store_true", help="Skip git commit")
-    parser.add_argument("--sheet", action="store_true", help="Submit to Google Sheet instead of trove.json")
 
     args = parser.parse_args()
-    add_link(args.url, args.title, args.tags or None, args.notes, args.no_archive, args.no_commit, args.sheet)
+    add_link(args.url, args.title, args.tags or None, args.notes, args.no_archive, args.no_commit)
 
 
 if __name__ == "__main__":
