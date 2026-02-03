@@ -23,6 +23,10 @@ const hideLink = (url) => {
     localStorage.setItem(HIDDEN_KEY, JSON.stringify(hidden));
   }
 };
+const unhideLink = (url) => {
+  const hidden = getHiddenLinks().filter(u => u !== url);
+  localStorage.setItem(HIDDEN_KEY, JSON.stringify(hidden));
+};
 
 // Store all loaded links for client-side filtering
 let allLinks = [];
@@ -30,6 +34,10 @@ let allLinks = [];
 let currentLinks = [];
 // Store current page tags to exclude from display
 let currentPageTags = [];
+// Track hidden count for current filter
+let currentHiddenCount = 0;
+// Whether we're showing hidden links
+let showingHidden = false;
 
 // Format date with progressive detail based on recency:
 // - Different year    → "2025"
@@ -87,6 +95,8 @@ function sortLinks(links, sortBy) {
 function renderLinks(links) {
   const container = document.getElementById('links');
   const currentPath = '/' + currentPageTags.join('/');
+  const hideHandler = showingHidden ? 'handleUnhide' : 'handleHide';
+  const hideLabel = showingHidden ? 'Unhide' : 'Hide';
   container.innerHTML = links.map(link => {
     const tags = parseTags(link.tags).filter(t => !currentPageTags.includes(t));
     let domain = link.url;
@@ -103,7 +113,7 @@ function renderLinks(links) {
         <div class="card-top">
           ${link.added ? `<span class="added">${formatDate(link.added)}</span>` : '<span></span>'}
           <span>
-            <span class="hide-btn" onclick="handleHide(event, '${escapedUrl}', this)">x</span>
+            <span class="hide-btn" onclick="${hideHandler}(event, '${escapedUrl}', this)">${hideLabel}</span>
           </span>
         </div>
         <div class="title-row">
@@ -196,25 +206,38 @@ function filterAndRender() {
   // Filter links by tags (must have ALL included tags, none of excluded tags)
   const excludeTags = tagFilters.filter(t => t.startsWith('-')).map(t => t.slice(1));
   const hiddenLinks = getHiddenLinks();
-  const links = allLinks.filter(link => {
-    if (hiddenLinks.includes(link.url)) return false;
+
+  // First filter by tags only to count hidden links
+  const tagMatchedLinks = allLinks.filter(link => {
     const linkTags = parseTags(link.tags);
     const hasAllIncluded = includeTags.every(tag => linkTags.includes(tag));
     const hasNoneExcluded = excludeTags.every(tag => !linkTags.includes(tag));
     return hasAllIncluded && hasNoneExcluded;
   });
 
+  currentHiddenCount = tagMatchedLinks.filter(link => hiddenLinks.includes(link.url)).length;
+  const visibleLinks = tagMatchedLinks.filter(link => !hiddenLinks.includes(link.url));
+  const hiddenLinksList = tagMatchedLinks.filter(link => hiddenLinks.includes(link.url));
+  const links = showingHidden ? hiddenLinksList : visibleLinks;
+
   if (links.length === 0) {
     sortControls.style.display = 'none';
-    container.innerHTML = '<div class="empty">No links found.</div>';
+    if (showingHidden) {
+      container.innerHTML = '<div class="empty">No hidden links. <a href="#" onclick="toggleShowHidden(); return false;">Show all</a></div>';
+    } else {
+      const hiddenText = currentHiddenCount > 0
+        ? ` (<a href="#" onclick="toggleShowHidden(); return false;">${currentHiddenCount} hidden</a>)`
+        : '';
+      container.innerHTML = `<div class="empty">No links found.${hiddenText}</div>`;
+    }
     return;
   }
 
   // Show sort controls, link count, and render sorted links
   sortControls.style.display = 'block';
-  document.getElementById('link-count').textContent = `${links.length} link${links.length === 1 ? '' : 's'}`;
   currentLinks = links;
   currentPageTags = includeTags;
+  updateLinkCountDisplay();
   const sortBy = document.getElementById('sort-select').value;
   const sorted = sortLinks(links, sortBy);
   renderLinks(sorted);
@@ -226,6 +249,36 @@ function handleHide(event, url, btn) {
   hideLink(url);
   btn.closest('.link-anchor').remove();
   currentLinks = currentLinks.filter(l => l.url !== url);
+  currentHiddenCount++;
+  updateLinkCountDisplay();
+}
+
+function handleUnhide(event, url, btn) {
+  event.preventDefault();
+  event.stopPropagation();
+  unhideLink(url);
+  btn.closest('.link-anchor').remove();
+  currentLinks = currentLinks.filter(l => l.url !== url);
+  currentHiddenCount--;
+  updateLinkCountDisplay();
+}
+
+function toggleShowHidden() {
+  showingHidden = !showingHidden;
+  filterAndRender();
+}
+
+function updateLinkCountDisplay() {
+  const count = currentLinks.length;
+  let suffix;
+  if (showingHidden) {
+    suffix = ` (<a href="#" onclick="toggleShowHidden(); return false;">show visible</a>)`;
+  } else if (currentHiddenCount > 0) {
+    suffix = ` (<a href="#" onclick="toggleShowHidden(); return false;">${currentHiddenCount} hidden</a>)`;
+  } else {
+    suffix = '';
+  }
+  document.getElementById('link-count').innerHTML = `${count} link${count === 1 ? '' : 's'}${suffix}`;
 }
 
 function handleAddTagClick(event, btn) {

@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 2026-02-03
+
+- Added hidden links feature:
+  - Link count now shows "(X hidden)" when links are hidden on current page
+  - Hidden count is a clickable link that toggles to show only hidden links
+  - In hidden view, "Hide" button becomes "Unhide" to restore links
+  - Counts update immediately when hiding/unhiding (no page reload needed)
+
+---
+
 ## 2026-02-02
 
 - Auto sign-in: silently authenticates on page load if previously authorized (no click needed)
