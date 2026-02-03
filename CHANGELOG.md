@@ -2,6 +2,13 @@
 
 ## 2026-02-03
 
+- Added `--fill-titles` option to process_issues.py to fetch missing titles for existing links
+- Added `make fill-titles` target
+
+---
+
+## 2026-02-03
+
 - Added bookmarklet support for quick link submission from any page:
   - Bookmarklet opens popup with URL pre-filled
   - Popup mode: compact form UI, user fills in tags/notes and submits

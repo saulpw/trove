@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Process GitHub issues with 'submission' label and add links to trove.jsonl."""
 
+import argparse
 import json
 import subprocess
 
@@ -109,5 +110,43 @@ def process_issues():
         print("No new links to add")
 
 
+def fill_titles():
+    """Find links without titles and fetch them."""
+    links = load_trove()
+    missing = [link for link in links if not link.get("title")]
+
+    if not missing:
+        print("All links have titles")
+        return
+
+    print(f"Found {len(missing)} link(s) without titles")
+    updated = 0
+
+    for link in missing:
+        url = link["url"]
+        print(f"Fetching title for {url}...")
+        title = fetch_title(url)
+        if title:
+            link["title"] = title
+            print(f"  -> {title}")
+            updated += 1
+        else:
+            print("  -> (no title found)")
+
+    if updated > 0:
+        save_trove(links)
+        print(f"Updated {updated} link(s)")
+    else:
+        print("No titles found to update")
+
+
 if __name__ == "__main__":
-    process_issues()
+    parser = argparse.ArgumentParser(description="Process link submissions")
+    parser.add_argument("--fill-titles", action="store_true",
+                        help="Fill in missing titles for existing links")
+    args = parser.parse_args()
+
+    if args.fill_titles:
+        fill_titles()
+    else:
+        process_issues()

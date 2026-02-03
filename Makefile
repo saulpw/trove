@@ -1,4 +1,4 @@
-.PHONY: setup serve add build test import process-issues
+.PHONY: setup serve add build test import process-issues fill-titles
 
 all: build
 
@@ -34,3 +34,7 @@ import:
 # Process GitHub issue submissions and add to trove.jsonl
 process-issues:
 	python3 process_issues.py
+
+# Fill in missing titles for existing links
+fill-titles:
+	python3 process_issues.py --fill-titles
