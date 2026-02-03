@@ -5,6 +5,11 @@
 [functions]
   directory = "netlify/functions"
 
+[[headers]]
+  for = "/trove.jsonl"
+  [headers.values]
+    Cache-Control = "max-age=60"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
