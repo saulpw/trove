@@ -47,6 +47,7 @@ def process_issues():
     links = load_trove()
     existing_urls = {link["url"] for link in links}
     processed = 0
+    merged = 0
 
     for issue in issues:
         number = issue["number"]
@@ -58,7 +59,20 @@ def process_issues():
             continue
 
         if url in existing_urls:
-            print(f"Issue #{number}: URL already exists, closing")
+            # Merge tags into existing entry
+            tags = fields.get("tags")
+            if tags:
+                for link in links:
+                    if link["url"] == url:
+                        existing_tags = set(link.get("tags", "").split()) if link.get("tags") else set()
+                        new_tags = set(tags.split())
+                        merged_tags = existing_tags | new_tags
+                        link["tags"] = " ".join(sorted(merged_tags))
+                        break
+                print(f"Issue #{number}: Merged tags into existing URL")
+                merged += 1
+            else:
+                print(f"Issue #{number}: URL already exists, no new tags")
             close_issue(number)
             continue
 
@@ -82,9 +96,12 @@ def process_issues():
         close_issue(number)
         processed += 1
 
-    if processed > 0:
+    if processed > 0 or merged > 0:
         save_trove(links)
-        print(f"\nAdded {processed} link(s) to {TROVE_FILE}")
+        if processed > 0:
+            print(f"\nAdded {processed} link(s) to {TROVE_FILE}")
+        if merged > 0:
+            print(f"Merged tags for {merged} existing link(s)")
     else:
         print("\nNo new links to add")
 

@@ -2,6 +2,18 @@
 
 ## 2026-02-02
 
+- Added '+' button to links for adding tags inline:
+  - Only visible when signed in
+  - Click '+' → shows inline input field
+  - Enter tags → optimistically appends to UI, submits to backend
+  - Escape/blur → cancels input
+- Backend now merges tags for duplicate URLs instead of rejecting
+- Bumped version to 0.11
+
+---
+
+## 2026-02-02
+
 - Simplified tag hover menu: inline CSS-only show/hide
   - Menu renders inline with each tag (no global menu element)
   - CSS `:hover` controls visibility (no JS timeouts/positioning)

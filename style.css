@@ -60,3 +60,16 @@ footer a { color: #666; }
 .tag-wrap:hover .tag-menu { display: block; }
 .tag-menu span { display: block; padding: 0.4rem 0.6rem; color: #333; cursor: pointer; }
 .tag-menu span:hover { background: #f0f6ff; }
+
+/* Add tag button and input */
+.add-tag-btn {
+  color: #999; font-size: 0.85em; cursor: pointer;
+  background: none; border: 1px solid #ddd; border-radius: 4px;
+  padding: 0 0.4rem; margin-left: 0.5rem; line-height: 1.4;
+}
+.add-tag-btn:hover { color: #0066cc; border-color: #0066cc; }
+.add-tag-input {
+  font-size: 0.85em; padding: 0.1rem 0.4rem;
+  border: 1px solid #0066cc; border-radius: 4px;
+  margin-left: 0.5rem; width: 8rem;
+}

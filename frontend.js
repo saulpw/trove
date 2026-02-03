@@ -111,7 +111,7 @@ function renderLinks(links) {
         </div>
         <span class="url">${domain}</span>
         ${link.notes ? `<div class="notes">${link.notes}</div>` : ''}
-        ${tags.length ? `<div class="card-bottom"><span class="tags">${tags.map(renderTag).join(' ')}</span></div>` : ''}
+        <div class="card-bottom"><span class="tags">${tags.map(renderTag).join(' ')}</span>${accessToken ? '<button class="add-tag-btn" onclick="handleAddTagClick(event, this)">+</button>' : ''}</div>
       </div>
     </a>`;
   }).join('');
@@ -228,6 +228,82 @@ function handleHide(event, url, btn) {
   currentLinks = currentLinks.filter(l => l.url !== url);
 }
 
+function handleAddTagClick(event, btn) {
+  event.preventDefault();
+  event.stopPropagation();
+
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'add-tag-input';
+  input.placeholder = 'tag tag...';
+
+  const linkEl = btn.closest('.link');
+  const url = linkEl.dataset.url;
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const tags = input.value.trim();
+      if (tags) {
+        submitTagsForLink(url, tags, linkEl, input, btn);
+      } else {
+        restoreAddButton(input, btn);
+      }
+    } else if (e.key === 'Escape') {
+      restoreAddButton(input, btn);
+    }
+  });
+
+  input.addEventListener('blur', () => {
+    // Small delay to allow click events to fire first
+    setTimeout(() => {
+      if (document.body.contains(input)) {
+        restoreAddButton(input, btn);
+      }
+    }, 100);
+  });
+
+  btn.style.display = 'none';
+  btn.parentNode.insertBefore(input, btn);
+  input.focus();
+}
+
+function restoreAddButton(input, btn) {
+  if (input.parentNode) {
+    input.remove();
+  }
+  btn.style.display = '';
+}
+
+async function submitTagsForLink(url, tags, linkEl, input, btn) {
+  if (!accessToken) return;
+
+  // Optimistically add tags to UI
+  const tagsEl = linkEl.querySelector('.tags');
+  const currentPath = '/' + currentPageTags.join('/');
+  const newTags = tags.split(' ').filter(t => t && !currentPageTags.includes(t));
+
+  newTags.forEach(t => {
+    const wrap = document.createElement('span');
+    wrap.className = 'tag-wrap';
+    wrap.innerHTML = `<span class="tag" data-tag="${t}">#${t}</span><span class="tag-menu"><span data-href="/${t}">→ /${t}</span><span data-href="${currentPath}/${t}">+ ${currentPath}/${t}</span><span data-href="${currentPath}/-${t}">− ${currentPath}/-${t}</span></span> `;
+    tagsEl.appendChild(wrap);
+  });
+
+  restoreAddButton(input, btn);
+
+  // Submit to backend
+  try {
+    await fetch('/.netlify/functions/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, tags, notes: '', googleToken: accessToken }),
+    });
+  } catch (e) {
+    console.error('Failed to submit tags:', e);
+  }
+}
+
 async function loadLinks() {
   const container = document.getElementById('links');
 
@@ -266,6 +342,10 @@ function initGoogleAuth() {
         accessToken = response.access_token;
         document.getElementById('auth-btn').textContent = 'Signed in';
         document.getElementById('auth-btn').disabled = true;
+        // Re-render to show + buttons
+        if (currentLinks.length > 0) {
+          applySort();
+        }
       }
     },
   });
