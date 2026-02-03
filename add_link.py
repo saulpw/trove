@@ -16,7 +16,7 @@ def fetch_title(url):
         req = urllib.request.Request(url, headers={"User-Agent": "trove-link-saver/1.0"})
         with urllib.request.urlopen(req, timeout=10) as response:
             # Read first 64KB - title should be near the top
-            html = response.read(65536).decode("utf-8", errors="ignore")
+            html = response.read(1024*1024).decode("utf-8", errors="ignore")
             match = re.search(r"<title[^>]*>([^<]+)</title>", html, re.IGNORECASE)
             if match:
                 return match.group(1).strip()
