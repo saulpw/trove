@@ -2,6 +2,15 @@
 
 ## 2026-02-03
 
+- Added bookmarklet support for quick link submission from any page:
+  - Bookmarklet opens popup with URL pre-filled
+  - Popup mode: compact form UI, user fills in tags/notes and submits
+- Bumped version to 0.12
+
+---
+
+## 2026-02-03
+
 - Added hidden links feature:
   - Link count now shows "(X hidden)" when links are hidden on current page
   - Hidden count is a clickable link that toggles to show only hidden links

@@ -28,6 +28,12 @@ Or use the script directly:
 python3 add_link.py "https://example.com" games puzzles -t "Example Site"
 ```
 
+## Bookmarklet
+
+Add links from any page with a browser bookmarklet. Drag the "+ bookmarklet" link from the footer to your bookmarks bar.
+
+Click the bookmarklet on any page → popup opens with URL pre-filled → add tags/notes → submit.
+
 ## Project Structure
 
 - `index.html` - Static frontend

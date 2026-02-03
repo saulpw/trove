@@ -404,16 +404,11 @@ function initGoogleAuth() {
     callback: (response) => {
       if (response.access_token) {
         accessToken = response.access_token;
-        document.getElementById('auth-btn').textContent = 'Signed in';
-        document.getElementById('auth-btn').disabled = true;
         // Schedule refresh before token expires
         if (response.expires_in) {
           scheduleTokenRefresh(response.expires_in);
         }
-        // Re-render to show + buttons
-        if (currentLinks.length > 0) {
-          applySort();
-        }
+        onAuthSuccess();
       }
     },
   });
@@ -463,11 +458,15 @@ async function submitLink() {
     if (response.ok) {
       status.textContent = 'Submitted!';
       status.className = 'status-success';
-      urlInput.value = '';
-      // Re-populate tags from current page filters
-      const tagFilters = getTagFilters();
-      tagsInput.value = tagFilters.filter(t => !t.startsWith('-')).join(' ');
-      notesInput.value = '';
+      if (bookmarkletMode) {
+        setTimeout(() => window.close(), 500);
+      } else {
+        urlInput.value = '';
+        // Re-populate tags from current page filters
+        const tagFilters = getTagFilters();
+        tagsInput.value = tagFilters.filter(t => !t.startsWith('-')).join(' ');
+        notesInput.value = '';
+      }
     } else {
       status.textContent = result.error || 'Failed';
       status.className = 'status-error';
@@ -485,6 +484,57 @@ window.addEventListener('popstate', () => {
   }
 });
 
+// Bookmarklet popup mode
+let bookmarkletMode = false;
+
+function getUrlParams() {
+  const params = new URLSearchParams(window.location.search);
+  return {
+    submit: params.get('submit') === '1',
+    url: params.get('url') || '',
+  };
+}
+
+function initBookmarkletMode() {
+  const params = getUrlParams();
+  if (!params.submit) return false;
+
+  bookmarkletMode = true;
+  document.body.classList.add('bookmarklet-mode');
+
+  // Hide main content, show only add form
+  document.getElementById('sort-controls').style.display = 'none';
+  document.getElementById('link-count').style.display = 'none';
+  document.getElementById('links').style.display = 'none';
+
+  // Pre-fill URL
+  document.getElementById('link-url').value = params.url;
+
+  return true;
+}
+
+// Auth success callback
+function onAuthSuccess() {
+  document.getElementById('auth-btn').textContent = 'Signed in';
+  document.getElementById('auth-btn').disabled = true;
+
+  if (!bookmarkletMode && currentLinks.length > 0) {
+    applySort();
+  }
+}
+
+// Set bookmarklet link href with current origin
+function initBookmarkletLink() {
+  const link = document.getElementById('bookmarklet');
+  if (link) {
+    const origin = location.origin;
+    link.href = "javascript:window.open('" + origin + "/?submit=1&url='+encodeURIComponent(location.href),'trove','width=450,height=350')";
+  }
+}
+
 // Initialize on page load
-initTagMenu();
-loadLinks();
+initBookmarkletLink();
+if (!initBookmarkletMode()) {
+  initTagMenu();
+  loadLinks();
+}
