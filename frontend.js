@@ -146,7 +146,7 @@ function renderLinks(links) {
   const hideHandler = showingHidden ? 'handleUnhide' : 'handleHide';
   const hideLabel = showingHidden ? 'Unhide' : 'Hide';
   container.innerHTML = links.map(link => {
-    const tags = parseTags(link.tags).filter(t => !currentPageTags.includes(t));
+    const tags = parseTags(link.tags).filter(t => !currentPageTags.includes(t)).sort();
     let domain = link.url;
     try { domain = new URL(link.url).hostname.replace(/^www\./, ''); } catch {}
     const escapedUrl = link.url.replace(/'/g, "\\'");
