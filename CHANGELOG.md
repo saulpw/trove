@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## 2026-02-07
+
+- Replaced Google OAuth with per-user password authentication:
+  - Users sign in with username + password, stored in localStorage (persists across refreshes)
+  - Netlify Function verifies credentials against `TROVE_USERS` env var (format: `alice:pw1,bob:pw2`)
+  - Username recorded as `submitted_by` in GitHub issues (replaces email)
+  - Removed Google Identity Services script, `config.js` dependency
+  - Added sign-in form with username/password fields, sign-out button
+  - Added `manage_users.py` CLI + Makefile targets (`add-user`, `remove-user`, `list-users`)
+  - Updated docs: auth.md, README.md, CLAUDE.md
+- Bumped version to 0.13
+
+---
+
 ## 2026-02-03
 
 - Added `--fill-titles` option to process_issues.py to fetch missing titles for existing links

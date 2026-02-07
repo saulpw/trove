@@ -11,8 +11,8 @@ A simple static website to share lists of links at a public mnemonic url.  e.g. 
 - `add_link.py` - CLI to add links to trove.jsonl (auto-fetches title, triggers archive.org, commits)
 - `process_issues.py` - Processes GitHub issue submissions into trove.jsonl
 - `import_md_links.py` - One-time bulk import from markdown files
-- `config.js` - Local dev only: sets `window.GOOGLE_CLIENT_ID`. In production, Netlify injects this via snippet injection.
-- `Makefile` - Targets: `setup`, `serve`, `add`, `build`, `test`, `import`, `process-issues`
+- `manage_users.py` - CLI to add/remove users from Netlify `TROVE_USERS` env var
+- `Makefile` - Targets: `setup`, `serve`, `add`, `build`, `test`, `import`, `process-issues`, `add-user`, `remove-user`, `list-users`
 - `netlify.toml` - Netlify config (SPA fallback routing)
 - `ARCHITECTURE.md` - Design: GitHub Issues submissions + GitHub Actions processor
 - `docs/auth.md` - Auth approach options and tradeoffs
@@ -21,6 +21,7 @@ A simple static website to share lists of links at a public mnemonic url.  e.g. 
 
 ## Design Decisions
 - CLI interface (`add_link.py`) uses positional arguments for tags (not `--tags` flag): `python3 add_link.py URL tag1 tag2`
+- Use `${FOO}` variable syntax in Makefiles (not `$(FOO)`), because it is directly compatible with shell env var syntax for easy copy-paste.
 
 ## Meta Rules
 - When the user asks a question, answer it. Don't start implementing a solution without asking first.

@@ -1,59 +1,40 @@
 # Authentication Options for Link Submission
 
-## Current Approach: Full OAuth (Option 4)
+## Current Approach: Per-User Passwords
 
-Users sign in with Google OAuth using `spreadsheets` scope. This grants full read/write access to all their spreadsheets, but we only use it to append to our single trove sheet. The upside: we capture user email for accountability.
+Each user has a unique username and password stored in the `TROVE_USERS` Netlify env var (format: `alice:pw1,bob:pw2`). Credentials are persisted in the browser via localStorage.
 
-**Tradeoff:** Scary permission prompt ("access all your spreadsheets") but simple implementation and full user identity.
+**Tradeoff:** Simple, zero OAuth friction, but passwords are plaintext in the env var. Acceptable for a small trusted group (10-100 users).
 
-## Alternative Approaches
+### How it works
 
-### Option 1: OAuth for Identity + Service Account for Writes (Recommended Future)
+1. User enters username + password in the sign-in form
+2. Credentials saved to localStorage (persists across refreshes)
+3. On submit, credentials sent to Netlify Function which verifies against `TROVE_USERS`
+4. Username recorded as `submitted_by` in the GitHub issue
 
-- User signs in with `email` scope only (benign "see your email" prompt)
-- Netlify Function validates the ID token, extracts email
-- Service account (server-side) appends row to sheet with that email
+### Managing users
 
-**Pros:** Minimal permissions, user identity, service account only accesses shared sheet
-**Cons:** Requires Netlify Function, two auth mechanisms
+```bash
+make add-user NAME=alice PASS=somepw
+make remove-user NAME=alice
+make list-users
+```
 
-### Option 2: Shared Password
+Or directly: `python3 manage_users.py add|remove|list`
 
-- Simple secret token field in the UI
-- Anyone with password can submit
-- Optional self-reported name field (honor system)
+## Previous Approaches Considered
 
-**Pros:** Dead simple, no OAuth
-**Cons:** No real identity, password can leak
+### Google OAuth (used previously, removed 2026-02-07)
+Required re-authentication on every page refresh. Token was in-memory only, not persisted. Frequently bounced to Google page even during "silent" auth. Too much friction for a small trusted user base.
 
-### Option 3: IP Logging Only
+### Shared Password
+Single password for all users. No per-user accountability.
 
-- Netlify Function captures IP address
-- No user authentication
-- Traceable after-the-fact if abuse occurs
-
-**Pros:** No login friction
-**Cons:** No identity, IPs can be spoofed/shared
-
-## Google OAuth Scope Limitations
-
-Google doesn't offer a "single spreadsheet" scope. Available options:
-
-| Scope | Access |
-|-------|--------|
-| `spreadsheets` | Full read/write to ALL user sheets |
-| `spreadsheets.readonly` | Read-only to all sheets |
-| `drive.file` | Only files app created/opened (won't work for pre-existing sheet) |
-| `email` | Just user's email address |
-
-## Service Account Notes
-
-- Created in Google Cloud Console under IAM & Admin
-- Download JSON key, store securely (never commit)
-- Share target sheet with service account's email (Editor access)
-- Use from server-side only (Netlify Function)
-- Only has access to explicitly shared sheets
+### IP Logging Only
+No real identity. IPs can be shared/spoofed.
 
 ## Decision Log
 
-- 2026-01-29: Chose Option 4 (full OAuth) for initial implementation. Acceptable for small trusted user base. Revisit Option 1 if permission prompt scares users.
+- 2026-02-07: Replaced Google OAuth with per-user password auth. OAuth was too friction-heavy for a small trusted group. Per-user passwords provide same accountability (`submitted_by: username`) with zero OAuth friction.
+- 2026-01-29: Chose Google OAuth for initial implementation. Later found it too friction-heavy.

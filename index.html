@@ -10,9 +10,18 @@
   <header>
     <h1><a href="/">trove</a></h1>
     <div id="auth-container">
-      <button id="auth-btn" onclick="handleAuth()">Sign in</button>
+      <span id="auth-user" style="display:none;"></span>
+      <button id="auth-btn" onclick="showSignIn()">Sign in</button>
+      <button id="signout-btn" onclick="signOut()" style="display:none;">Sign out</button>
     </div>
   </header>
+
+  <div id="signin-form" style="display:none;">
+    <input type="text" id="auth-username" placeholder="Username" />
+    <input type="password" id="auth-password" placeholder="Password" />
+    <button onclick="handleSignIn()">Sign in</button>
+    <span id="auth-status"></span>
+  </div>
 
   <div id="add-form">
     <input type="text" id="link-url" placeholder="https://..." />
@@ -35,14 +44,8 @@
 
   <footer>
     <div>a <a href="https://saul.pw">saul.pw</a> project | <a href="/privacy">privacy policy</a> | <a id="bookmarklet" href="#">+ bookmarklet</a></div>
-    <div id="version">v0.12</div>
+    <div id="version">v0.13</div>
   </footer>
-
-  <!-- config for local dev; empty file in production -->
-  <script src="/config.js" onerror=""></script>
-
-  <!-- Google Identity Services -->
-  <script src="https://accounts.google.com/gsi/client" async defer onload="initGoogleAuth()"></script>
 
   <!-- Main frontend code -->
   <script src="/frontend.js"></script>

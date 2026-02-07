@@ -43,7 +43,7 @@ Click the bookmarklet on any page → popup opens with URL pre-filled → add ta
 - `process_issues.py` - Process GitHub issue submissions
 - `import_md_links.py` - One-time bulk import from markdown files
 - `Makefile` - Build and dev commands
-- `config.js` - Local dev config (Google client ID); not used in production
+- `manage_users.py` - CLI to manage users in Netlify TROVE_USERS env var
 
 ## Features
 
@@ -68,38 +68,22 @@ Click the bookmarklet on any page → popup opens with URL pre-filled → add ta
 
 ## Setup
 
-### Google OAuth (for user identity)
+### User Authentication
 
-Google OAuth is used to identify users submitting links. Only the `email` scope is requested.
+Users authenticate with a username and password. Credentials are stored in the `TROVE_USERS` Netlify environment variable.
 
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a new project (or select existing)
-3. Configure OAuth consent screen:
-   - Go to APIs & Services → OAuth consent screen
-   - Choose "External" user type
-   - Fill in app name, user support email, developer email
-   - Add scope: `email`
-   - Add your email as a test user (required while app is unverified)
-4. Create OAuth credentials:
-   - Go to APIs & Services → Credentials
-   - Create Credentials → OAuth client ID
-   - Application type: **Web application**
-   - Add Authorized JavaScript origins:
-     - `http://localhost:8888` (for local dev)
-     - `https://trove.pw` (for production)
-   - Copy the **Client ID**
-
-5. Configure the frontend:
-   - **Production (Netlify):** Site configuration → Post processing → Snippet injection
-     - Add snippet to `<head>` of all pages:
-       ```html
-       <script>window.GOOGLE_CLIENT_ID = "your-web-client-id";</script>
-       ```
-   - **Local dev:** Create `config.js` with your client ID:
-       ```javascript
-       window.GOOGLE_CLIENT_ID = "your-web-client-id";
-       ```
-     This file is gitignored and only used for local development. In production, Netlify injects the client ID via snippet injection.
+1. In Netlify Dashboard → Site settings → Environment variables, add:
+   - `TROVE_USERS`: Comma-separated `username:password` pairs (e.g., `alice:pw1,bob:pw2`)
+2. For local dev, add to `.env` file:
+   ```
+   TROVE_USERS=testuser:testpass
+   ```
+3. Manage users via CLI:
+   ```bash
+   make add-user NAME=alice PASS=somepw
+   make remove-user NAME=alice
+   make list-users
+   ```
 
 ### GitHub Token (for submissions)
 
@@ -119,7 +103,7 @@ Submissions create GitHub Issues via a Netlify Function.
 ### Netlify Deployment
 
 The site auto-deploys from the main branch. Environment variables:
-- `GOOGLE_CLIENT_ID` - Web OAuth client ID for frontend submissions
+- `TROVE_USERS` - Comma-separated `username:password` pairs for auth
 - `GITHUB_TOKEN` - GitHub PAT for creating issues
 - `GITHUB_REPO` - Repository in `owner/repo` format
 
@@ -135,5 +119,5 @@ See [ARCHITECTURE.md](ARCHITECTURE.md).
 ## Example: trove.pw/puzzles
 
 I find a puzzle site, go to `trove.pw/puzzles`, and submit the link.
-I'm authenticated via Google OAuth, so the submission goes to a Netlify Function that creates a GitHub Issue.
+I'm signed in with my username/password, so the submission goes to a Netlify Function that creates a GitHub Issue.
 The next GitHub Action run processes it into `trove.jsonl` and commits, triggering a rebuild.

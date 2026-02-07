@@ -121,7 +121,7 @@ function renderLinks(links) {
         </div>
         <span class="url">${domain}</span>
         ${link.notes ? `<div class="notes">${link.notes}</div>` : ''}
-        <div class="card-bottom"><span class="tags">${tags.map(renderTag).join(' ')}</span>${accessToken ? '<button class="add-tag-btn" onclick="handleAddTagClick(event, this)">+</button>' : ''}</div>
+        <div class="card-bottom"><span class="tags">${tags.map(renderTag).join(' ')}</span><button class="add-tag-btn" onclick="handleAddTagClick(event, this)">+</button></div>
       </div>
     </a>`;
   }).join('');
@@ -329,7 +329,8 @@ function restoreAddButton(input, btn) {
 }
 
 async function submitTagsForLink(url, tags, linkEl, input, btn) {
-  if (!accessToken) return;
+  const creds = getCredentials();
+  if (!creds) { showSignIn(); return; }
 
   // Optimistically add tags to UI
   const tagsEl = linkEl.querySelector('.tags');
@@ -350,7 +351,7 @@ async function submitTagsForLink(url, tags, linkEl, input, btn) {
     await fetch('/.netlify/functions/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url, tags, notes: '', googleToken: accessToken }),
+      body: JSON.stringify({ url, tags, notes: '', username: creds.username, password: creds.password }),
     });
   } catch (e) {
     console.error('Failed to submit tags:', e);
@@ -376,49 +377,88 @@ async function loadLinks() {
   }
 }
 
-// Google Auth
-let accessToken = null;
-let tokenClient = null;
-let tokenRefreshTimer = null;
+// Auth: per-user password stored in localStorage
+const CREDS_KEY = 'trove_credentials';
 
-function scheduleTokenRefresh(expiresIn) {
-  if (tokenRefreshTimer) clearTimeout(tokenRefreshTimer);
-  // Refresh 5 minutes before expiry (or halfway if less than 10 min)
-  const refreshIn = expiresIn > 600 ? (expiresIn - 300) * 1000 : (expiresIn / 2) * 1000;
-  tokenRefreshTimer = setTimeout(() => {
-    tokenClient.requestAccessToken({ prompt: '' });
-  }, refreshIn);
+function getCredentials() {
+  const stored = localStorage.getItem(CREDS_KEY);
+  if (!stored) return null;
+  try { return JSON.parse(stored); } catch { return null; }
 }
 
-function initGoogleAuth() {
-  const clientId = window.GOOGLE_CLIENT_ID || '';
-  if (!clientId) {
-    document.getElementById('auth-btn').textContent = 'No OAuth configured';
-    document.getElementById('auth-btn').disabled = true;
+function saveCredentials(username, password) {
+  localStorage.setItem(CREDS_KEY, JSON.stringify({ username, password }));
+}
+
+function clearCredentials() {
+  localStorage.removeItem(CREDS_KEY);
+}
+
+function isSignedIn() {
+  return getCredentials() !== null;
+}
+
+function showSignIn() {
+  document.getElementById('signin-form').style.display = 'flex';
+  document.getElementById('auth-username').focus();
+}
+
+async function handleSignIn() {
+  const username = document.getElementById('auth-username').value.trim();
+  const password = document.getElementById('auth-password').value;
+  const status = document.getElementById('auth-status');
+
+  if (!username || !password) {
+    status.textContent = 'Enter username and password';
+    status.className = 'status-error';
     return;
   }
-  tokenClient = google.accounts.oauth2.initTokenClient({
-    client_id: clientId,
-    scope: 'email',
-    prompt: '',
-    callback: (response) => {
-      if (response.access_token) {
-        accessToken = response.access_token;
-        // Schedule refresh before token expires
-        if (response.expires_in) {
-          scheduleTokenRefresh(response.expires_in);
-        }
-        onAuthSuccess();
-      }
-    },
-  });
-  // Auto-trigger auth to silently sign in if user already authorized
-  tokenClient.requestAccessToken({ prompt: '' });
+
+  status.textContent = 'Signing in...';
+  status.className = '';
+
+  try {
+    const response = await fetch('/.netlify/functions/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password }),
+    });
+
+    if (response.ok) {
+      saveCredentials(username, password);
+      status.textContent = '';
+      document.getElementById('signin-form').style.display = 'none';
+      onAuthSuccess(username);
+    } else {
+      const result = await response.json();
+      status.textContent = result.error || 'Sign in failed';
+      status.className = 'status-error';
+    }
+  } catch (e) {
+    status.textContent = 'Network error';
+    status.className = 'status-error';
+  }
 }
 
-function handleAuth() {
-  if (tokenClient) {
-    tokenClient.requestAccessToken();
+function signOut() {
+  clearCredentials();
+  document.getElementById('auth-user').style.display = 'none';
+  document.getElementById('signout-btn').style.display = 'none';
+  document.getElementById('auth-btn').style.display = '';
+
+  if (currentLinks.length > 0) {
+    applySort();
+  }
+}
+
+function onAuthSuccess(username) {
+  document.getElementById('auth-user').textContent = username;
+  document.getElementById('auth-user').style.display = '';
+  document.getElementById('auth-btn').style.display = 'none';
+  document.getElementById('signout-btn').style.display = '';
+
+  if (!bookmarkletMode && currentLinks.length > 0) {
+    applySort();
   }
 }
 
@@ -437,9 +477,9 @@ async function submitLink() {
     return;
   }
 
-  if (!accessToken) {
-    status.textContent = 'Sign in first';
-    status.className = 'status-error';
+  const creds = getCredentials();
+  if (!creds) {
+    showSignIn();
     return;
   }
 
@@ -450,7 +490,7 @@ async function submitLink() {
     const response = await fetch('/.netlify/functions/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url, tags, notes, googleToken: accessToken }),
+      body: JSON.stringify({ url, tags, notes, username: creds.username, password: creds.password }),
     });
 
     const result = await response.json();
@@ -513,16 +553,6 @@ function initBookmarkletMode() {
   return true;
 }
 
-// Auth success callback
-function onAuthSuccess() {
-  document.getElementById('auth-btn').textContent = 'Signed in';
-  document.getElementById('auth-btn').disabled = true;
-
-  if (!bookmarkletMode && currentLinks.length > 0) {
-    applySort();
-  }
-}
-
 // Set bookmarklet link href with current origin
 function initBookmarkletLink() {
   const link = document.getElementById('bookmarklet');
@@ -532,8 +562,31 @@ function initBookmarkletLink() {
   }
 }
 
+// Check for existing credentials on page load
+function initAuth() {
+  const creds = getCredentials();
+  if (creds) {
+    onAuthSuccess(creds.username);
+  }
+}
+
+// Allow Enter key to submit sign-in form
+function initSignInForm() {
+  const form = document.getElementById('signin-form');
+  if (form) {
+    form.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleSignIn();
+      }
+    });
+  }
+}
+
 // Initialize on page load
 initBookmarkletLink();
+initAuth();
+initSignInForm();
 if (!initBookmarkletMode()) {
   initTagMenu();
   loadLinks();
