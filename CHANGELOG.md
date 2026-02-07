@@ -2,6 +2,19 @@
 
 ## 2026-02-07
 
+- Added dedicated /tags page:
+  - New #/tags route shows all tags with time period filtering (day/week/month/year/all-time)
+  - Tags filtered by when links were added (counts only tags from links in selected period)
+  - Default sort by link count (most popular first)
+  - Added "all tags" link in header navigation
+- Changed front page to show recent links (50 most recent) with time period filtering
+- Time period filter now available on all pages (front page, /tags, and tag filter pages)
+- Bumped version to 0.15
+
+---
+
+## 2026-02-07
+
 - Added title editing for existing links:
   - Pencil icon (✏️) appears next to title for authenticated users
   - Click to replace title with inline input field

@@ -9,6 +9,9 @@
 <body>
   <header>
     <h1><a href="/">trove</a></h1>
+    <nav>
+      <a href="#/tags">all tags</a>
+    </nav>
     <div id="auth-container">
       <span id="auth-user" style="display:none;"></span>
       <button id="auth-btn" onclick="showSignIn()">Sign in</button>
@@ -39,12 +42,21 @@
       <option value="random">Random</option>
     </select>
   </div>
+  <div id="time-filter-controls" style="display: none;">
+    Time period: <select id="time-filter-select" onchange="filterAndRender()">
+      <option value="all">All time</option>
+      <option value="day">Last day</option>
+      <option value="week">Last week</option>
+      <option value="month">Last month</option>
+      <option value="year">Last year</option>
+    </select>
+  </div>
   <div id="link-count"></div>
   <div id="links"></div>
 
   <footer>
     <div>a <a href="https://saul.pw">saul.pw</a> project | <a href="/privacy">privacy policy</a> | <a id="bookmarklet" href="#">+ bookmarklet</a></div>
-    <div id="version">v0.14</div>
+    <div id="version">v0.15</div>
   </footer>
 
   <!-- Main frontend code -->

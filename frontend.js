@@ -10,6 +10,43 @@ function getTagFilters() {
     .filter(segment => segment.length > 0 && segment !== 'index.html');
 }
 
+// Check if we're on the /tags page
+function isTagsPage() {
+  const hash = window.location.hash.replace(/^#\/?/, '');
+  return hash === 'tags';
+}
+
+// Filter links by time period based on their added date
+function filterLinksByTime(links, period) {
+  if (period === 'all') return links;
+
+  const now = new Date();
+  const cutoff = new Date();
+
+  switch (period) {
+    case 'day':
+      cutoff.setDate(now.getDate() - 1);
+      break;
+    case 'week':
+      cutoff.setDate(now.getDate() - 7);
+      break;
+    case 'month':
+      cutoff.setMonth(now.getMonth() - 1);
+      break;
+    case 'year':
+      cutoff.setFullYear(now.getFullYear() - 1);
+      break;
+    default:
+      return links;
+  }
+
+  return links.filter(link => {
+    if (!link.added) return false;
+    const added = new Date(link.added);
+    return added >= cutoff;
+  });
+}
+
 // Parse tags from space-separated string to array
 const parseTags = (tags) => tags ? tags.split(' ').filter(t => t) : [];
 
@@ -162,6 +199,7 @@ function initTagMenu() {
 function filterAndRender() {
   const container = document.getElementById('links');
   const sortControls = document.getElementById('sort-controls');
+  const timeFilterControls = document.getElementById('time-filter-controls');
   const tagFilters = getTagFilters();
 
   // Pre-populate tags input with current filters (exclude negated tags)
@@ -171,7 +209,7 @@ function filterAndRender() {
 
   // Update heading to show breadcrumb trail
   const h1 = document.querySelector('h1');
-  if (tagFilters.length > 0) {
+  if (tagFilters.length > 0 && !isTagsPage()) {
     const crumbs = [`<a href="/" data-nav>trove</a>`];
     tagFilters.forEach(t => {
       const label = t.startsWith('-') ? `-${t.slice(1)}` : t;
@@ -185,11 +223,18 @@ function filterAndRender() {
     document.title = 'trove';
   }
 
-  // Front page: show tag list with counts (no sort controls)
-  if (tagFilters.length === 0) {
+  // Apply time filter once for all pages
+  timeFilterControls.style.display = 'block';
+  const timePeriod = document.getElementById('time-filter-select').value;
+  const filteredLinks = filterLinksByTime(allLinks, timePeriod);
+
+  // /tags page: show tag list
+  if (isTagsPage()) {
     sortControls.style.display = 'none';
+    document.getElementById('link-count').innerHTML = '';
+
     const tagCounts = {};
-    allLinks.forEach(link => {
+    filteredLinks.forEach(link => {
       parseTags(link.tags).forEach(tag => {
         tagCounts[tag] = (tagCounts[tag] || 0) + 1;
       });
@@ -209,12 +254,25 @@ function filterAndRender() {
     return;
   }
 
-  // Filter links by tags (must have ALL included tags, none of excluded tags)
+  // Front page: show recent links
+  if (tagFilters.length === 0) {
+    sortControls.style.display = 'none';
+
+    const recentLinks = sortLinks(filteredLinks, 'newest').slice(0, 50);
+    currentLinks = recentLinks;
+    currentPageTags = [];
+    currentHiddenCount = 0;
+
+    document.getElementById('link-count').innerHTML = '';
+    renderLinks(recentLinks);
+    return;
+  }
+
+  // Tag filter pages: filter links by tags
   const excludeTags = tagFilters.filter(t => t.startsWith('-')).map(t => t.slice(1));
   const hiddenLinks = getHiddenLinks();
 
-  // First filter by tags only to count hidden links
-  const tagMatchedLinks = allLinks.filter(link => {
+  const tagMatchedLinks = filteredLinks.filter(link => {
     const linkTags = parseTags(link.tags);
     const hasAllIncluded = includeTags.every(tag => linkTags.includes(tag));
     const hasNoneExcluded = excludeTags.every(tag => !linkTags.includes(tag));
@@ -565,6 +623,13 @@ async function submitLink() {
 
 // Handle browser back/forward navigation
 window.addEventListener('popstate', () => {
+  if (allLinks.length > 0) {
+    filterAndRender();
+  }
+});
+
+// Handle hash changes for #/tags route
+window.addEventListener('hashchange', () => {
   if (allLinks.length > 0) {
     filterAndRender();
   }
