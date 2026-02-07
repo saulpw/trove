@@ -340,8 +340,9 @@ async function submitTagsForLink(url, tags, linkEl, input, btn) {
   newTags.forEach(t => {
     const wrap = document.createElement('span');
     wrap.className = 'tag-wrap';
-    wrap.innerHTML = `<span class="tag" data-tag="${t}">#${t}</span><span class="tag-menu"><span data-href="/${t}">→ /${t}</span><span data-href="${currentPath}/${t}">+ ${currentPath}/${t}</span><span data-href="${currentPath}/-${t}">− ${currentPath}/-${t}</span></span> `;
+    wrap.innerHTML = `<span class="tag" data-tag="${t}">#${t}</span><span class="tag-menu"><span data-href="/${t}">→ /${t}</span><span data-href="${currentPath}/${t}">+ ${currentPath}/${t}</span><span data-href="${currentPath}/-${t}">− ${currentPath}/-${t}</span></span>`;
     tagsEl.appendChild(wrap);
+    tagsEl.appendChild(document.createTextNode(' '));
   });
 
   restoreAddButton(input, btn);
