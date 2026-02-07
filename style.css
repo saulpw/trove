@@ -53,8 +53,18 @@ header h1 a:hover { text-decoration: underline; }
 .link .added { color: var(--color-text-faint); font-size: var(--text-sm); flex-shrink: 0; }
 .link .hide-btn { color: var(--color-border-input); cursor: pointer; font-size: var(--text-base); margin-left: 0.5rem; flex-shrink: 0; }
 .link .hide-btn:hover { color: var(--color-error); }
-.link .title-row { text-align: center; margin: 0.5rem 0; }
+.link .title-row { text-align: center; margin: 0.5rem 0; position: relative; }
 .link .title { color: var(--color-link); font-size: var(--text-lg); font-weight: 500; }
+.edit-title-btn {
+  color: var(--color-text-faint); font-size: var(--text-sm); cursor: pointer;
+  margin-left: 0.4rem; opacity: 0.5; transition: opacity 0.15s;
+}
+.edit-title-btn:hover { opacity: 1; }
+.edit-title-input {
+  font-size: var(--text-lg); font-weight: 500; padding: 0.2rem 0.5rem;
+  border: 1px solid var(--color-link); border-radius: 4px;
+  text-align: center; width: 80%; max-width: 500px;
+}
 .link .url { color: var(--color-text-light); font-size: var(--text-sm); display: block; text-align: center; margin-bottom: 0.25rem; }
 .link .notes { color: #555; font-size: var(--text-md); text-align: center; margin: 0.5rem 0; font-style: italic; }
 .link .card-bottom { display: flex; justify-content: flex-start; }

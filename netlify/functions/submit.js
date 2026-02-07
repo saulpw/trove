@@ -19,7 +19,7 @@ exports.handler = async (event) => {
     return { statusCode: 400, body: JSON.stringify({ error: 'Invalid JSON' }) };
   }
 
-  const { url, tags, notes, username, password } = body;
+  const { url, title, tags, notes, username, password } = body;
 
   if (!url) {
     return { statusCode: 400, body: JSON.stringify({ error: 'URL required' }) };
@@ -43,6 +43,7 @@ exports.handler = async (event) => {
   // Create GitHub issue
   const issueBody = [
     `url: ${url}`,
+    title ? `title: ${title}` : null,
     tags ? `tags: ${tags}` : null,
     notes ? `notes: ${notes}` : null,
     `submitted_by: ${username}`,

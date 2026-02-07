@@ -2,6 +2,19 @@
 
 ## 2026-02-07
 
+- Added title editing for existing links:
+  - Pencil icon (✏️) appears next to title for authenticated users
+  - Click to replace title with inline input field
+  - Enter to save, Escape to cancel
+  - Backend deduplicates and merges submissions: updates title and/or tags for existing URLs
+  - Submissions for existing URLs now update title if provided (via GitHub issues or direct submission)
+  - Fixed: Netlify submit function now includes `title` field in GitHub issue body
+- Bumped version to 0.14
+
+---
+
+## 2026-02-07
+
 - Replaced Google OAuth with per-user password authentication:
   - Users sign in with username + password, stored in localStorage (persists across refreshes)
   - Netlify Function verifies credentials against `TROVE_USERS` env var (format: `alice:pw1,bob:pw2`)

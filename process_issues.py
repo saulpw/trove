@@ -63,20 +63,38 @@ def process_issues():
             continue
 
         if url in existing_urls:
-            # Merge tags into existing entry
+            # Merge tags and/or update title for existing entry
             tags = fields.get("tags")
-            if tags:
-                for link in links:
-                    if link["url"] == url:
+            title = fields.get("title")
+            updated = False
+
+            for link in links:
+                if link["url"] == url:
+                    # Merge tags if provided
+                    if tags:
                         existing_tags = set(link.get("tags", "").split()) if link.get("tags") else set()
                         new_tags = set(tags.split())
                         merged_tags = existing_tags | new_tags
                         link["tags"] = " ".join(sorted(merged_tags))
-                        break
-                print(f"Issue #{number}: Merged tags into existing URL")
+                        updated = True
+
+                    # Update title if provided
+                    if title:
+                        link["title"] = title
+                        updated = True
+                        print(f"Issue #{number}: Updated title for existing URL")
+
+                    break
+
+            if updated:
+                if tags and title:
+                    print(f"Issue #{number}: Merged tags and updated title for existing URL")
+                elif tags:
+                    print(f"Issue #{number}: Merged tags into existing URL")
                 merged += 1
             else:
-                print(f"Issue #{number}: URL already exists, no new tags")
+                print(f"Issue #{number}: URL already exists, no updates")
+
             close_issue(number)
             continue
 

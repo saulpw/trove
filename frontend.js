@@ -118,6 +118,7 @@ function renderLinks(links) {
         </div>
         <div class="title-row">
           <span class="title">${link.title || link.url}</span>
+          ${isSignedIn() ? `<span class="edit-title-btn" onclick="handleEditTitleClick(event, this)">✏️</span>` : ''}
         </div>
         <span class="url">${domain}</span>
         ${link.notes ? `<div class="notes">${link.notes}</div>` : ''}
@@ -281,6 +282,44 @@ function updateLinkCountDisplay() {
   document.getElementById('link-count').innerHTML = `${count} link${count === 1 ? '' : 's'}${suffix}`;
 }
 
+function handleEditTitleClick(event, btn) {
+  event.preventDefault();
+  event.stopPropagation();
+
+  const linkEl = btn.closest('.link');
+  const titleEl = linkEl.querySelector('.title');
+  const url = linkEl.dataset.url;
+  const currentTitle = linkEl.dataset.title || '';
+
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'edit-title-input';
+  input.value = currentTitle;
+
+  const cancel = () => { input.remove(); titleEl.style.display = ''; btn.style.display = ''; };
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const newTitle = input.value.trim();
+      if (newTitle && newTitle !== currentTitle) {
+        titleEl.textContent = newTitle;
+        linkEl.dataset.title = newTitle;
+        cancel();
+        submitToBackend({ url, title: newTitle });
+      } else { cancel(); }
+    } else if (e.key === 'Escape') { cancel(); }
+  });
+
+  input.addEventListener('blur', () => { setTimeout(() => { if (document.body.contains(input)) cancel(); }, 100); });
+
+  titleEl.style.display = 'none';
+  btn.style.display = 'none';
+  titleEl.parentNode.insertBefore(input, titleEl);
+  input.focus();
+  input.select();
+}
+
 function handleAddTagClick(event, btn) {
   event.preventDefault();
   event.stopPropagation();
@@ -328,10 +367,21 @@ function restoreAddButton(input, btn) {
   btn.style.display = '';
 }
 
-async function submitTagsForLink(url, tags, linkEl, input, btn) {
+async function submitToBackend(fields) {
   const creds = getCredentials();
   if (!creds) { showSignIn(); return; }
+  try {
+    await fetch('/.netlify/functions/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: fields.url, title: fields.title || '', tags: fields.tags || '', notes: fields.notes || '', username: creds.username, password: creds.password }),
+    });
+  } catch (e) {
+    console.error('Failed to submit:', e);
+  }
+}
 
+async function submitTagsForLink(url, tags, linkEl, input, btn) {
   // Optimistically add tags to UI
   const tagsEl = linkEl.querySelector('.tags');
   const currentPath = '/' + currentPageTags.join('/');
@@ -346,17 +396,7 @@ async function submitTagsForLink(url, tags, linkEl, input, btn) {
   });
 
   restoreAddButton(input, btn);
-
-  // Submit to backend
-  try {
-    await fetch('/.netlify/functions/submit', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url, tags, notes: '', username: creds.username, password: creds.password }),
-    });
-  } catch (e) {
-    console.error('Failed to submit tags:', e);
-  }
+  submitToBackend({ url, tags });
 }
 
 async function loadLinks() {
