@@ -1,9 +1,14 @@
 # TODO
 
-- use PRs against trove.jsonl instead of issues
-   - netlify action should just do direct adding of json
+- ideally, could right click in/on tab and 
 
-- fix github action failure
+- alternative 'backend' to github
+  - append-only
+  - could be compiled (dedups and title/metadata fetches and removals and vote consolidations) by netlify on deploy or via github action on regular cadence or when new submit
+  - queueing/concurrency management
+
+
+- breadcrumbs
 
 - actions that can be taken on a link:
    - visit link: click anywhere in box ("default" action)

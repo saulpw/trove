@@ -169,14 +169,19 @@ function filterAndRender() {
   const includeTags = tagFilters.filter(t => !t.startsWith('-'));
   if (tagsInput) tagsInput.value = includeTags.join(' ');
 
-  // Update heading to show active filters
+  // Update heading to show breadcrumb trail
+  const h1 = document.querySelector('h1');
   if (tagFilters.length > 0) {
-    document.querySelector('h1 a').textContent = tagFilters.map(t =>
-      t.startsWith('-') ? `-#${t.slice(1)}` : `#${t}`
-    ).join(' ');
+    const crumbs = [`<a href="/" data-nav>trove</a>`];
+    tagFilters.forEach(t => {
+      const label = t.startsWith('-') ? `-${t.slice(1)}` : t;
+      const href = '/' + t;
+      crumbs.push(`<a href="${href}" data-nav>${label}</a>`);
+    });
+    h1.innerHTML = crumbs.join(' <span class="breadcrumb-sep">&#x2229;</span> ');
     document.title = tagFilters.join('/') + ' - trove';
   } else {
-    document.querySelector('h1 a').textContent = 'trove';
+    h1.innerHTML = '<a href="/" data-nav>trove</a>';
     document.title = 'trove';
   }
 
@@ -624,11 +629,24 @@ function initSignInForm() {
   }
 }
 
+// Handle breadcrumb navigation without page reload
+function initBreadcrumbNav() {
+  document.querySelector('h1').addEventListener('click', (e) => {
+    const link = e.target.closest('a[data-nav]');
+    if (link) {
+      e.preventDefault();
+      history.pushState(null, '', link.getAttribute('href'));
+      filterAndRender();
+    }
+  });
+}
+
 // Initialize on page load
 initBookmarkletLink();
 initAuth();
 initSignInForm();
 if (!initBookmarkletMode()) {
+  initBreadcrumbNav();
   initTagMenu();
   loadLinks();
 }
