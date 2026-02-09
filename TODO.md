@@ -1,22 +1,12 @@
 # TODO
 
-- ideally, could right click in/on tab and 
+- under tag breadcrumb: rename tag (possibly to multiple tags)
+   - implementation may be better as an 'action' rather resubmitting all links
+   - predictive autocomplete (most popular tags preferentially)
 
-- alternative 'backend' to github
-  - append-only
-  - could be compiled (dedups and title/metadata fetches and removals and vote consolidations) by netlify on deploy or via github action on regular cadence or when new submit
-  - queueing/concurrency management
+- delete button to delete link entirely
 
-
-- breadcrumbs
-
-- actions that can be taken on a link:
-   - visit link: click anywhere in box ("default" action)
-   - hide from me ('seen').  currently "x".
-      - toggle "locally hidden" checkbox to see hidden items.
-      - 'x' should be to the left of the title
-   - add tag: '+' should open a typing box that autocompletes from existing tagset, autocompletion preference order related to 
-      - resubmits link with new tags, gets absorbed into trove.jsonl (dedup happens at import time)
+- delete tag association
 
 - add local notes (when present, a unicode "note" character is a link to edit them)
 
@@ -24,6 +14,7 @@
    - note invalid links
    - note links that are 404 (replace with archive.org links in frontend, but show original link in interface)
    - fold duplicate links by combining their tags
+   - where should logs go?
 
 - fixup existing trove with these same fixup rules
 
@@ -47,3 +38,12 @@
 - remove link entirely: moderator action (do not implement right now) for "bad" links
 
 - auto-tag [tagless] links with llm and using current list of tags
+
+- alternative 'backend' to github
+  - append-only
+  - could be compiled (dedups and title/metadata fetches and removals and vote consolidations) by netlify on deploy or via github action on regular cadence or when new submit
+  - queueing/concurrency management
+
+- tag cloud?
+
+
