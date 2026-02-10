@@ -131,8 +131,8 @@ def do_import(filepath, no_archive, no_commit):
 
     # Skip header row
     for line in lines[1:]:
-        line = line.strip()
-        if not line:
+        line = line.rstrip("\n\r")
+        if not line.strip():
             continue
 
         parts = line.split(SEPARATOR)

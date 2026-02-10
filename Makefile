@@ -47,9 +47,9 @@ list-users:
 	python3 manage_users.py list
 
 # Extract links from a webpage into a reviewable PSV file
-web-extract:
+import-url:
 	python3 import_web_links.py extract ${URL} ${TAGS}
 
 # Import links from a reviewed PSV file into trove.jsonl
-web-import:
-	python3 import_web_links.py import ${FILE}
+import-psv:
+	python3 import_web_links.py import ${PSV}
