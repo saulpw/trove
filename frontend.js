@@ -22,6 +22,12 @@ function isHelpPage() {
   return hash === 'help';
 }
 
+// Check if we're on the /favorites page
+function isFavoritesPage() {
+  const hash = window.location.hash.replace(/^#\/?/, '');
+  return hash === 'favorites';
+}
+
 // Filter links by time period based on their added date
 function filterLinksByTime(links, period) {
   if (period === 'all') return links;
@@ -71,6 +77,21 @@ const unhideLink = (url) => {
   localStorage.setItem(HIDDEN_KEY, JSON.stringify(hidden));
 };
 
+// Favorite links stored in localStorage
+const FAVORITES_KEY = 'trove_favorites';
+const getFavorites = () => JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]');
+const addFavorite = (url) => {
+  const favs = getFavorites();
+  if (!favs.includes(url)) {
+    favs.push(url);
+    localStorage.setItem(FAVORITES_KEY, JSON.stringify(favs));
+  }
+};
+const removeFavorite = (url) => {
+  const favs = getFavorites().filter(u => u !== url);
+  localStorage.setItem(FAVORITES_KEY, JSON.stringify(favs));
+};
+
 // Store all loaded links for client-side filtering
 let allLinks = [];
 // Store current filtered links for re-sorting
@@ -79,6 +100,8 @@ let currentLinks = [];
 let currentPageTags = [];
 // Track hidden count for current filter
 let currentHiddenCount = 0;
+// Whether current page truncates display
+let currentTruncate = false;
 // Whether we're showing hidden links
 let showingHidden = false;
 
@@ -170,7 +193,7 @@ function renderLinks(links) {
         </div>
         <span class="url">${domain}</span>
         ${link.notes ? `<div class="notes">${link.notes}</div>` : ''}
-        <div class="card-bottom"><span class="tags">${tags.map(t => renderTag(t, currentPath)).join(' ')}</span><button class="add-tag-btn" onclick="handleAddTagClick(event, this)">+</button></div>
+        <div class="card-bottom"><span class="tags">${tags.map(t => renderTag(t, currentPath)).join(' ')}</span><button class="add-tag-btn" onclick="handleAddTagClick(event, this)">+</button><span class="fav-btn${getFavorites().includes(link.url) ? ' favorited' : ''}" onclick="handleFavClick(event, '${escapedUrl}', this)">&hearts;</span></div>
       </div>
     </a>`;
   }).join('');
@@ -299,33 +322,71 @@ function initSidebarTagMenu() {
   });
 }
 
+// Resolve page config from current route: title, heading, filter, pageTags
+function getPageConfig() {
+  const tagFilters = getTagFilters();
+  const includeTags = tagFilters.filter(t => !t.startsWith('-'));
+  const excludeTags = tagFilters.filter(t => t.startsWith('-')).map(t => t.slice(1));
+
+  if (isFavoritesPage()) {
+    const favorites = getFavorites();
+    return {
+      title: 'favorites - trove',
+      heading: '<a href="/" data-nav>trove</a> <span class="breadcrumb-sep">/</span> favorites',
+      filter: link => favorites.includes(link.url),
+      pageTags: [],
+      tagFilters,
+      truncate: false,
+    };
+  }
+
+  const tagFilter = link => {
+    const linkTags = parseTags(link.tags);
+    return includeTags.every(tag => linkTags.includes(tag))
+        && excludeTags.every(tag => !linkTags.includes(tag));
+  };
+
+  if (tagFilters.length > 0 && !isTagsPage()) {
+    const crumbs = [`<a href="/" data-nav>trove</a>`];
+    tagFilters.forEach(t => {
+      const label = t.startsWith('-') ? `-${t.slice(1)}` : t;
+      crumbs.push(`<a href="/${t}" data-nav>${label}</a>`);
+    });
+    return {
+      title: tagFilters.join('/') + ' - trove',
+      heading: crumbs.join(' <span class="breadcrumb-sep">&#x2229;</span> '),
+      filter: tagFilter,
+      pageTags: includeTags,
+      tagFilters,
+      truncate: false,
+    };
+  }
+
+  return {
+    title: 'trove',
+    heading: '<a href="/" data-nav>trove</a>',
+    filter: tagFilter,
+    pageTags: includeTags,
+    tagFilters,
+    truncate: true,
+  };
+}
+
 // Filter allLinks by current URL and render
 function filterAndRender() {
   const container = document.getElementById('links');
   const sortControls = document.getElementById('sort-controls');
   const timeFilterControls = document.getElementById('time-filter-controls');
-  const tagFilters = getTagFilters();
+  const page = getPageConfig();
 
   // Pre-populate tags input with current filters (exclude negated tags)
   const tagsInput = document.getElementById('link-tags');
-  const includeTags = tagFilters.filter(t => !t.startsWith('-'));
-  if (tagsInput) tagsInput.value = includeTags.join(' ');
+  if (tagsInput) tagsInput.value = page.pageTags.join(' ');
 
-  // Update heading to show breadcrumb trail
+  // Update heading
   const h1 = document.querySelector('h1');
-  if (tagFilters.length > 0 && !isTagsPage()) {
-    const crumbs = [`<a href="/" data-nav>trove</a>`];
-    tagFilters.forEach(t => {
-      const label = t.startsWith('-') ? `-${t.slice(1)}` : t;
-      const href = '/' + t;
-      crumbs.push(`<a href="${href}" data-nav>${label}</a>`);
-    });
-    h1.innerHTML = crumbs.join(' <span class="breadcrumb-sep">&#x2229;</span> ');
-    document.title = tagFilters.join('/') + ' - trove';
-  } else {
-    h1.innerHTML = '<a href="/" data-nav>trove</a>';
-    document.title = 'trove';
-  }
+  h1.innerHTML = page.heading;
+  document.title = page.title;
 
   // Apply time filter once for all pages
   timeFilterControls.style.display = 'block';
@@ -414,16 +475,9 @@ function filterAndRender() {
     return;
   }
 
-  // Filter links by tags (front page: no filters, shows all)
-  const excludeTags = tagFilters.filter(t => t.startsWith('-')).map(t => t.slice(1));
+  // Filter links using page-specific filter
   const hiddenLinks = getHiddenLinks();
-
-  const tagMatchedLinks = filteredLinks.filter(link => {
-    const linkTags = parseTags(link.tags);
-    const hasAllIncluded = includeTags.every(tag => linkTags.includes(tag));
-    const hasNoneExcluded = excludeTags.every(tag => !linkTags.includes(tag));
-    return hasAllIncluded && hasNoneExcluded;
-  });
+  const tagMatchedLinks = filteredLinks.filter(page.filter);
 
   currentHiddenCount = tagMatchedLinks.filter(link => hiddenLinks.includes(link.url)).length;
   const visibleLinks = tagMatchedLinks.filter(link => !hiddenLinks.includes(link.url));
@@ -432,6 +486,8 @@ function filterAndRender() {
 
   if (links.length === 0) {
     sortControls.style.display = 'none';
+    timeFilterControls.style.display = 'none';
+    renderTagSidebar([], []);
     if (showingHidden) {
       container.innerHTML = '<div class="empty">No hidden links. <a href="#" onclick="toggleShowHidden(); return false;">Show all</a></div>';
     } else {
@@ -446,14 +502,14 @@ function filterAndRender() {
   // Show sort controls, link count, and render sorted links
   sortControls.style.display = 'block';
   currentLinks = links;
-  currentPageTags = includeTags;
+  currentPageTags = page.pageTags;
+  currentTruncate = page.truncate;
   updateLinkCountDisplay();
   const sortBy = document.getElementById('sort-select').value;
   const sorted = sortLinks(links, sortBy);
-  // Front page: truncate display to 100 but use full set for sidebar
-  const displayLinks = tagFilters.length === 0 ? sorted.slice(0, 100) : sorted;
+  const displayLinks = page.truncate ? sorted.slice(0, 100) : sorted;
   renderLinks(displayLinks);
-  renderTagSidebar(links, includeTags);
+  renderTagSidebar(links, page.pageTags);
 }
 
 function handleHide(event, url, btn) {
@@ -476,6 +532,18 @@ function handleUnhide(event, url, btn) {
   updateLinkCountDisplay();
 }
 
+function handleFavClick(event, url, btn) {
+  event.preventDefault();
+  event.stopPropagation();
+  if (btn.classList.contains('favorited')) {
+    removeFavorite(url);
+    btn.classList.remove('favorited');
+  } else {
+    addFavorite(url);
+    btn.classList.add('favorited');
+  }
+}
+
 function toggleShowHidden() {
   showingHidden = !showingHidden;
   filterAndRender();
@@ -491,8 +559,7 @@ function updateLinkCountDisplay() {
   } else {
     suffix = '';
   }
-  const tagFilters = getTagFilters();
-  const truncated = tagFilters.length === 0 && count > 100;
+  const truncated = currentTruncate && count > 100;
   const displayCount = truncated ? 100 : count;
   const truncSuffix = truncated ? ` of ${count}` : '';
   document.getElementById('link-count').innerHTML = `${displayCount}${truncSuffix} link${count === 1 ? '' : 's'}${suffix}`;
@@ -771,8 +838,7 @@ async function handleSignIn() {
 
 function signOut() {
   clearCredentials();
-  document.getElementById('auth-user').style.display = 'none';
-  document.getElementById('signout-btn').style.display = 'none';
+  document.getElementById('auth-menu').style.display = 'none';
   document.getElementById('auth-btn').style.display = '';
 
   if (currentLinks.length > 0) {
@@ -782,9 +848,8 @@ function signOut() {
 
 function onAuthSuccess(username) {
   document.getElementById('auth-user').textContent = username;
-  document.getElementById('auth-user').style.display = '';
+  document.getElementById('auth-menu').style.display = '';
   document.getElementById('auth-btn').style.display = 'none';
-  document.getElementById('signout-btn').style.display = '';
 
   if (!bookmarkletMode && currentLinks.length > 0) {
     applySort();

@@ -14,9 +14,14 @@
       <a href="#/help">help</a>
     </nav>
     <div id="auth-container">
-      <span id="auth-user" style="display:none;"></span>
+      <div id="auth-menu" style="display:none;">
+        <span id="auth-user"></span>
+        <div id="auth-dropdown">
+          <span onclick="location.hash='#/favorites'">My favorites</span>
+          <span onclick="signOut()">Sign out</span>
+        </div>
+      </div>
       <button id="auth-btn" onclick="showSignIn()">Sign in</button>
-      <button id="signout-btn" onclick="signOut()" style="display:none;">Sign out</button>
     </div>
   </header>
 
@@ -64,7 +69,7 @@
 
   <footer>
     <div>a <a href="https://saul.pw">saul.pw</a> project | <a href="/privacy">privacy policy</a> | <a id="bookmarklet" href="#">+ bookmarklet</a></div>
-    <div id="version">v0.17</div>
+    <div id="version">v0.18</div>
   </footer>
 
   <!-- Main frontend code -->

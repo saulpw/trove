@@ -2,6 +2,16 @@
 
 ## 2026-02-11
 
+- Added favorite links feature:
+  - Heart icon in lower-right corner of each link card
+  - Click to toggle favorite (red = favorited, empty = not)
+  - Favorites stored in localStorage (`trove_favorites`)
+- Bumped version to 0.18
+
+---
+
+## 2026-02-11
+
 - Reorganized page layout: sort/time dropdowns in horizontal row (right-justified), link count on same line (left-justified)
 - Moved add form, filter bar, and links into content-wrapper alongside tag sidebar to eliminate empty space above sidebar
 

@@ -34,8 +34,18 @@ header nav { flex: 1; margin-left: 1.5rem; }
 header nav a { color: var(--color-link); text-decoration: none; font-size: var(--text-md); }
 header nav a:hover { text-decoration: underline; }
 .breadcrumb-sep { color: var(--color-text-light); font-weight: normal; margin: 0 0.1em; }
-#auth-container { font-size: var(--text-md); display: flex; align-items: center; gap: 0.5rem; }
+#auth-container { font-size: var(--text-md); display: flex; align-items: center; gap: 0.5rem; margin-right: max(0px, calc(100% - 200px - 2rem - 800px)); }
+#auth-menu { position: relative; cursor: pointer; }
 #auth-user { color: var(--color-text-muted); }
+#auth-user::after { content: ' ▾'; font-size: 0.7em; }
+#auth-dropdown {
+  display: none; position: absolute; right: 0; top: 100%;
+  background: var(--color-bg); border: 1px solid var(--color-border); border-radius: 4px;
+  box-shadow: 0 2px 8px var(--color-shadow); z-index: 100; white-space: nowrap;
+}
+#auth-menu:hover #auth-dropdown { display: block; }
+#auth-dropdown span { display: block; padding: 0.4rem 0.8rem; color: var(--color-text); cursor: pointer; }
+#auth-dropdown span:hover { background: var(--color-link-hover-bg); }
 #signin-form { display: flex; gap: 0.5rem; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; }
 #signin-form input { padding: 0.4rem; font-size: var(--text-md); border: 1px solid var(--color-border-input); border-radius: 4px; width: 10rem; }
 #signin-form button { padding: 0.4rem 0.8rem; font-size: var(--text-md); cursor: pointer; border: 1px solid var(--color-border-input); border-radius: 4px; background: var(--color-bg-btn); }
@@ -116,6 +126,11 @@ footer a { color: var(--color-text-muted); }
   padding: 0 0.4rem; margin-left: 0.5rem; line-height: 1.4;
 }
 .add-tag-btn:hover { color: var(--color-link); border-color: var(--color-link); }
+
+/* Favorite heart */
+.fav-btn { color: var(--color-border-input); cursor: pointer; font-size: 1.1em; margin-left: auto; padding-left: 0.5rem; }
+.fav-btn:hover { color: #e55; }
+.fav-btn.favorited { color: #e22; }
 .add-tag-input, .rename-tag-input {
   font-size: var(--text-base); padding: 0.1rem 0.4rem;
   border: 1px solid var(--color-link); border-radius: 4px;
@@ -145,6 +160,7 @@ footer a { color: var(--color-text-muted); }
 @media (max-width: 900px) {
   #tag-sidebar { display: none; }
   #main-content { max-width: none; }
+  #auth-container { margin-right: 0; }
 }
 
 /* Help page */
