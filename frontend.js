@@ -163,6 +163,7 @@ function renderLinks(links) {
             <span class="hide-btn" onclick="${hideHandler}(event, '${escapedUrl}', this)">${hideLabel}</span>
           </span>
         </div>
+        ${/\.(jpe?g|png|gif|webp)(\?.*)?$/i.test(link.url) ? `<div class="card-image"><img src="${link.url}" alt="${(link.title || '').replace(/"/g, '&quot;')}" loading="lazy"></div>` : ''}
         <div class="title-row">
           <span class="title">${link.title || link.url}</span>
           ${isSignedIn() ? `<span class="edit-title-btn" onclick="handleEditTitleClick(event, this)">✏️</span>` : ''}

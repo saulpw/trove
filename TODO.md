@@ -1,7 +1,5 @@
 # TODO
 
-- add help page with t
-
 - add a #u/contributor tag
 
 - import bulk lines from web page: include link to source in notes (markdown, converted to html in js?)
@@ -9,6 +7,10 @@
 - under tag breadcrumb: rename tag (possibly to multiple tags)
    - implementation may be better as an 'action' rather resubmitting all links
    - predictive autocomplete (most popular tags preferentially)
+
+- local highlight/favorite
+
+- for youtube, show youtube player
 
 - delete button to delete link entirely
 

@@ -57,6 +57,8 @@ header nav a:hover { text-decoration: underline; }
 .link .added { color: var(--color-text-faint); font-size: var(--text-sm); flex-shrink: 0; }
 .link .hide-btn { color: var(--color-border-input); cursor: pointer; font-size: var(--text-base); margin-left: 0.5rem; flex-shrink: 0; }
 .link .hide-btn:hover { color: var(--color-error); }
+.card-image { text-align: center; margin: 0.5rem 0; }
+.card-image img { max-width: 100%; max-height: 300px; object-fit: contain; border-radius: 4px; }
 .link .title-row { text-align: center; margin: 0.5rem 0; position: relative; }
 .link .title { color: var(--color-link); font-size: var(--text-lg); font-weight: 500; }
 .edit-title-btn {
