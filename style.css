@@ -69,8 +69,6 @@ header nav a:hover { text-decoration: underline; }
 .link:hover { border-color: var(--color-link); box-shadow: 0 2px 8px var(--color-link-hover-shadow); }
 .link .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.25rem; }
 .link .added { color: var(--color-text-faint); font-size: var(--text-sm); flex-shrink: 0; }
-.link .hide-btn { color: var(--color-border-input); cursor: pointer; font-size: var(--text-base); margin-left: 0.5rem; flex-shrink: 0; }
-.link .hide-btn:hover { color: var(--color-error); }
 .card-image { text-align: center; margin: 0.5rem 0; }
 .card-image img { max-width: 100%; max-height: 300px; object-fit: contain; border-radius: 4px; }
 .yt-meta { text-align: center; font-size: var(--text-sm); color: var(--color-text-light); margin-bottom: 0.25rem; }
@@ -128,10 +126,14 @@ footer a { color: var(--color-text-muted); }
 }
 .add-tag-btn:hover { color: var(--color-link); border-color: var(--color-link); }
 
-/* Favorite heart */
-.fav-btn { color: var(--color-border-input); cursor: pointer; font-size: 1.1em; margin-left: auto; padding-left: 0.5rem; }
-.fav-btn:hover { color: #e55; }
-.fav-btn.favorited { color: #e22; }
+/* Rating widget */
+.rating-widget { margin-left: auto; padding-left: 0.5rem; display: flex; align-items: center; gap: 0.3rem; }
+.rate-up, .rate-down { cursor: pointer; font-size: 0.9em; opacity: 0.6; transition: opacity 0.15s; }
+.rate-up:hover, .rate-down:hover { opacity: 1; }
+.rating-value { font-size: var(--text-sm); min-width: 1.2em; text-align: center; }
+.rating-value.positive { color: #e22; }
+.rating-value.negative { color: var(--color-text-light); }
+.rating-value.zero { color: var(--color-text-faint); }
 .add-tag-input, .rename-tag-input {
   font-size: var(--text-base); padding: 0.1rem 0.4rem;
   border: 1px solid var(--color-link); border-radius: 4px;
@@ -155,6 +157,8 @@ footer a { color: var(--color-text-muted); }
   background: var(--color-bg); border: 1px solid var(--color-border); border-radius: 4px;
   box-shadow: 0 2px 8px var(--color-shadow); z-index: 100; white-space: nowrap;
 }
+#tag-sidebar .sidebar-pseudo { margin-bottom: 0.5rem; }
+#tag-sidebar .sidebar-pseudo .tag { font-style: italic; }
 #tag-sidebar .sidebar-menu.open { display: block; }
 #tag-sidebar .sidebar-menu span { display: block; padding: 0.4rem 0.6rem; color: var(--color-text); cursor: pointer; }
 #tag-sidebar .sidebar-menu span:hover { background: var(--color-link-hover-bg); }

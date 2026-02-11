@@ -15,7 +15,6 @@
       <div id="auth-menu" style="display:none;">
         <span id="auth-user"></span>
         <div id="auth-dropdown">
-          <span onclick="location.hash='#/favorites'">My favorites</span>
           <span onclick="signOut()">Sign out</span>
         </div>
       </div>
@@ -47,8 +46,7 @@
       <li><a href="#help-menu">The tag menu</a></li>
       <li><a href="#help-sidebar">The tag sidebar</a></li>
       <li><a href="#help-sorting">Sorting &amp; filtering</a></li>
-      <li><a href="#help-hiding">Hiding links</a></li>
-      <li><a href="#help-favorites">Favorites</a></li>
+      <li><a href="#help-rating">Rating links</a></li>
       <li><a href="#help-adding">Adding links</a></li>
     </ul></nav>
     <div class="help-content">
@@ -91,12 +89,14 @@
         <li><strong>Time period</strong> &mdash; filter links by when they were added (last day, week, month, year, or all time)</li>
       </ul>
 
-      <h3 id="help-hiding">Hiding links</h3>
-      <p>Each link card has a "Hide" button in the top-right corner. Hidden links are stored locally in the browser and can be toggled back via the "N hidden" link in the link count.</p>
-
-      <h3 id="help-favorites">Favorites</h3>
-      <p>Each link card has a <strong>&hearts;</strong> heart icon in the lower-right corner. Click it to add the link to your favorites (the heart turns red). Click again to remove it. Favorites are stored locally in the browser.</p>
-      <p>To view all your favorited links, click your username in the top-right corner and select <strong>My favorites</strong>. The favorites page displays links just like a tag page, with sorting and tag sidebar.</p>
+      <h3 id="help-rating">Rating links</h3>
+      <p>Each link card has a rating widget in the lower-right corner: 💣 [number] ❤️</p>
+      <ul>
+        <li><strong>❤️</strong> &mdash; click to bump the rating up by 1</li>
+        <li><strong>💣</strong> &mdash; click to bump the rating down by 1</li>
+      </ul>
+      <p>Links with a negative rating are hidden by default. The "N hidden" link in the link count lets you toggle their visibility. Ratings are stored locally in the browser.</p>
+      <p>Use the pseudo-tags <code>_favs</code> and <code>_peeves</code> in the tag sidebar to view positively or negatively rated links.</p>
 
       <h3 id="help-adding">Adding links</h3>
       <p>Signed-in users can add links using the form at the top of the page. Tags are space-separated. A bookmarklet is available in the footer for quick submissions from any page.</p>

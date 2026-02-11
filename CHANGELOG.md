@@ -2,6 +2,19 @@
 
 ## 2026-02-11
 
+- Unified favorites and hidden links into a numeric rating system:
+  - Rating widget on each card: 💣 [number] ❤️ (click to rate down/up)
+  - Links with rating < 0 are hidden by default (replaces separate Hide button)
+  - Pseudo-tags `_favs` (rating > 0) and `_peeves` (rating < 0) in tag sidebar
+  - Removed "My favorites" menu item, `isFavoritesPage()`, old favorites/hidden localStorage keys
+  - Single `trove_ratings` localStorage key stores `{ url: number }` map
+  - Updated help.html with new rating documentation
+- Bumped version to 0.20
+
+---
+
+## 2026-02-11
+
 - YouTube link support: YouTube URLs now get special treatment with thumbnail images, duration, and channel metadata displayed on cards
 - `add_link.py`: Added `is_youtube_url()`, `fetch_youtube_metadata()` using `yt-dlp` to fetch title, duration, channel, and thumbnail
 - `trove_utils.py`: `create_link_entry()` accepts `duration`, `channel`, `thumbnail` optional fields

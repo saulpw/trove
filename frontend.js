@@ -10,12 +10,6 @@ function getTagFilters() {
     .filter(segment => segment.length > 0 && segment !== 'index.html');
 }
 
-// Check if we're on the /favorites page
-function isFavoritesPage() {
-  const hash = window.location.hash.replace(/^#\/?/, '');
-  return hash === 'favorites';
-}
-
 // Filter links by time period based on their added date
 function filterLinksByTime(links, period) {
   if (period === 'all') return links;
@@ -50,34 +44,14 @@ function filterLinksByTime(links, period) {
 // Parse tags from space-separated string to array
 const parseTags = (tags) => tags ? tags.split(' ').filter(t => t) : [];
 
-// Hidden links stored in localStorage
-const HIDDEN_KEY = 'trove_hidden_links';
-const getHiddenLinks = () => JSON.parse(localStorage.getItem(HIDDEN_KEY) || '[]');
-const hideLink = (url) => {
-  const hidden = getHiddenLinks();
-  if (!hidden.includes(url)) {
-    hidden.push(url);
-    localStorage.setItem(HIDDEN_KEY, JSON.stringify(hidden));
-  }
-};
-const unhideLink = (url) => {
-  const hidden = getHiddenLinks().filter(u => u !== url);
-  localStorage.setItem(HIDDEN_KEY, JSON.stringify(hidden));
-};
-
-// Favorite links stored in localStorage
-const FAVORITES_KEY = 'trove_favorites';
-const getFavorites = () => JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]');
-const addFavorite = (url) => {
-  const favs = getFavorites();
-  if (!favs.includes(url)) {
-    favs.push(url);
-    localStorage.setItem(FAVORITES_KEY, JSON.stringify(favs));
-  }
-};
-const removeFavorite = (url) => {
-  const favs = getFavorites().filter(u => u !== url);
-  localStorage.setItem(FAVORITES_KEY, JSON.stringify(favs));
+// Ratings stored in localStorage: { url: number }
+const RATINGS_KEY = 'trove_ratings';
+const getRatings = () => JSON.parse(localStorage.getItem(RATINGS_KEY) || '{}');
+const getRating = (url) => getRatings()[url] || 0;
+const setRating = (url, n) => {
+  const ratings = getRatings();
+  if (n === 0) { delete ratings[url]; } else { ratings[url] = n; }
+  localStorage.setItem(RATINGS_KEY, JSON.stringify(ratings));
 };
 
 // Store all loaded links for client-side filtering
@@ -154,13 +128,14 @@ function renderTag(t, currentPath) {
 function renderLinks(links) {
   const container = document.getElementById('links');
   const currentPath = '/' + currentPageTags.join('/');
-  const hideHandler = showingHidden ? 'handleUnhide' : 'handleHide';
-  const hideLabel = showingHidden ? 'Unhide' : 'Hide';
+  const ratings = getRatings();
   container.innerHTML = links.map(link => {
     const tags = parseTags(link.tags).filter(t => !currentPageTags.includes(t)).sort();
     let domain = link.url;
     try { domain = new URL(link.url).hostname.replace(/^www\./, ''); } catch {}
     const escapedUrl = link.url.replace(/'/g, "\\'");
+    const rating = ratings[link.url] || 0;
+    const ratingClass = rating > 0 ? 'positive' : rating < 0 ? 'negative' : 'zero';
     return `
     <a class="link-anchor" href="${link.url}" target="_blank" rel="noopener">
       <div class="link"
@@ -170,9 +145,6 @@ function renderLinks(links) {
            ${tags.length ? `data-tags="${tags.join(' ')}"` : ''}>
         <div class="card-top">
           ${link.added ? `<span class="added">${formatDate(link.added)}</span>` : '<span></span>'}
-          <span>
-            <span class="hide-btn" onclick="${hideHandler}(event, '${escapedUrl}', this)">${hideLabel}</span>
-          </span>
         </div>
         ${link.thumbnail ? `<div class="card-image"><img src="${link.thumbnail}" alt="${(link.title || '').replace(/"/g, '&quot;')}" loading="lazy"></div>` : /\.(jpe?g|png|gif|webp)(\?.*)?$/i.test(link.url) ? `<div class="card-image"><img src="${link.url}" alt="${(link.title || '').replace(/"/g, '&quot;')}" loading="lazy"></div>` : ''}
         ${link.duration || link.channel ? `<div class="yt-meta">${link.duration ? `<span class="yt-duration">${link.duration}</span>` : ''}${link.duration && link.channel ? ' · ' : ''}${link.channel ? `<span class="yt-channel">${link.channel}</span>` : ''}</div>` : ''}
@@ -182,7 +154,7 @@ function renderLinks(links) {
         </div>
         <span class="url">${domain}</span>
         ${link.notes ? `<div class="notes">${link.notes}</div>` : ''}
-        <div class="card-bottom"><span class="tags">${tags.map(t => renderTag(t, currentPath)).join(' ')}</span><button class="add-tag-btn" onclick="handleAddTagClick(event, this)">+</button><span class="fav-btn${getFavorites().includes(link.url) ? ' favorited' : ''}" onclick="handleFavClick(event, '${escapedUrl}', this)">&hearts;</span></div>
+        <div class="card-bottom"><span class="tags">${tags.map(t => renderTag(t, currentPath)).join(' ')}</span><button class="add-tag-btn" onclick="handleAddTagClick(event, this)">+</button><span class="rating-widget"><span class="rate-down" onclick="handleRateDown(event, '${escapedUrl}', this)">💣</span><span class="rating-value ${ratingClass}">${rating}</span><span class="rate-up" onclick="handleRateUp(event, '${escapedUrl}', this)">❤️</span></span></div>
       </div>
     </a>`;
   }).join('');
@@ -245,7 +217,8 @@ function renderTagSidebar(links, pageTags) {
   }
   const currentPath = '/' + pageTags.join('/');
   sidebar.style.display = '';
-  sidebar.innerHTML = sorted.map(([tag, count]) =>
+  const pseudoTags = `<span class="sidebar-tag sidebar-pseudo" data-tag="_favs"><span class="tag">#_favs</span></span><span class="sidebar-tag sidebar-pseudo" data-tag="_peeves"><span class="tag">#_peeves</span></span>`;
+  sidebar.innerHTML = pseudoTags + sorted.map(([tag, count]) =>
     `<span class="sidebar-tag" data-tag="${tag}"><span class="tag">#${tag}</span> <span class="sidebar-count">(${count})</span></span>`
   ).join('') + `<div class="sidebar-menu"></div>`;
 }
@@ -280,6 +253,12 @@ function initSidebarTagMenu() {
     if (tagEl) {
       e.preventDefault();
       e.stopPropagation();
+      // Pseudo-tags navigate directly
+      if (tagEl.classList.contains('sidebar-pseudo')) {
+        history.pushState(null, '', '/' + tagEl.dataset.tag);
+        filterAndRender();
+        return;
+      }
       const menu = sidebar.querySelector('.sidebar-menu');
       const tag = tagEl.dataset.tag;
       if (menu._tag === tag) {
@@ -317,12 +296,25 @@ function getPageConfig() {
   const includeTags = tagFilters.filter(t => !t.startsWith('-'));
   const excludeTags = tagFilters.filter(t => t.startsWith('-')).map(t => t.slice(1));
 
-  if (isFavoritesPage()) {
-    const favorites = getFavorites();
+  if (includeTags.includes('_favs')) {
+    const ratings = getRatings();
     return {
-      title: 'favorites - trove',
-      heading: '<a href="/" data-nav>trove</a> <span class="breadcrumb-sep">/</span> favorites',
-      filter: link => favorites.includes(link.url),
+      title: '_favs - trove',
+      heading: '<a href="/" data-nav>trove</a> <span class="breadcrumb-sep">/</span> _favs',
+      filter: link => (ratings[link.url] || 0) > 0,
+      pageTags: [],
+      tagFilters,
+      truncate: false,
+    };
+  }
+
+  if (includeTags.includes('_peeves')) {
+    const ratings = getRatings();
+    showingHidden = true;
+    return {
+      title: '_peeves - trove',
+      heading: '<a href="/" data-nav>trove</a> <span class="breadcrumb-sep">/</span> _peeves',
+      filter: link => (ratings[link.url] || 0) < 0,
       pageTags: [],
       tagFilters,
       truncate: false,
@@ -363,6 +355,7 @@ function getPageConfig() {
 
 // Filter allLinks by current URL and render
 function filterAndRender() {
+  showingHidden = false;
   const container = document.getElementById('links');
   const sortControls = document.getElementById('sort-controls');
   const timeFilterControls = document.getElementById('time-filter-controls');
@@ -383,12 +376,12 @@ function filterAndRender() {
   const filteredLinks = filterLinksByTime(allLinks, timePeriod);
 
   // Filter links using page-specific filter
-  const hiddenLinks = getHiddenLinks();
+  const ratings = getRatings();
   const tagMatchedLinks = filteredLinks.filter(page.filter);
 
-  currentHiddenCount = tagMatchedLinks.filter(link => hiddenLinks.includes(link.url)).length;
-  const visibleLinks = tagMatchedLinks.filter(link => !hiddenLinks.includes(link.url));
-  const hiddenLinksList = tagMatchedLinks.filter(link => hiddenLinks.includes(link.url));
+  currentHiddenCount = tagMatchedLinks.filter(link => (ratings[link.url] || 0) < 0).length;
+  const visibleLinks = tagMatchedLinks.filter(link => (ratings[link.url] || 0) >= 0);
+  const hiddenLinksList = tagMatchedLinks.filter(link => (ratings[link.url] || 0) < 0);
   const links = showingHidden ? hiddenLinksList : visibleLinks;
 
   if (links.length === 0) {
@@ -419,36 +412,35 @@ function filterAndRender() {
   renderTagSidebar(links, page.pageTags);
 }
 
-function handleHide(event, url, btn) {
+function handleRateUp(event, url, btn) {
   event.preventDefault();
   event.stopPropagation();
-  hideLink(url);
-  btn.closest('.link-anchor').remove();
-  currentLinks = currentLinks.filter(l => l.url !== url);
-  currentHiddenCount++;
-  updateLinkCountDisplay();
+  const newRating = getRating(url) + 1;
+  setRating(url, newRating);
+  const widget = btn.closest('.rating-widget');
+  const valueEl = widget.querySelector('.rating-value');
+  valueEl.textContent = newRating;
+  valueEl.className = 'rating-value ' + (newRating > 0 ? 'positive' : newRating < 0 ? 'negative' : 'zero');
 }
 
-function handleUnhide(event, url, btn) {
+function handleRateDown(event, url, btn) {
   event.preventDefault();
   event.stopPropagation();
-  unhideLink(url);
-  btn.closest('.link-anchor').remove();
-  currentLinks = currentLinks.filter(l => l.url !== url);
-  currentHiddenCount--;
-  updateLinkCountDisplay();
-}
-
-function handleFavClick(event, url, btn) {
-  event.preventDefault();
-  event.stopPropagation();
-  if (btn.classList.contains('favorited')) {
-    removeFavorite(url);
-    btn.classList.remove('favorited');
-  } else {
-    addFavorite(url);
-    btn.classList.add('favorited');
+  const oldRating = getRating(url);
+  const newRating = oldRating - 1;
+  setRating(url, newRating);
+  // If rating just went negative, hide the card (unless showing hidden)
+  if (oldRating >= 0 && newRating < 0 && !showingHidden) {
+    btn.closest('.link-anchor').remove();
+    currentLinks = currentLinks.filter(l => l.url !== url);
+    currentHiddenCount++;
+    updateLinkCountDisplay();
+    return;
   }
+  const widget = btn.closest('.rating-widget');
+  const valueEl = widget.querySelector('.rating-value');
+  valueEl.textContent = newRating;
+  valueEl.className = 'rating-value ' + (newRating > 0 ? 'positive' : newRating < 0 ? 'negative' : 'zero');
 }
 
 function toggleShowHidden() {

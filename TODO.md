@@ -2,8 +2,6 @@
 
 - bookmarklet popup widget on same page to be added
 
-- make the thumbnail smaller and on the right of the card.  unify the thumbnail mechanism in frontend.js for youtube videos and images.
-
 - delete tag association
 
 - /help.html -> /help URL
