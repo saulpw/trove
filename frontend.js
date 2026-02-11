@@ -16,6 +16,12 @@ function isTagsPage() {
   return hash === 'tags';
 }
 
+// Check if we're on the /help page
+function isHelpPage() {
+  const hash = window.location.hash.replace(/^#\/?/, '');
+  return hash === 'help';
+}
+
 // Filter links by time period based on their added date
 function filterLinksByTime(links, period) {
   if (period === 'all') return links;
@@ -324,6 +330,61 @@ function filterAndRender() {
   timeFilterControls.style.display = 'block';
   const timePeriod = document.getElementById('time-filter-select').value;
   const filteredLinks = filterLinksByTime(allLinks, timePeriod);
+
+  // /help page: show help content
+  if (isHelpPage()) {
+    sortControls.style.display = 'none';
+    timeFilterControls.style.display = 'none';
+    document.getElementById('link-count').innerHTML = '';
+    renderTagSidebar([], []);
+    container.innerHTML = `<div class="help-page">
+<h2>How trove works</h2>
+
+<p>Trove is a shared collection of links organized by tags. Each link can have one or more tags (e.g. <code>games</code>, <code>retro</code>, <code>tools</code>).</p>
+
+<h3>Browsing by tag</h3>
+<p>Click any <span class="tag-example">#tag</span> to see all links with that tag. The URL updates to reflect the filter &mdash; e.g. <code>/games</code> shows all links tagged "games".</p>
+
+<h3>Tag intersections</h3>
+<p>Combine tags by adding more path segments. For example:</p>
+<ul>
+  <li><code>/games</code> &mdash; links tagged "games"</li>
+  <li><code>/games/retro</code> &mdash; links tagged <em>both</em> "games" <em>and</em> "retro"</li>
+  <li><code>/games/retro/free</code> &mdash; links tagged all three</li>
+</ul>
+<p>The heading shows the active filters joined by <strong>&cap;</strong> (intersection symbol). Click any filter in the heading to navigate to just that tag.</p>
+
+<h3>Excluding tags</h3>
+<p>Prefix a tag with <code>-</code> to exclude it:</p>
+<ul>
+  <li><code>/games/-retro</code> &mdash; links tagged "games" but <em>not</em> "retro"</li>
+</ul>
+
+<h3>The tag menu</h3>
+<p>Hover over any tag on a link card to see a popup menu with three options:</p>
+<ul>
+  <li><strong>&rarr; /tag</strong> &mdash; navigate to that tag's page (replaces current filters)</li>
+  <li><strong>+ /current/tag</strong> &mdash; add this tag to the current intersection (narrow results)</li>
+  <li><strong>&minus; /current/-tag</strong> &mdash; exclude this tag from the current view</li>
+</ul>
+
+<h3>Tag sidebar</h3>
+<p>On wider screens, a sidebar appears on the right showing all tags present in the currently displayed links, sorted by frequency. Click a sidebar tag to see the same menu options. Tags already in the active filter are hidden from the sidebar.</p>
+
+<h3>Sorting &amp; filtering</h3>
+<ul>
+  <li><strong>Sort</strong> &mdash; newest first (default), oldest first, alphabetical, or random</li>
+  <li><strong>Time period</strong> &mdash; filter links by when they were added (last day, week, month, year, or all time)</li>
+</ul>
+
+<h3>Hiding links</h3>
+<p>Each link card has a "Hide" button in the top-right corner. Hidden links are stored locally in the browser and can be toggled back via the "N hidden" link in the link count.</p>
+
+<h3>Adding links</h3>
+<p>Signed-in users can add links using the form at the top of the page. Tags are space-separated. A bookmarklet is available in the footer for quick submissions from any page.</p>
+</div>`;
+    return;
+  }
 
   // /tags page: show tag list
   if (isTagsPage()) {

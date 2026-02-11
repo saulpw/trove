@@ -2,6 +2,16 @@
 
 ## 2026-02-11
 
+- Added help page (#/help) explaining the UI:
+  - Tag browsing, intersections, and exclusions
+  - Tag hover menu and sidebar behavior
+  - Sorting, time filtering, hiding links, and adding links
+- Bumped version to 0.17
+
+---
+
+## 2026-02-11
+
 - Added tag sidebar on tag filter pages:
   - Shows all other tags present in the current filtered linkset, sorted by count
   - Reuses existing tag hover menu (replace/add/exclude navigation)
