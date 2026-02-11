@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>help - trove</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header>
+    <h1><a href="/">trove</a> <span class="breadcrumb-sep">/</span> help</h1>
+    <nav>
+      <a href="#/tags">all tags</a>
+    </nav>
+    <div id="auth-container">
+      <div id="auth-menu" style="display:none;">
+        <span id="auth-user"></span>
+        <div id="auth-dropdown">
+          <span onclick="location.hash='#/favorites'">My favorites</span>
+          <span onclick="signOut()">Sign out</span>
+        </div>
+      </div>
+      <button id="auth-btn" onclick="showSignIn()">Sign in</button>
+    </div>
+  </header>
+
+  <div id="signin-form" style="display:none;">
+    <input type="text" id="auth-username" placeholder="Username" />
+    <input type="password" id="auth-password" placeholder="Password" />
+    <button onclick="handleSignIn()">Sign in</button>
+    <span id="auth-status"></span>
+  </div>
+
+  <div class="help-page">
+    <nav class="help-toc"><ul>
+      <li><a href="#help-browsing">Browsing by tag</a></li>
+      <li><a href="#help-intersections">Tag intersections</a></li>
+      <li><a href="#help-excluding">Excluding tags</a></li>
+      <li><a href="#help-menu">The tag menu</a></li>
+      <li><a href="#help-sidebar">The tag sidebar</a></li>
+      <li><a href="#help-sorting">Sorting &amp; filtering</a></li>
+      <li><a href="#help-hiding">Hiding links</a></li>
+      <li><a href="#help-favorites">Favorites</a></li>
+      <li><a href="#help-adding">Adding links</a></li>
+    </ul></nav>
+    <div class="help-content">
+      <h2>How trove works</h2>
+
+      <p>Trove is a shared collection of links organized by tags. Each link can have one or more tags (e.g. <code>games</code>, <code>retro</code>, <code>tools</code>).</p>
+
+      <h3 id="help-browsing">Browsing by tag</h3>
+      <p>Click any <span class="tag-example">#tag</span> to see all links with that tag. The URL updates to reflect the filter &mdash; e.g. <code>/games</code> shows all links tagged "games".</p>
+
+      <h3 id="help-intersections">Tag intersections</h3>
+      <p>Combine tags by adding more path segments. For example:</p>
+      <ul>
+        <li><code>/games</code> &mdash; links tagged "games"</li>
+        <li><code>/games/retro</code> &mdash; links tagged <em>both</em> "games" <em>and</em> "retro"</li>
+        <li><code>/games/retro/free</code> &mdash; links tagged all three</li>
+      </ul>
+      <p>The heading shows the active filters joined by <strong>&cap;</strong> (intersection symbol). Click any filter in the heading to navigate to just that tag.</p>
+
+      <h3 id="help-excluding">Excluding tags</h3>
+      <p>Prefix a tag with <code>-</code> to exclude it:</p>
+      <ul>
+        <li><code>/games/-retro</code> &mdash; links tagged "games" but <em>not</em> "retro"</li>
+      </ul>
+
+      <h3 id="help-menu">The tag menu</h3>
+      <p>Hover over any tag on a link card to see a popup menu with three options:</p>
+      <ul>
+        <li><strong>&rarr; /tag</strong> &mdash; navigate to that tag's page (replaces current filters)</li>
+        <li><strong>+ /current/tag</strong> &mdash; add this tag to the current intersection (narrow results)</li>
+        <li><strong>&minus; /current/-tag</strong> &mdash; exclude this tag from the current view</li>
+      </ul>
+
+      <h3 id="help-sidebar">The tag sidebar</h3>
+      <p>On wider screens, a sidebar appears on the right showing all tags present in the currently displayed links, sorted by frequency. Click a sidebar tag to see the same menu options. Tags already in the active filter are hidden from the sidebar.</p>
+
+      <h3 id="help-sorting">Sorting &amp; filtering</h3>
+      <ul>
+        <li><strong>Sort</strong> &mdash; newest first (default), oldest first, alphabetical, or random</li>
+        <li><strong>Time period</strong> &mdash; filter links by when they were added (last day, week, month, year, or all time)</li>
+      </ul>
+
+      <h3 id="help-hiding">Hiding links</h3>
+      <p>Each link card has a "Hide" button in the top-right corner. Hidden links are stored locally in the browser and can be toggled back via the "N hidden" link in the link count.</p>
+
+      <h3 id="help-favorites">Favorites</h3>
+      <p>Each link card has a <strong>&hearts;</strong> heart icon in the lower-right corner. Click it to add the link to your favorites (the heart turns red). Click again to remove it. Favorites are stored locally in the browser.</p>
+      <p>To view all your favorited links, click your username in the top-right corner and select <strong>My favorites</strong>. The favorites page displays links just like a tag page, with sorting and tag sidebar.</p>
+
+      <h3 id="help-adding">Adding links</h3>
+      <p>Signed-in users can add links using the form at the top of the page. Tags are space-separated. A bookmarklet is available in the footer for quick submissions from any page.</p>
+    </div>
+  </div>
+
+  <footer>
+    <div>a <a href="https://saul.pw">saul.pw</a> project | <a href="/privacy">privacy policy</a></div>
+  </footer>
+  <script src="/frontend.js"></script>
+</body>
+</html>

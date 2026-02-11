@@ -2,6 +2,17 @@
 
 ## 2026-02-11
 
+- Moved help page to standalone `help.html`:
+  - Separate page without add-link form or filter widgets
+  - TOC sidebar on the left with anchor links to each section
+  - Retains sign-in/user menu from shared `frontend.js`
+  - Removed `isHelpPage()` and inline help rendering from `frontend.js`
+  - Added favorites documentation section
+
+---
+
+## 2026-02-11
+
 - Added favorite links feature:
   - Heart icon in lower-right corner of each link card
   - Click to toggle favorite (red = favorited, empty = not)

@@ -18,7 +18,7 @@ add:
 # Build for Netlify deployment
 build:
 	mkdir -p _build
-	cp index.html style.css frontend.js trove.jsonl _build/
+	cp index.html help.html style.css frontend.js trove.jsonl _build/
 	sed -i='' 's/BUILD_TIMESTAMP/$(shell date +%s)/' _build/index.html
 
 # Syntax check all Python files, then run tests
