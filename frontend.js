@@ -210,11 +210,6 @@ function initTagMenu() {
 
 function renderTagSidebar(links, pageTags) {
   const sidebar = document.getElementById('tag-sidebar');
-  if (!pageTags || pageTags.length === 0) {
-    sidebar.innerHTML = '';
-    sidebar.style.display = 'none';
-    return;
-  }
   const tagCounts = {};
   links.forEach(link => {
     parseTags(link.tags).forEach(tag => {
@@ -357,22 +352,7 @@ function filterAndRender() {
     return;
   }
 
-  // Front page: show recent links
-  if (tagFilters.length === 0) {
-    sortControls.style.display = 'none';
-
-    const recentLinks = sortLinks(filteredLinks, 'newest').slice(0, 50);
-    currentLinks = recentLinks;
-    currentPageTags = [];
-    currentHiddenCount = 0;
-
-    document.getElementById('link-count').innerHTML = '';
-    renderLinks(recentLinks);
-    renderTagSidebar([], []);
-    return;
-  }
-
-  // Tag filter pages: filter links by tags
+  // Filter links by tags (front page: no filters, shows all)
   const excludeTags = tagFilters.filter(t => t.startsWith('-')).map(t => t.slice(1));
   const hiddenLinks = getHiddenLinks();
 
@@ -408,7 +388,9 @@ function filterAndRender() {
   updateLinkCountDisplay();
   const sortBy = document.getElementById('sort-select').value;
   const sorted = sortLinks(links, sortBy);
-  renderLinks(sorted);
+  // Front page: truncate display to 100 but use full set for sidebar
+  const displayLinks = tagFilters.length === 0 ? sorted.slice(0, 100) : sorted;
+  renderLinks(displayLinks);
   renderTagSidebar(links, includeTags);
 }
 
@@ -447,7 +429,11 @@ function updateLinkCountDisplay() {
   } else {
     suffix = '';
   }
-  document.getElementById('link-count').innerHTML = `${count} link${count === 1 ? '' : 's'}${suffix}`;
+  const tagFilters = getTagFilters();
+  const truncated = tagFilters.length === 0 && count > 100;
+  const displayCount = truncated ? 100 : count;
+  const truncSuffix = truncated ? ` of ${count}` : '';
+  document.getElementById('link-count').innerHTML = `${displayCount}${truncSuffix} link${count === 1 ? '' : 's'}${suffix}`;
 }
 
 function handleEditTitleClick(event, btn) {
