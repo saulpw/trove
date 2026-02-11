@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 2026-02-11
+
+- Added tag sidebar on tag filter pages:
+  - Shows all other tags present in the current filtered linkset, sorted by count
+  - Reuses existing tag hover menu (replace/add/exclude navigation)
+  - Hidden on front page, /tags page, and mobile (<900px)
+  - Body max-width widened to 1100px to accommodate sidebar
+  - Extracted `renderTag()` to standalone function for reuse
+- Bumped version to 0.16
+
+---
+
 ## 2026-02-07
 
 - Added dedicated /tags page:

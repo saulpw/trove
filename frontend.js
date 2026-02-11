@@ -129,6 +129,10 @@ function sortLinks(links, sortBy) {
   return sorted;
 }
 
+function renderTag(t, currentPath) {
+  return `<span class="tag-wrap"><span class="tag" data-tag="${t}">#${t}</span><span class="tag-menu"><span data-href="/${t}">→ /${t}</span><span data-href="${currentPath}/${t}">+ ${currentPath}/${t}</span><span data-href="${currentPath}/-${t}">− ${currentPath}/-${t}</span></span></span>`;
+}
+
 function renderLinks(links) {
   const container = document.getElementById('links');
   const currentPath = '/' + currentPageTags.join('/');
@@ -139,7 +143,6 @@ function renderLinks(links) {
     let domain = link.url;
     try { domain = new URL(link.url).hostname.replace(/^www\./, ''); } catch {}
     const escapedUrl = link.url.replace(/'/g, "\\'");
-    const renderTag = (t) => `<span class="tag-wrap"><span class="tag" data-tag="${t}">#${t}</span><span class="tag-menu"><span data-href="/${t}">→ /${t}</span><span data-href="${currentPath}/${t}">+ ${currentPath}/${t}</span><span data-href="${currentPath}/-${t}">− ${currentPath}/-${t}</span></span></span>`;
     return `
     <a class="link-anchor" href="${link.url}" target="_blank" rel="noopener">
       <div class="link"
@@ -159,7 +162,7 @@ function renderLinks(links) {
         </div>
         <span class="url">${domain}</span>
         ${link.notes ? `<div class="notes">${link.notes}</div>` : ''}
-        <div class="card-bottom"><span class="tags">${tags.map(renderTag).join(' ')}</span><button class="add-tag-btn" onclick="handleAddTagClick(event, this)">+</button></div>
+        <div class="card-bottom"><span class="tags">${tags.map(t => renderTag(t, currentPath)).join(' ')}</span><button class="add-tag-btn" onclick="handleAddTagClick(event, this)">+</button></div>
       </div>
     </a>`;
   }).join('');
@@ -192,6 +195,85 @@ function initTagMenu() {
       e.stopPropagation();
       navigateToTag(tag.dataset.tag);
     }
+  });
+}
+
+function renderTagSidebar(links, pageTags) {
+  const sidebar = document.getElementById('tag-sidebar');
+  if (!pageTags || pageTags.length === 0) {
+    sidebar.innerHTML = '';
+    sidebar.style.display = 'none';
+    return;
+  }
+  const tagCounts = {};
+  links.forEach(link => {
+    parseTags(link.tags).forEach(tag => {
+      if (!pageTags.includes(tag)) {
+        tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+      }
+    });
+  });
+  const sorted = Object.entries(tagCounts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+  if (sorted.length === 0) {
+    sidebar.innerHTML = '';
+    sidebar.style.display = 'none';
+    return;
+  }
+  const currentPath = '/' + pageTags.join('/');
+  sidebar.style.display = '';
+  sidebar.innerHTML = sorted.map(([tag, count]) =>
+    `<span class="sidebar-tag" data-tag="${tag}"><span class="tag">#${tag}</span> <span class="sidebar-count">(${count})</span></span>`
+  ).join('') + `<div class="sidebar-menu"></div>`;
+}
+
+function closeSidebarMenu() {
+  const menu = document.querySelector('#tag-sidebar .sidebar-menu');
+  if (menu) { menu.classList.remove('open'); menu._tag = null; }
+}
+
+function initSidebarTagMenu() {
+  const sidebar = document.getElementById('tag-sidebar');
+  sidebar.addEventListener('click', (e) => {
+    const menuItem = e.target.closest('.sidebar-menu [data-href]');
+    if (menuItem) {
+      e.preventDefault();
+      e.stopPropagation();
+      closeSidebarMenu();
+      history.pushState(null, '', menuItem.dataset.href);
+      filterAndRender();
+      return;
+    }
+    const tagEl = e.target.closest('.sidebar-tag[data-tag]');
+    if (tagEl) {
+      e.preventDefault();
+      e.stopPropagation();
+      const menu = sidebar.querySelector('.sidebar-menu');
+      const tag = tagEl.dataset.tag;
+      if (menu._tag === tag) {
+        closeSidebarMenu();
+        return;
+      }
+      const currentPath = '/' + currentPageTags.join('/');
+      menu.innerHTML = `<span data-href="/${tag}">→ /${tag}</span><span data-href="${currentPath}/${tag}">+ ${currentPath}/${tag}</span><span data-href="${currentPath}/-${tag}">− ${currentPath}/-${tag}</span>`;
+      // Position menu next to the clicked tag
+      const tagRect = tagEl.getBoundingClientRect();
+      const sidebarRect = sidebar.getBoundingClientRect();
+      menu.style.top = (tagRect.top - sidebarRect.top + tagRect.height) + 'px';
+      menu._tag = tag;
+      menu._entered = false;
+      menu.classList.add('open');
+    }
+  });
+  sidebar.addEventListener('mouseenter', (e) => {
+    const menu = sidebar.querySelector('.sidebar-menu');
+    if (menu && e.target === menu) menu._entered = true;
+  }, true);
+  sidebar.addEventListener('mouseleave', (e) => {
+    const menu = sidebar.querySelector('.sidebar-menu');
+    if (menu && e.target === menu && menu._entered) closeSidebarMenu();
+  }, true);
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#tag-sidebar')) closeSidebarMenu();
   });
 }
 
@@ -232,6 +314,7 @@ function filterAndRender() {
   if (isTagsPage()) {
     sortControls.style.display = 'none';
     document.getElementById('link-count').innerHTML = '';
+    renderTagSidebar([], []);
 
     const tagCounts = {};
     filteredLinks.forEach(link => {
@@ -265,6 +348,7 @@ function filterAndRender() {
 
     document.getElementById('link-count').innerHTML = '';
     renderLinks(recentLinks);
+    renderTagSidebar([], []);
     return;
   }
 
@@ -305,6 +389,7 @@ function filterAndRender() {
   const sortBy = document.getElementById('sort-select').value;
   const sorted = sortLinks(links, sortBy);
   renderLinks(sorted);
+  renderTagSidebar(links, includeTags);
 }
 
 function handleHide(event, url, btn) {
@@ -713,5 +798,6 @@ initSignInForm();
 if (!initBookmarkletMode()) {
   initBreadcrumbNav();
   initTagMenu();
+  initSidebarTagMenu();
   loadLinks();
 }

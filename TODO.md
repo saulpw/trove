@@ -1,5 +1,11 @@
 # TODO
 
+- list all tags *from the current set of links* on the sidebar
+
+- add a #u/contributor tag
+
+- import bulk lines from web page: include link to source in notes (markdown, converted to html in js?)
+
 - under tag breadcrumb: rename tag (possibly to multiple tags)
    - implementation may be better as an 'action' rather resubmitting all links
    - predictive autocomplete (most popular tags preferentially)
@@ -22,6 +28,14 @@
 
 - any tag with only one link becomes a redirect by netlify
 
+## Discoverability
+
+## Dev/Testing
+
+- convert to typescript
+- run tests from cli outside browser
+- tell claude to create unit tests for public functions/interfaces
+
 ## Later
 
 - [ ] Browser plugin to submit current page + text selection
@@ -32,7 +46,7 @@
   - so /* yields games
   - so /-* filters out anything with a tag of any kind
 
-   - add a 'personal' tag
+   - separate 'personal' tag?
 
 - remove tag: regarded as a downvote for that link/tag combo
 - remove link entirely: moderator action (do not implement right now) for "bad" links
