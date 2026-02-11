@@ -733,6 +733,15 @@ function isSignedIn() {
   return getCredentials() !== null;
 }
 
+function togglePasswordVisibility() {
+  const input = document.getElementById('auth-password');
+  const svg = input.nextElementSibling.querySelector('svg');
+  const shut = svg.querySelector('.eye-shut');
+  const isHidden = input.type === 'password';
+  input.type = isHidden ? 'text' : 'password';
+  shut.style.display = isHidden ? '' : 'none';
+}
+
 function showSignIn() {
   document.getElementById('signin-form').style.display = 'flex';
   document.getElementById('auth-username').focus();

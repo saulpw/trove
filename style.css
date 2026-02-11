@@ -48,6 +48,10 @@ header nav a:hover { text-decoration: underline; }
 #auth-dropdown span:hover { background: var(--color-link-hover-bg); }
 #signin-form { display: flex; gap: 0.5rem; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; }
 #signin-form input { padding: 0.4rem; font-size: var(--text-md); border: 1px solid var(--color-border-input); border-radius: 4px; width: 10rem; }
+.password-wrap { position: relative; display: inline-block; }
+.password-wrap input { width: 10rem; padding-right: 2rem; }
+.password-toggle { position: absolute; right: 0.4rem; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--color-text-light); line-height: 0; }
+.password-toggle:hover { color: var(--color-text); }
 #signin-form button { padding: 0.4rem 0.8rem; font-size: var(--text-md); cursor: pointer; border: 1px solid var(--color-border-input); border-radius: 4px; background: var(--color-bg-btn); }
 #signin-form button:hover { background: var(--color-bg-btn-hover); }
 #links { list-style: none; padding: 0; }
