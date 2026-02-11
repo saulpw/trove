@@ -91,11 +91,6 @@ header nav a:hover { text-decoration: underline; }
 .link .tag { color: var(--color-text-muted); font-size: var(--text-base); cursor: pointer; }
 .link .tag:hover { text-decoration: underline; color: var(--color-link); }
 .empty { color: var(--color-text-faint); font-style: italic; }
-.tag-list { list-style: none; padding: 0; }
-.tag-list li { margin: 0.5rem 0; }
-.tag-list a { color: var(--color-link); text-decoration: none; font-size: var(--text-lg); }
-.tag-list a:hover { text-decoration: underline; }
-.tag-list .count { color: var(--color-text-light); margin-left: 0.5rem; }
 #add-form { margin-bottom: 1.5rem; display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
 #add-form input[type="text"] { flex: 1; padding: 0.5rem; font-size: 1rem; border: 1px solid var(--color-border-input); border-radius: 4px; min-width: 150px; }
 #add-form button { padding: 0.5rem 1rem; font-size: 1rem; cursor: pointer; border: 1px solid var(--color-border-input); border-radius: 4px; background: var(--color-bg-btn); white-space: nowrap; }

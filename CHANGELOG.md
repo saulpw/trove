@@ -2,6 +2,12 @@
 
 ## 2026-02-11
 
+- Removed separate `#/tags` page and all associated special cases (nav links, `isTagsPage()`, tag-list rendering/CSS). The front page tag sidebar now serves this purpose.
+
+---
+
+## 2026-02-11
+
 - Moved help page to standalone `help.html`:
   - Separate page without add-link form or filter widgets
   - TOC sidebar on the left with anchor links to each section

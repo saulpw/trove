@@ -10,12 +10,6 @@ function getTagFilters() {
     .filter(segment => segment.length > 0 && segment !== 'index.html');
 }
 
-// Check if we're on the /tags page
-function isTagsPage() {
-  const hash = window.location.hash.replace(/^#\/?/, '');
-  return hash === 'tags';
-}
-
 // Check if we're on the /favorites page
 function isFavoritesPage() {
   const hash = window.location.hash.replace(/^#\/?/, '');
@@ -340,7 +334,7 @@ function getPageConfig() {
         && excludeTags.every(tag => !linkTags.includes(tag));
   };
 
-  if (tagFilters.length > 0 && !isTagsPage()) {
+  if (tagFilters.length > 0) {
     const crumbs = [`<a href="/" data-nav>trove</a>`];
     tagFilters.forEach(t => {
       const label = t.startsWith('-') ? `-${t.slice(1)}` : t;
@@ -386,33 +380,6 @@ function filterAndRender() {
   timeFilterControls.style.display = 'block';
   const timePeriod = document.getElementById('time-filter-select').value;
   const filteredLinks = filterLinksByTime(allLinks, timePeriod);
-
-  // /tags page: show tag list
-  if (isTagsPage()) {
-    sortControls.style.display = 'none';
-    document.getElementById('link-count').innerHTML = '';
-    renderTagSidebar([], []);
-
-    const tagCounts = {};
-    filteredLinks.forEach(link => {
-      parseTags(link.tags).forEach(tag => {
-        tagCounts[tag] = (tagCounts[tag] || 0) + 1;
-      });
-    });
-
-    const sortedTags = Object.entries(tagCounts)
-      .sort((a, b) => b[1] - a[1]);
-
-    if (sortedTags.length === 0) {
-      container.innerHTML = '<div class="empty">No tags found.</div>';
-      return;
-    }
-
-    container.innerHTML = '<ul class="tag-list">' + sortedTags.map(([tag, count]) =>
-      `<li><span class="tag-wrap"><a href="/${tag}" class="tag" data-tag="${tag}">#${tag}</a><span class="tag-menu"><a href="/${tag}">→ /${tag}</a></span></span><span class="count">(${count})</span></li>`
-    ).join('') + '</ul>';
-    return;
-  }
 
   // Filter links using page-specific filter
   const hiddenLinks = getHiddenLinks();
