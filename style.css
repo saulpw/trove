@@ -113,11 +113,12 @@ footer a { color: var(--color-text-muted); }
   padding: 0 0.4rem; margin-left: 0.5rem; line-height: 1.4;
 }
 .add-tag-btn:hover { color: var(--color-link); border-color: var(--color-link); }
-.add-tag-input {
+.add-tag-input, .rename-tag-input {
   font-size: var(--text-base); padding: 0.1rem 0.4rem;
   border: 1px solid var(--color-link); border-radius: 4px;
-  margin-left: 0.5rem; width: 8rem;
+  width: 8rem;
 }
+.add-tag-input { margin-left: 0.5rem; }
 
 /* Content wrapper and tag sidebar */
 #content-wrapper { display: flex; gap: 2rem; }

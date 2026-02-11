@@ -68,6 +68,14 @@ Click the bookmarklet on any page → popup opens with URL pre-filled → add ta
 
 ## Setup
 
+### Dependencies
+
+```bash
+make setup
+```
+
+This installs `netlify-cli` (npm) and `pytest` (pip).
+
 ### User Authentication
 
 Users authenticate with a username and password. Credentials are stored in the `TROVE_USERS` Netlify environment variable.

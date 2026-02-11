@@ -41,6 +41,31 @@ def close_issue(number):
         print(f"Could not close issue #{number}: {result.stdout}\n{result.stderr}")
 
 
+def rename_tag(links, remove_tag, add_tags_str, target_urls):
+    """Rename a tag on specific links. Returns count of links modified.
+
+    Args:
+        links: List of link dicts to modify in place.
+        remove_tag: Tag string to remove.
+        add_tags_str: Space-separated string of tags to add.
+        target_urls: Space-separated string of URLs to apply the rename to.
+    """
+    new_tags = add_tags_str.split()
+    target_set = set(target_urls.split())
+    count = 0
+    for link in links:
+        if link["url"] not in target_set:
+            continue
+        tags = set(link.get("tags", "").split()) if link.get("tags") else set()
+        if remove_tag not in tags:
+            continue
+        tags.discard(remove_tag)
+        tags.update(new_tags)
+        link["tags"] = " ".join(sorted(tags))
+        count += 1
+    return count
+
+
 def process_issues():
     """Process all open submission issues."""
     issues = get_submission_issues()
@@ -52,10 +77,26 @@ def process_issues():
     existing_urls = {link["url"] for link in links}
     processed = 0
     merged = 0
+    renamed = 0
 
     for issue in issues:
         number = issue["number"]
         fields = parse_issue_body(issue["body"])
+
+        # Handle rename_tag action
+        if fields.get("action") == "rename_tag":
+            remove_tag = fields.get("remove_tag")
+            add_tags_str = fields.get("add_tags", "")
+            urls_str = fields.get("urls", "")
+            if not remove_tag or not add_tags_str or not urls_str:
+                print(f"Issue #{number}: Invalid rename_tag fields, skipping")
+                close_issue(number)
+                continue
+            count = rename_tag(links, remove_tag, add_tags_str, urls_str)
+            print(f"Issue #{number}: Renamed '{remove_tag}' → '{add_tags_str}' on {count} link(s)")
+            renamed += count
+            close_issue(number)
+            continue
 
         url = fields.get("url")
         if not url:
@@ -118,12 +159,14 @@ def process_issues():
         close_issue(number)
         processed += 1
 
-    if processed > 0 or merged > 0:
+    if processed > 0 or merged > 0 or renamed > 0:
         save_trove(links)
         if processed > 0:
             print(f"Added {processed} link(s) to {TROVE_FILE}")
         if merged > 0:
             print(f"Merged tags for {merged} existing link(s)")
+        if renamed > 0:
+            print(f"Renamed tags on {renamed} link(s)")
     else:
         print("No new links to add")
 

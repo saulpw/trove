@@ -1,6 +1,6 @@
 # TODO
 
-- list all tags *from the current set of links* on the sidebar
+- add help page with t
 
 - add a #u/contributor tag
 

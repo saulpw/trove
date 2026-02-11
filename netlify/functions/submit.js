@@ -19,11 +19,7 @@ exports.handler = async (event) => {
     return { statusCode: 400, body: JSON.stringify({ error: 'Invalid JSON' }) };
   }
 
-  const { url, title, tags, notes, username, password } = body;
-
-  if (!url) {
-    return { statusCode: 400, body: JSON.stringify({ error: 'URL required' }) };
-  }
+  const { url, title, tags, notes, username, password, action, remove_tag, add_tags, urls } = body;
 
   if (!username || !password) {
     return { statusCode: 401, body: JSON.stringify({ error: 'Authentication required' }) };
@@ -40,14 +36,33 @@ exports.handler = async (event) => {
     return { statusCode: 401, body: JSON.stringify({ error: 'Invalid credentials' }) };
   }
 
-  // Create GitHub issue
-  const issueBody = [
-    `url: ${url}`,
-    title ? `title: ${title}` : null,
-    tags ? `tags: ${tags}` : null,
-    notes ? `notes: ${notes}` : null,
-    `submitted_by: ${username}`,
-  ].filter(Boolean).join('\n');
+  let issueTitle, issueBody;
+
+  if (action === 'rename_tag') {
+    if (!remove_tag || !add_tags || !urls) {
+      return { statusCode: 400, body: JSON.stringify({ error: 'rename_tag requires remove_tag, add_tags, and urls' }) };
+    }
+    issueTitle = `Rename tag: ${remove_tag} → ${add_tags}`;
+    issueBody = [
+      `action: rename_tag`,
+      `remove_tag: ${remove_tag}`,
+      `add_tags: ${add_tags}`,
+      `urls: ${urls}`,
+      `submitted_by: ${username}`,
+    ].join('\n');
+  } else {
+    if (!url) {
+      return { statusCode: 400, body: JSON.stringify({ error: 'URL required' }) };
+    }
+    issueTitle = `Link submission: ${url}`;
+    issueBody = [
+      `url: ${url}`,
+      title ? `title: ${title}` : null,
+      tags ? `tags: ${tags}` : null,
+      notes ? `notes: ${notes}` : null,
+      `submitted_by: ${username}`,
+    ].filter(Boolean).join('\n');
+  }
 
   try {
     const ghResponse = await fetch(
@@ -61,7 +76,7 @@ exports.handler = async (event) => {
           'User-Agent': 'trove-submit',
         },
         body: JSON.stringify({
-          title: `Link submission: ${url}`,
+          title: issueTitle,
           body: issueBody,
           labels: ['submission'],
         }),

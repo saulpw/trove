@@ -130,7 +130,8 @@ function sortLinks(links, sortBy) {
 }
 
 function renderTag(t, currentPath) {
-  return `<span class="tag-wrap"><span class="tag" data-tag="${t}">#${t}</span><span class="tag-menu"><span data-href="/${t}">→ /${t}</span><span data-href="${currentPath}/${t}">+ ${currentPath}/${t}</span><span data-href="${currentPath}/-${t}">− ${currentPath}/-${t}</span></span></span>`;
+  const renameOpt = isSignedIn() ? `<span class="rename-tag-trigger" data-tag="${t}">✎ rename</span>` : '';
+  return `<span class="tag-wrap"><span class="tag" data-tag="${t}">#${t}</span><span class="tag-menu"><span data-href="/${t}">→ /${t}</span><span data-href="${currentPath}/${t}">+ ${currentPath}/${t}</span><span data-href="${currentPath}/-${t}">− ${currentPath}/-${t}</span>${renameOpt}</span></span>`;
 }
 
 function renderLinks(links) {
@@ -183,6 +184,15 @@ function navigateToTag(tag) {
 // Set up tag click handlers (delegated)
 function initTagMenu() {
   document.getElementById('links').addEventListener('click', (e) => {
+    const renameTrigger = e.target.closest('.rename-tag-trigger');
+    if (renameTrigger) {
+      e.preventDefault();
+      e.stopPropagation();
+      const tagName = renameTrigger.dataset.tag;
+      const linkEl = renameTrigger.closest('.link');
+      handleRenameTagClick(tagName, linkEl);
+      return;
+    }
     const menuItem = e.target.closest('.tag-menu [data-href]');
     const tag = e.target.closest('.tag[data-tag]');
     if (menuItem) {
@@ -234,6 +244,15 @@ function closeSidebarMenu() {
 function initSidebarTagMenu() {
   const sidebar = document.getElementById('tag-sidebar');
   sidebar.addEventListener('click', (e) => {
+    const renameTrigger = e.target.closest('.sidebar-menu .rename-tag-trigger');
+    if (renameTrigger) {
+      e.preventDefault();
+      e.stopPropagation();
+      const tagName = renameTrigger.dataset.tag;
+      closeSidebarMenu();
+      handleRenameSidebarTag(tagName);
+      return;
+    }
     const menuItem = e.target.closest('.sidebar-menu [data-href]');
     if (menuItem) {
       e.preventDefault();
@@ -254,7 +273,8 @@ function initSidebarTagMenu() {
         return;
       }
       const currentPath = '/' + currentPageTags.join('/');
-      menu.innerHTML = `<span data-href="/${tag}">→ /${tag}</span><span data-href="${currentPath}/${tag}">+ ${currentPath}/${tag}</span><span data-href="${currentPath}/-${tag}">− ${currentPath}/-${tag}</span>`;
+      const renameOpt = isSignedIn() ? `<span class="rename-tag-trigger" data-tag="${tag}">✎ rename</span>` : '';
+      menu.innerHTML = `<span data-href="/${tag}">→ /${tag}</span><span data-href="${currentPath}/${tag}">+ ${currentPath}/${tag}</span><span data-href="${currentPath}/-${tag}">− ${currentPath}/-${tag}</span>${renameOpt}`;
       // Position menu next to the clicked tag
       const tagRect = tagEl.getBoundingClientRect();
       const sidebarRect = sidebar.getBoundingClientRect();
@@ -522,7 +542,7 @@ async function submitToBackend(fields) {
     await fetch('/.netlify/functions/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url: fields.url, title: fields.title || '', tags: fields.tags || '', notes: fields.notes || '', username: creds.username, password: creds.password }),
+      body: JSON.stringify({ ...fields, username: creds.username, password: creds.password }),
     });
   } catch (e) {
     console.error('Failed to submit:', e);
@@ -545,6 +565,78 @@ async function submitTagsForLink(url, tags, linkEl, input, btn) {
 
   restoreAddButton(input, btn);
   submitToBackend({ url, tags });
+}
+
+function showRenameInput(hideEl, tagName, onConfirm) {
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'rename-tag-input';
+  input.value = tagName;
+
+  const cancel = () => { input.remove(); hideEl.style.display = ''; };
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      e.stopPropagation();
+      const newTagStr = input.value.trim();
+      if (newTagStr && newTagStr !== tagName) {
+        onConfirm(newTagStr.split(/\s+/).filter(t => t));
+        cancel();
+      } else { cancel(); }
+    } else if (e.key === 'Escape') { e.stopPropagation(); cancel(); }
+  });
+
+  input.addEventListener('blur', () => { setTimeout(() => { if (document.body.contains(input)) cancel(); }, 100); });
+
+  hideEl.style.display = 'none';
+  hideEl.parentNode.insertBefore(input, hideEl);
+  input.focus();
+  input.select();
+}
+
+function handleRenameTagClick(tagName, linkEl) {
+  const tagWrap = linkEl.querySelector(`.tag-wrap .tag[data-tag="${tagName}"]`).closest('.tag-wrap');
+  showRenameInput(tagWrap, tagName, (newTags) => {
+    const currentPath = '/' + currentPageTags.join('/');
+    newTags.forEach(t => {
+      tagWrap.insertAdjacentHTML('beforebegin', renderTag(t, currentPath) + ' ');
+    });
+    tagWrap.remove();
+    const oldTags = (linkEl.dataset.tags || '').split(' ').filter(t => t);
+    linkEl.dataset.tags = oldTags.filter(t => t !== tagName).concat(newTags).join(' ');
+    submitToBackend({ action: 'rename_tag', remove_tag: tagName, add_tags: newTags.join(' '), urls: linkEl.dataset.url });
+  });
+}
+
+function handleRenameSidebarTag(tagName) {
+  const sidebar = document.getElementById('tag-sidebar');
+  const sidebarTag = sidebar.querySelector(`.sidebar-tag[data-tag="${tagName}"]`);
+  if (!sidebarTag) return;
+
+  showRenameInput(sidebarTag, tagName, (newTags) => {
+    const currentPath = '/' + currentPageTags.join('/');
+    const affectedUrls = [];
+
+    document.querySelectorAll('#links .link').forEach(linkEl => {
+      const tags = (linkEl.dataset.tags || '').split(' ').filter(t => t);
+      if (!tags.includes(tagName)) return;
+      affectedUrls.push(linkEl.dataset.url);
+      const updatedTags = tags.filter(t => t !== tagName).concat(newTags);
+      linkEl.dataset.tags = updatedTags.join(' ');
+      linkEl.querySelector('.tags').innerHTML = updatedTags.filter(t => !currentPageTags.includes(t)).map(t => renderTag(t, currentPath)).join(' ');
+    });
+
+    const visibleLinks = [];
+    document.querySelectorAll('#links .link').forEach(linkEl => {
+      visibleLinks.push({ tags: linkEl.dataset.tags || '' });
+    });
+    renderTagSidebar(visibleLinks, currentPageTags);
+
+    if (affectedUrls.length > 0) {
+      submitToBackend({ action: 'rename_tag', remove_tag: tagName, add_tags: newTags.join(' '), urls: affectedUrls.join(' ') });
+    }
+  });
 }
 
 async function loadLinks() {

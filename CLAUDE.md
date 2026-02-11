@@ -21,6 +21,7 @@ A simple static website to share lists of links at a public mnemonic url.  e.g. 
 
 ## Design Decisions
 - CLI interface (`add_link.py`) uses positional arguments for tags (not `--tags` flag): `python3 add_link.py URL tag1 tag2`
+- Use space-separated strings (not lists) for multi-value fields like tags and URLs in Python function interfaces. This matches the trove.jsonl storage format and keeps a consistent pattern across the codebase.
 - Use `${FOO}` variable syntax in Makefiles (not `$(FOO)`), because it is directly compatible with shell env var syntax for easy copy-paste.
 
 ## Meta Rules
@@ -31,6 +32,7 @@ A simple static website to share lists of links at a public mnemonic url.  e.g. 
 - When user says "learn to do X", update CLAUDE.md with the rule.
 - When a change doesn't work and you fix it elsewhere, revert the failed change.
 - Keep implementations minimal - prototype first, polish later.
+- After every big change that adds dozens of lines of code, self-review for simplification: extract shared patterns, remove dead code, combine duplicated logic, delete unnecessary abstractions. Do the simplification pass before presenting the work as done.
 - Use Makefile targets for any repeatable command, including setup, tests, and builds.
 - NEVER run raw pytest/python/etc commands - always use `make test`, `make run`, etc.  Create a new Makefile target FIRST if one doesn't exist, then use it.
 - After editing source files, run `make build`. The user runs `make serve` themselves (never run it).

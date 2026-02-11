@@ -5,6 +5,7 @@ all: build
 # Install dependencies
 setup:
 	npm install -g netlify-cli
+	pip3 install pytest
 
 # Start a local server to view the site
 serve:
@@ -20,9 +21,10 @@ build:
 	cp index.html style.css frontend.js trove.jsonl _build/
 	sed -i='' 's/BUILD_TIMESTAMP/$(shell date +%s)/' _build/index.html
 
-# Syntax check all Python files
+# Syntax check all Python files, then run tests
 test:
 	python3 -m py_compile *.py && echo "Syntax OK"
+	python3 -m pytest test_process_issues.py -v
 
 # Import links from markdown files
 import:
