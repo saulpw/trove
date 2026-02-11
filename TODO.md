@@ -47,3 +47,4 @@
 - tag cloud?
 
 
+- Option to automatically remove tracking attributes from URLs: https://raindropio.canny.io/feature-requests/p/option-to-automatically-remove-tracking-attributes-from-urls

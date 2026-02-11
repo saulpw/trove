@@ -2,10 +2,19 @@
 """Shared utilities for trove link management."""
 
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 
 TROVE_FILE = Path(__file__).parent / "trove.jsonl"
+
+
+def slugify(text):
+    """Convert header text to tag slug."""
+    text = text.lower().strip()
+    text = re.sub(r'[^\w\s-]', '', text)
+    text = re.sub(r'[\s_]+', '-', text)
+    return text.strip('-')
 
 
 def load_trove(trove_path=None):

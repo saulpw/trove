@@ -5,14 +5,7 @@ import re
 import sys
 from pathlib import Path
 
-from trove_utils import TROVE_FILE, load_trove, save_trove
-
-def slugify(text):
-    """Convert header text to tag slug."""
-    text = text.lower().strip()
-    text = re.sub(r'[^\w\s-]', '', text)
-    text = re.sub(r'[\s_]+', '-', text)
-    return text.strip('-')
+from trove_utils import TROVE_FILE, load_trove, save_trove, slugify
 
 def parse_md_file(filepath):
     """Parse a markdown file and extract links with metadata."""

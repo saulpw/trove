@@ -1,4 +1,4 @@
-.PHONY: setup serve add build test import process-issues fill-titles add-user remove-user list-users
+.PHONY: setup serve add build test import process-issues fill-titles add-user remove-user list-users web-extract web-import
 
 all: build
 
@@ -45,3 +45,11 @@ remove-user:
 
 list-users:
 	python3 manage_users.py list
+
+# Extract links from a webpage into a reviewable PSV file
+web-extract:
+	python3 import_web_links.py extract ${URL} ${TAGS}
+
+# Import links from a reviewed PSV file into trove.jsonl
+web-import:
+	python3 import_web_links.py import ${FILE}
