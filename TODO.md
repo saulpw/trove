@@ -2,6 +2,8 @@
 
 - bookmarklet popup widget on same page to be added
 
+- convert login dropdown to signout link only.
+
 - delete tag association
 
 - /help.html -> /help URL

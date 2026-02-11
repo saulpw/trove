@@ -89,6 +89,22 @@ const formatDate = (iso) => {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 };
 
+// Format duration from "M:SS" or "H:MM:SS" to compact form: "45s", "3m", "1h45m"
+const formatDuration = (dur) => {
+  if (!dur) return '';
+  const parts = dur.split(':').map(Number);
+  let secs, mins, hrs;
+  if (parts.length === 3) { [hrs, mins, secs] = parts; }
+  else if (parts.length === 2) { [mins, secs] = parts; hrs = 0; }
+  else return dur;
+  const total = hrs * 3600 + mins * 60 + secs;
+  if (total < 60) return `${total}s`;
+  if (total < 3600) return `${Math.floor(total / 60)}m`;
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  return m > 0 ? `${h}h${m}m` : `${h}h`;
+};
+
 // Normalize URL: prepend https:// if missing protocol
 const normalizeUrl = (url) => {
   if (url && !url.includes('://')) {
@@ -136,6 +152,12 @@ function renderLinks(links) {
     const escapedUrl = link.url.replace(/'/g, "\\'");
     const rating = ratings[link.url] || 0;
     const ratingClass = rating > 0 ? 'positive' : rating < 0 ? 'negative' : 'zero';
+    const imgSrc = link.thumbnail || (/\.(jpe?g|png|gif|webp)(\?.*)?$/i.test(link.url) ? link.url : '');
+    const imgAlt = (link.title || '').replace(/"/g, '&quot;');
+    const metaParts = [domain];
+    if (link.added) metaParts.push(formatDate(link.added));
+    if (link.duration) metaParts.push(formatDuration(link.duration));
+    if (link.channel) metaParts.push(link.channel);
     return `
     <a class="link-anchor" href="${link.url}" target="_blank" rel="noopener">
       <div class="link"
@@ -143,18 +165,23 @@ function renderLinks(links) {
            data-added="${link.added || ''}"
            ${link.title ? `data-title="${link.title.replace(/"/g, '&quot;')}"` : ''}
            ${tags.length ? `data-tags="${tags.join(' ')}"` : ''}>
-        <div class="card-top">
-          ${link.added ? `<span class="added">${formatDate(link.added)}</span>` : '<span></span>'}
+        <div class="card-body">
+          <div class="card-rating">
+            <span class="rate-up" onclick="handleRateUp(event, '${escapedUrl}', this)">❤️</span>
+            <span class="rating-value ${ratingClass}">${rating}</span>
+            <span class="rate-down" onclick="handleRateDown(event, '${escapedUrl}', this)">💣</span>
+          </div>
+          <div class="card-left">
+            <div class="title-row">
+              <span class="title">${link.title || link.url}</span>
+              ${isSignedIn() ? `<span class="edit-title-btn" onclick="handleEditTitleClick(event, this)">✏️</span>` : ''}
+            </div>
+            <span class="meta-line">${metaParts.join(' · ')}</span>
+            ${link.notes ? `<div class="notes">${link.notes}</div>` : ''}
+            <div class="card-bottom"><span class="tags">${tags.map(t => renderTag(t, currentPath)).join(' ')}</span><button class="add-tag-btn" onclick="handleAddTagClick(event, this)">+</button></div>
+          </div>
+          ${imgSrc ? `<div class="card-thumb"><img src="${imgSrc}" alt="${imgAlt}" loading="lazy"></div>` : ''}
         </div>
-        ${link.thumbnail ? `<div class="card-image"><img src="${link.thumbnail}" alt="${(link.title || '').replace(/"/g, '&quot;')}" loading="lazy"></div>` : /\.(jpe?g|png|gif|webp)(\?.*)?$/i.test(link.url) ? `<div class="card-image"><img src="${link.url}" alt="${(link.title || '').replace(/"/g, '&quot;')}" loading="lazy"></div>` : ''}
-        ${link.duration || link.channel ? `<div class="yt-meta">${link.duration ? `<span class="yt-duration">${link.duration}</span>` : ''}${link.duration && link.channel ? ' · ' : ''}${link.channel ? `<span class="yt-channel">${link.channel}</span>` : ''}</div>` : ''}
-        <div class="title-row">
-          <span class="title">${link.title || link.url}</span>
-          ${isSignedIn() ? `<span class="edit-title-btn" onclick="handleEditTitleClick(event, this)">✏️</span>` : ''}
-        </div>
-        <span class="url">${domain}</span>
-        ${link.notes ? `<div class="notes">${link.notes}</div>` : ''}
-        <div class="card-bottom"><span class="tags">${tags.map(t => renderTag(t, currentPath)).join(' ')}</span><button class="add-tag-btn" onclick="handleAddTagClick(event, this)">+</button><span class="rating-widget"><span class="rate-down" onclick="handleRateDown(event, '${escapedUrl}', this)">💣</span><span class="rating-value ${ratingClass}">${rating}</span><span class="rate-up" onclick="handleRateUp(event, '${escapedUrl}', this)">❤️</span></span></div>
       </div>
     </a>`;
   }).join('');
@@ -417,8 +444,8 @@ function handleRateUp(event, url, btn) {
   event.stopPropagation();
   const newRating = getRating(url) + 1;
   setRating(url, newRating);
-  const widget = btn.closest('.rating-widget');
-  const valueEl = widget.querySelector('.rating-value');
+  const ratingEl = btn.closest('.card-rating');
+  const valueEl = ratingEl.querySelector('.rating-value');
   valueEl.textContent = newRating;
   valueEl.className = 'rating-value ' + (newRating > 0 ? 'positive' : newRating < 0 ? 'negative' : 'zero');
 }
@@ -437,8 +464,8 @@ function handleRateDown(event, url, btn) {
     updateLinkCountDisplay();
     return;
   }
-  const widget = btn.closest('.rating-widget');
-  const valueEl = widget.querySelector('.rating-value');
+  const ratingEl = btn.closest('.card-rating');
+  const valueEl = ratingEl.querySelector('.rating-value');
   valueEl.textContent = newRating;
   valueEl.className = 'rating-value ' + (newRating > 0 ? 'positive' : newRating < 0 ? 'negative' : 'zero');
 }

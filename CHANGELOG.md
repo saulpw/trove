@@ -2,6 +2,19 @@
 
 ## 2026-02-11
 
+- Card layout: thumbnail/image now appears smaller on the right side of the card, with title/URL/tags left-aligned
+- Unified thumbnail mechanism in frontend.js: `link.thumbnail` and image-URL detection merged into single `imgSrc` variable
+- Cards maintain consistent height regardless of whether they have a thumbnail
+- Rating icons repositioned: ❤️ upper-left, value middle-left, 💣 lower-left as a vertical strip
+- Thumbnail/image stretches full card height, flush with card edge
+- Title moved to top of card; domain, date, duration, channel merged into single meta line below title
+- Duration format changed from "M:SS" to compact form: "45s", "3m", "1h45m"
+- Bumped version to 0.22
+
+---
+
+## 2026-02-11
+
 - Unified favorites and hidden links into a numeric rating system:
   - Rating widget on each card: 💣 [number] ❤️ (click to rate down/up)
   - Links with rating < 0 are hidden by default (replaces separate Hide button)
