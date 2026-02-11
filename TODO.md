@@ -1,5 +1,13 @@
 # TODO
 
+- bookmarklet popup widget on same page to be added
+
+- make the thumbnail smaller and on the right of the card.  unify the thumbnail mechanism in frontend.js for youtube videos and images.
+
+- delete tag association
+
+- /help.html -> /help URL
+
 - add a #u/contributor tag
 
 - import bulk lines from web page: include link to source in notes (markdown, converted to html in js?)
@@ -8,13 +16,7 @@
    - implementation may be better as an 'action' rather resubmitting all links
    - predictive autocomplete (most popular tags preferentially)
 
-- local highlight/favorite
-
-- for youtube, show youtube player
-
 - delete button to delete link entirely
-
-- delete tag association
 
 - add local notes (when present, a unicode "note" character is a link to edit them)
 
@@ -27,8 +29,6 @@
 - fixup existing trove with these same fixup rules
 
 - add sort links by # of tags (so /-xyz will show untagged links first)
-
-- any tag with only one link becomes a redirect by netlify
 
 ## Discoverability
 
