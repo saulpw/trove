@@ -41,7 +41,7 @@ header nav a:hover { text-decoration: underline; }
 #signin-form button { padding: 0.4rem 0.8rem; font-size: var(--text-md); cursor: pointer; border: 1px solid var(--color-border-input); border-radius: 4px; background: var(--color-bg-btn); }
 #signin-form button:hover { background: var(--color-bg-btn-hover); }
 #links { list-style: none; padding: 0; }
-#link-count { color: var(--color-text-muted); font-size: var(--text-md); margin-bottom: 0.5rem; }
+#link-count { color: var(--color-text-muted); font-size: var(--text-md); margin-right: auto; }
 .link-anchor { text-decoration: none; color: inherit; }
 .link {
   margin: 0.75rem 0;
@@ -92,9 +92,10 @@ header nav a:hover { text-decoration: underline; }
 footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--color-border-light); font-size: var(--text-base); color: var(--color-text-muted); display: flex; justify-content: space-between; }
 footer a { color: var(--color-text-muted); }
 #version { font-size: var(--text-xs); color: var(--color-text-faint); }
-#sort-controls { margin-bottom: 1rem; font-size: var(--text-md); }
+#filter-bar { display: flex; justify-content: flex-end; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+#sort-controls { font-size: var(--text-md); }
 #sort-controls select { padding: 0.25rem; font-size: var(--text-md); }
-#time-filter-controls { margin-bottom: 1rem; font-size: var(--text-md); }
+#time-filter-controls { font-size: var(--text-md); }
 #time-filter-controls select { padding: 0.25rem; font-size: var(--text-md); }
 
 /* Tag hover menu */
@@ -124,7 +125,8 @@ footer a { color: var(--color-text-muted); }
 
 /* Content wrapper and tag sidebar */
 #content-wrapper { display: flex; gap: 2rem; }
-#links { flex: 1; min-width: 0; max-width: 800px; }
+#main-content { flex: 1; min-width: 0; max-width: 800px; }
+#links { }
 #tag-sidebar {
   width: 200px; flex-shrink: 0; font-size: var(--text-sm);
   padding-top: 0.75rem; position: relative;
@@ -142,7 +144,7 @@ footer a { color: var(--color-text-muted); }
 #tag-sidebar .sidebar-menu span:hover { background: var(--color-link-hover-bg); }
 @media (max-width: 900px) {
   #tag-sidebar { display: none; }
-  #links { max-width: none; }
+  #main-content { max-width: none; }
 }
 
 /* Help page */

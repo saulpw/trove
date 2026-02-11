@@ -2,6 +2,13 @@
 
 ## 2026-02-11
 
+- Reorganized page layout: sort/time dropdowns in horizontal row (right-justified), link count on same line (left-justified)
+- Moved add form, filter bar, and links into content-wrapper alongside tag sidebar to eliminate empty space above sidebar
+
+---
+
+## 2026-02-11
+
 - Added help page (#/help) explaining the UI:
   - Tag browsing, intersections, and exclusions
   - Tag hover menu and sidebar behavior
