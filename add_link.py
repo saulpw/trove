@@ -2,12 +2,54 @@
 """Add a link to trove.jsonl from the command line."""
 
 import argparse
+import json
 import re
 import subprocess
 import urllib.request
 import urllib.error
 
 from trove_utils import TROVE_FILE, load_trove, save_trove, create_link_entry
+
+
+def is_youtube_url(url):
+    """Check if URL is a YouTube video link."""
+    return bool(re.search(r'(youtube\.com/watch|youtu\.be/|youtube\.com/shorts/)', url))
+
+
+def format_duration(seconds):
+    """Format duration in seconds to human-readable string like '3:45' or '1:02:30'."""
+    seconds = int(seconds)
+    hours, remainder = divmod(seconds, 3600)
+    minutes, secs = divmod(remainder, 60)
+    if hours:
+        return f"{hours}:{minutes:02d}:{secs:02d}"
+    return f"{minutes}:{secs:02d}"
+
+
+def fetch_youtube_metadata(url):
+    """Fetch YouTube video metadata using yt-dlp. Returns dict with title, duration, channel, thumbnail."""
+    try:
+        result = subprocess.run(
+            ["yt-dlp", "--dump-json", "--no-download", url],
+            capture_output=True, text=True, timeout=30
+        )
+        if result.returncode != 0:
+            print(f"Warning: yt-dlp failed: {result.stderr.strip()}")
+            return {}
+        data = json.loads(result.stdout)
+        meta = {}
+        if data.get("title"):
+            meta["title"] = data["title"]
+        if data.get("duration"):
+            meta["duration"] = format_duration(data["duration"])
+        if data.get("uploader"):
+            meta["channel"] = data["uploader"]
+        if data.get("thumbnail"):
+            meta["thumbnail"] = data["thumbnail"]
+        return meta
+    except (subprocess.TimeoutExpired, FileNotFoundError, json.JSONDecodeError) as e:
+        print(f"Warning: Could not fetch YouTube metadata: {e}")
+        return {}
 
 
 def fetch_title(url):
@@ -57,15 +99,24 @@ def git_commit(url, title):
 
 
 def add_link(url, title=None, tags=None, notes=None, no_archive=False, no_commit=False):
-    # Auto-fetch title if not provided
-    if not title:
+    yt_meta = {}
+    if is_youtube_url(url):
+        print(f"Fetching YouTube metadata from {url}...")
+        yt_meta = fetch_youtube_metadata(url)
+        if not title and yt_meta.get("title"):
+            title = yt_meta["title"]
+            print(f"Found title: {title}")
+    elif not title:
         print(f"Fetching title from {url}...")
         title = fetch_title(url)
         if title:
             print(f"Found title: {title}")
 
     links = load_trove()
-    link = create_link_entry(url, title, tags, notes)
+    link = create_link_entry(url, title, tags, notes,
+                             duration=yt_meta.get("duration"),
+                             channel=yt_meta.get("channel"),
+                             thumbnail=yt_meta.get("thumbnail"))
     links.append(link)
     save_trove(links)
     print(f"Added: {url}")

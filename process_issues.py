@@ -6,7 +6,7 @@ import json
 import subprocess
 
 from trove_utils import TROVE_FILE, load_trove, save_trove, create_link_entry
-from add_link import fetch_title, trigger_archive
+from add_link import fetch_title, trigger_archive, is_youtube_url, fetch_youtube_metadata
 
 
 def get_submission_issues():
@@ -141,13 +141,21 @@ def process_issues():
 
         print(f"Issue #{number}: Processing {url}")
 
-        # Fetch title
-        title = fetch_title(url)
+        # Fetch metadata (YouTube-specific or generic title)
+        yt_meta = {}
+        if is_youtube_url(url):
+            yt_meta = fetch_youtube_metadata(url)
+            title = yt_meta.get("title")
+        else:
+            title = fetch_title(url)
         if title:
             print(f"  Found title: {title}")
 
         # Build link entry
-        link = create_link_entry(url, title, fields.get("tags"), fields.get("notes"))
+        link = create_link_entry(url, title, fields.get("tags"), fields.get("notes"),
+                                 duration=yt_meta.get("duration"),
+                                 channel=yt_meta.get("channel"),
+                                 thumbnail=yt_meta.get("thumbnail"))
 
         links.append(link)
         existing_urls.add(url)

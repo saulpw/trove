@@ -174,7 +174,8 @@ function renderLinks(links) {
             <span class="hide-btn" onclick="${hideHandler}(event, '${escapedUrl}', this)">${hideLabel}</span>
           </span>
         </div>
-        ${/\.(jpe?g|png|gif|webp)(\?.*)?$/i.test(link.url) ? `<div class="card-image"><img src="${link.url}" alt="${(link.title || '').replace(/"/g, '&quot;')}" loading="lazy"></div>` : ''}
+        ${link.thumbnail ? `<div class="card-image"><img src="${link.thumbnail}" alt="${(link.title || '').replace(/"/g, '&quot;')}" loading="lazy"></div>` : /\.(jpe?g|png|gif|webp)(\?.*)?$/i.test(link.url) ? `<div class="card-image"><img src="${link.url}" alt="${(link.title || '').replace(/"/g, '&quot;')}" loading="lazy"></div>` : ''}
+        ${link.duration || link.channel ? `<div class="yt-meta">${link.duration ? `<span class="yt-duration">${link.duration}</span>` : ''}${link.duration && link.channel ? ' · ' : ''}${link.channel ? `<span class="yt-channel">${link.channel}</span>` : ''}</div>` : ''}
         <div class="title-row">
           <span class="title">${link.title || link.url}</span>
           ${isSignedIn() ? `<span class="edit-title-btn" onclick="handleEditTitleClick(event, this)">✏️</span>` : ''}

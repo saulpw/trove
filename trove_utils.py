@@ -36,7 +36,8 @@ def save_trove(links, trove_path=None):
             f.write(json.dumps(link) + '\n')
 
 
-def create_link_entry(url, title=None, tags=None, notes=None, added=None):
+def create_link_entry(url, title=None, tags=None, notes=None, added=None,
+                      duration=None, channel=None, thumbnail=None):
     """Create a link entry dict with optional fields.
 
     Args:
@@ -45,6 +46,9 @@ def create_link_entry(url, title=None, tags=None, notes=None, added=None):
         tags: Space-separated tag string or list of tags (optional)
         notes: Notes about the link (optional)
         added: ISO timestamp string (defaults to now)
+        duration: Video duration string, e.g. "3:45" (optional)
+        channel: Video channel/uploader name (optional)
+        thumbnail: URL to video thumbnail image (optional)
 
     Returns:
         dict with url, added, and any provided optional fields
@@ -63,4 +67,10 @@ def create_link_entry(url, title=None, tags=None, notes=None, added=None):
             link["tags"] = tags
     if notes:
         link["notes"] = notes
+    if duration:
+        link["duration"] = duration
+    if channel:
+        link["channel"] = channel
+    if thumbnail:
+        link["thumbnail"] = thumbnail
     return link

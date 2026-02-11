@@ -2,6 +2,18 @@
 
 ## 2026-02-11
 
+- YouTube link support: YouTube URLs now get special treatment with thumbnail images, duration, and channel metadata displayed on cards
+- `add_link.py`: Added `is_youtube_url()`, `fetch_youtube_metadata()` using `yt-dlp` to fetch title, duration, channel, and thumbnail
+- `trove_utils.py`: `create_link_entry()` accepts `duration`, `channel`, `thumbnail` optional fields
+- `process_issues.py`: YouTube URLs processed via `yt-dlp` instead of generic title fetch
+- `frontend.js`: Cards with `thumbnail` field show the image; duration/channel shown as `.yt-meta` row
+- `style.css`: Added `.yt-meta`, `.yt-duration`, `.yt-channel` styles
+- `Makefile`: Added `yt-dlp` to `setup` target
+
+---
+
+## 2026-02-11
+
 - Removed separate `#/tags` page and all associated special cases (nav links, `isTagsPage()`, tag-list rendering/CSS). The front page tag sidebar now serves this purpose.
 
 ---

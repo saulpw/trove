@@ -5,7 +5,7 @@ all: build
 # Install dependencies
 setup:
 	npm install -g netlify-cli
-	pip3 install pytest
+	pip3 install pytest yt-dlp
 
 # Start a local server to view the site
 serve:
