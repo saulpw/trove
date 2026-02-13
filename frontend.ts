@@ -161,8 +161,8 @@ function sortLinks(links: Link[], sortBy: string): Link[] {
 }
 
 function renderTag(t: string): string {
-  const renameOpt = isSignedIn() ? `<span class="rename-tag-trigger" data-tag="${t}">✎ rename</span>` : '';
-  return `<span class="tag-wrap"><span class="tag" data-tag="${t}">#${t}</span><span class="tag-menu"><span data-href="/${t}">→ /${t}</span><span data-href="${currentPath()}/${t}">+ ${currentPath()}/${t}</span><span data-href="${currentPath()}/-${t}">− ${currentPath()}/-${t}</span>${renameOpt}</span></span>`;
+  const authOpts = isSignedIn() ? `<span class="remove-tag-trigger" data-tag="${t}">✕ remove</span><span class="rename-tag-trigger" data-tag="${t}">✎ rename</span>` : '';
+  return `<span class="tag-wrap"><span class="tag" data-tag="${t}">#${t}</span><span class="tag-menu"><span data-href="/${t}">→ /${t}</span><span data-href="${currentPath()}/${t}">+ ${currentPath()}/${t}</span><span data-href="${currentPath()}/-${t}">− ${currentPath()}/-${t}</span>${authOpts}</span></span>`;
 }
 
 function renderLinks(links: Link[]): void {
@@ -225,6 +225,15 @@ function navigateToTag(tag: string): void {
 // Set up tag click handlers (delegated)
 function initTagMenu(): void {
   document.getElementById('links')!.addEventListener('click', (e) => {
+    const removeTrigger = (e.target as HTMLElement).closest('.remove-tag-trigger') as HTMLElement | null;
+    if (removeTrigger) {
+      e.preventDefault();
+      e.stopPropagation();
+      const tagName = removeTrigger.dataset.tag!;
+      const linkEl = removeTrigger.closest('.link') as HTMLElement;
+      handleRemoveTag(tagName, linkEl);
+      return;
+    }
     const renameTrigger = (e.target as HTMLElement).closest('.rename-tag-trigger') as HTMLElement | null;
     if (renameTrigger) {
       e.preventDefault();
@@ -536,7 +545,7 @@ function handleEditTitleClick(event: Event, btn: HTMLElement): void {
         titleEl.textContent = newTitle;
         linkEl.dataset.title = newTitle;
         cancel();
-        submitToBackend({ url, title: newTitle });
+        submitToBackend({ action: 'set_title', url, title: newTitle });
       } else { cancel(); }
     } else if (e.key === 'Escape') { cancel(); }
   });
@@ -625,7 +634,7 @@ async function submitTagsForLink(url: string, tags: string, linkEl: HTMLElement,
   });
 
   restoreAddButton(input, btn);
-  submitToBackend({ url, tags });
+  submitToBackend({ action: 'add_tag', url, tags });
 }
 
 function showRenameInput(hideEl: HTMLElement, tagName: string, onConfirm: (newTags: string[]) => void): void {
@@ -654,6 +663,14 @@ function showRenameInput(hideEl: HTMLElement, tagName: string, onConfirm: (newTa
   hideEl.parentNode!.insertBefore(input, hideEl);
   input.focus();
   input.select();
+}
+
+function handleRemoveTag(tagName: string, linkEl: HTMLElement): void {
+  const tagWrap = linkEl.querySelector(`.tag-wrap .tag[data-tag="${tagName}"]`)?.closest('.tag-wrap') as HTMLElement | null;
+  if (tagWrap) tagWrap.remove();
+  const oldTags = (linkEl.dataset.tags || '').split(' ').filter(t => t);
+  linkEl.dataset.tags = oldTags.filter(t => t !== tagName).join(' ');
+  submitToBackend({ action: 'remove_tag', url: linkEl.dataset.url!, tags: tagName });
 }
 
 function handleRenameTagClick(tagName: string, linkEl: HTMLElement): void {

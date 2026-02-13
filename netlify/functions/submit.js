@@ -59,8 +59,12 @@ exports.handler = async (event) => {
     if (!url) {
       return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'URL required' }) };
     }
-    issueTitle = `Link submission: ${url}`;
+    const effectiveAction = action || 'add';
+    issueTitle = effectiveAction === 'add'
+      ? `Link submission: ${url}`
+      : `${effectiveAction}: ${url}`;
     issueBody = [
+      effectiveAction !== 'add' ? `action: ${effectiveAction}` : null,
       `url: ${url}`,
       title ? `title: ${title}` : null,
       tags ? `tags: ${tags}` : null,

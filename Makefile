@@ -1,4 +1,4 @@
-.PHONY: setup serve add build typecheck test import process-issues fill-titles add-user remove-user list-users web-extract web-import
+.PHONY: setup serve add build typecheck test dedup import process-issues fill-titles add-user remove-user list-users web-extract web-import
 
 all: build
 
@@ -22,7 +22,8 @@ build: tags.json
 	npx esbuild bookmarklet.ts --bundle --minify --outfile=_build/bookmarklet-code.txt
 	npx esbuild frontend.ts --bundle --loader:.txt=text --outfile=_build/frontend.js
 	npx esbuild bookmarklet.ts --bundle --outfile=_build/bookmarklet.js
-	cp tags.json index.html help.html style.css trove.jsonl _build/
+	cp tags.json index.html help.html style.css _build/
+	python3 dedup_trove.py trove.jsonl _build/trove.jsonl
 	sed -i='' 's/BUILD_TIMESTAMP/$(shell date +%s)/' _build/index.html
 
 # Type check TypeScript (no output)
@@ -36,7 +37,11 @@ tags.json: trove.jsonl
 # Syntax check all Python files, then run tests
 test:
 	python3 -m py_compile *.py && echo "Syntax OK"
-	python3 -m pytest test_process_issues.py -v
+	python3 -m pytest test_process_issues.py test_dedup_trove.py -v
+
+# Deduplicate trove.jsonl (standalone)
+dedup:
+	python3 dedup_trove.py trove.jsonl trove.jsonl
 
 # Import links from markdown files
 import:

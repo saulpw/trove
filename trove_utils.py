@@ -37,7 +37,8 @@ def save_trove(links, trove_path=None):
 
 
 def create_link_entry(url, title=None, tags=None, notes=None, added=None,
-                      duration=None, channel=None, thumbnail=None):
+                      duration=None, channel=None, thumbnail=None,
+                      op=None, submitted_by=None):
     """Create a link entry dict with optional fields.
 
     Args:
@@ -49,14 +50,18 @@ def create_link_entry(url, title=None, tags=None, notes=None, added=None,
         duration: Video duration string, e.g. "3:45" (optional)
         channel: Video channel/uploader name (optional)
         thumbnail: URL to video thumbnail image (optional)
+        op: Operation type: "add" (default), "set_title", "set_notes",
+            "add_tag", "remove_tag" (optional)
+        submitted_by: Username who submitted this entry (optional)
 
     Returns:
         dict with url, added, and any provided optional fields
     """
-    link = {
-        "url": url,
-        "added": added or datetime.now(timezone.utc).isoformat(),
-    }
+    link = {}
+    if op:
+        link["op"] = op
+    link["url"] = url
+    link["added"] = added or datetime.now(timezone.utc).isoformat()
     if title:
         link["title"] = title
     if tags:
@@ -73,4 +78,6 @@ def create_link_entry(url, title=None, tags=None, notes=None, added=None,
         link["channel"] = channel
     if thumbnail:
         link["thumbnail"] = thumbnail
+    if submitted_by:
+        link["submitted_by"] = submitted_by
     return link

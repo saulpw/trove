@@ -1,41 +1,29 @@
-"""Tests for rename_tag processing in process_issues.py."""
+"""Tests for process_issues.py parsing logic."""
 
-from process_issues import rename_tag
-
-
-def test_rename_single_url():
-    links = [{"url": "https://a.com", "added": "2025-01-01", "tags": "games retro"}]
-    rename_tag(links, "retro", "classic", "https://a.com")
-    assert links[0]["tags"] == "classic games"
+from process_issues import parse_issue_body
 
 
-def test_rename_to_multiple_tags():
-    links = [{"url": "https://a.com", "added": "2025-01-01", "tags": "games retro"}]
-    rename_tag(links, "retro", "classic vintage", "https://a.com")
-    assert links[0]["tags"] == "classic games vintage"
+def test_parse_issue_body_basic():
+    body = "url: https://example.com\ntags: games retro\nnotes: great site"
+    fields = parse_issue_body(body)
+    assert fields["url"] == "https://example.com"
+    assert fields["tags"] == "games retro"
+    assert fields["notes"] == "great site"
 
 
-def test_rename_multiple_urls():
-    links = [
-        {"url": "https://a.com", "added": "2025-01-01", "tags": "games retro"},
-        {"url": "https://b.com", "added": "2025-01-02", "tags": "retro music"},
-    ]
-    rename_tag(links, "retro", "classic", "https://a.com https://b.com")
-    assert links[0]["tags"] == "classic games"
-    assert links[1]["tags"] == "classic music"
+def test_parse_issue_body_with_action():
+    body = "action: set_title\nurl: https://example.com\ntitle: New Title\nsubmitted_by: alice"
+    fields = parse_issue_body(body)
+    assert fields["action"] == "set_title"
+    assert fields["url"] == "https://example.com"
+    assert fields["title"] == "New Title"
+    assert fields["submitted_by"] == "alice"
 
 
-def test_rename_nonexistent_tag():
-    links = [{"url": "https://a.com", "added": "2025-01-01", "tags": "games retro"}]
-    rename_tag(links, "missing", "classic", "https://a.com")
-    assert links[0]["tags"] == "games retro"
-
-
-def test_rename_preserves_other_links():
-    links = [
-        {"url": "https://a.com", "added": "2025-01-01", "tags": "games retro"},
-        {"url": "https://b.com", "added": "2025-01-02", "tags": "retro music"},
-    ]
-    rename_tag(links, "retro", "classic", "https://a.com")
-    assert links[0]["tags"] == "classic games"
-    assert links[1]["tags"] == "retro music"
+def test_parse_issue_body_rename_tag():
+    body = "action: rename_tag\nremove_tag: retro\nadd_tags: classic\nurls: https://a.com https://b.com\nsubmitted_by: bob"
+    fields = parse_issue_body(body)
+    assert fields["action"] == "rename_tag"
+    assert fields["remove_tag"] == "retro"
+    assert fields["add_tags"] == "classic"
+    assert fields["urls"] == "https://a.com https://b.com"

@@ -2,6 +2,23 @@
 
 ## 2026-02-13
 
+- Build-time dedup for trove.jsonl:
+  - trove.jsonl is now an append-only operation log; deduplication happens at build time
+  - New `dedup_trove.py`: merges entries per URL with configurable ops (`add`, `set_title`, `set_notes`, `add_tag`, `remove_tag`, `rename_tag`)
+  - Merge rules: tag union, sticky `set_title`, combined notes with submitter prefixes, earliest timestamp, last-write-wins for media fields
+  - `trove_utils.py`: `create_link_entry()` now accepts `op` and `submitted_by` params
+  - `process_issues.py`: removed inline merge logic; now appends op entries for build-time dedup
+  - `submit.js`: passes `action` field through to GitHub issues for non-add operations
+  - `frontend.ts`: title edits use `set_title` action, tag adds use `add_tag` action
+  - New remove-tag UI: tag menu shows "remove" option when signed in, submits `remove_tag` action
+  - Makefile: `build` target runs `dedup_trove.py` instead of copying trove.jsonl; new `dedup` target
+  - Tests for dedup merge logic in `test_dedup_trove.py`
+- Bumped version to 0.26
+
+---
+
+## 2026-02-13
+
 - Inline bookmarklet to bypass CSP:
   - Bookmarklet code is now fully inlined in the `javascript:` URL instead of injecting an external `<script>` tag
   - Fixes bookmarklet on CSP-strict sites (YouTube, etc.) that block external script loading

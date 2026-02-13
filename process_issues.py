@@ -41,33 +41,12 @@ def close_issue(number):
         print(f"Could not close issue #{number}: {result.stdout}\n{result.stderr}")
 
 
-def rename_tag(links, remove_tag, add_tags_str, target_urls):
-    """Rename a tag on specific links. Returns count of links modified.
-
-    Args:
-        links: List of link dicts to modify in place.
-        remove_tag: Tag string to remove.
-        add_tags_str: Space-separated string of tags to add.
-        target_urls: Space-separated string of URLs to apply the rename to.
-    """
-    new_tags = add_tags_str.split()
-    target_set = set(target_urls.split())
-    count = 0
-    for link in links:
-        if link["url"] not in target_set:
-            continue
-        tags = set(link.get("tags", "").split()) if link.get("tags") else set()
-        if remove_tag not in tags:
-            continue
-        tags.discard(remove_tag)
-        tags.update(new_tags)
-        link["tags"] = " ".join(sorted(tags))
-        count += 1
-    return count
-
-
 def process_issues():
-    """Process all open submission issues."""
+    """Process all open submission issues.
+
+    Appends operation entries to trove.jsonl. Deduplication happens at build
+    time via dedup_trove.py.
+    """
     issues = get_submission_issues()
     if not issues:
         print("No open submission issues found")
@@ -75,16 +54,16 @@ def process_issues():
 
     links = load_trove()
     existing_urls = {link["url"] for link in links}
-    processed = 0
-    merged = 0
-    renamed = 0
+    appended = 0
 
     for issue in issues:
         number = issue["number"]
         fields = parse_issue_body(issue["body"])
+        action = fields.get("action", "add")
+        submitted_by = fields.get("submitted_by")
 
         # Handle rename_tag action
-        if fields.get("action") == "rename_tag":
+        if action == "rename_tag":
             remove_tag = fields.get("remove_tag")
             add_tags_str = fields.get("add_tags", "")
             urls_str = fields.get("urls", "")
@@ -92,10 +71,16 @@ def process_issues():
                 print(f"Issue #{number}: Invalid rename_tag fields, skipping")
                 close_issue(number)
                 continue
-            count = rename_tag(links, remove_tag, add_tags_str, urls_str)
-            print(f"Issue #{number}: Renamed '{remove_tag}' → '{add_tags_str}' on {count} link(s)")
-            renamed += count
+            entry = {"op": "rename_tag", "remove_tag": remove_tag,
+                     "add_tags": add_tags_str, "urls": urls_str,
+                     "added": __import__('datetime').datetime.now(
+                         __import__('datetime').timezone.utc).isoformat()}
+            if submitted_by:
+                entry["submitted_by"] = submitted_by
+            links.append(entry)
+            print(f"Issue #{number}: Appended rename_tag '{remove_tag}' → '{add_tags_str}'")
             close_issue(number)
+            appended += 1
             continue
 
         url = fields.get("url")
@@ -103,80 +88,50 @@ def process_issues():
             print(f"Issue #{number}: No URL found, skipping")
             continue
 
-        if url in existing_urls:
-            # Merge tags and/or update title for existing entry
-            tags = fields.get("tags")
-            title = fields.get("title")
-            updated = False
-
-            for link in links:
-                if link["url"] == url:
-                    # Merge tags if provided
-                    if tags:
-                        existing_tags = set(link.get("tags", "").split()) if link.get("tags") else set()
-                        new_tags = set(tags.split())
-                        merged_tags = existing_tags | new_tags
-                        link["tags"] = " ".join(sorted(merged_tags))
-                        updated = True
-
-                    # Update title if provided
-                    if title:
-                        link["title"] = title
-                        updated = True
-                        print(f"Issue #{number}: Updated title for existing URL")
-
-                    break
-
-            if updated:
-                if tags and title:
-                    print(f"Issue #{number}: Merged tags and updated title for existing URL")
-                elif tags:
-                    print(f"Issue #{number}: Merged tags into existing URL")
-                merged += 1
-            else:
-                print(f"Issue #{number}: URL already exists, no updates")
-
+        # For set_title, set_notes, add_tag, remove_tag: just append the op
+        if action in ("set_title", "set_notes", "add_tag", "remove_tag"):
+            entry = create_link_entry(
+                url, title=fields.get("title"), tags=fields.get("tags"),
+                notes=fields.get("notes"), op=action, submitted_by=submitted_by)
+            links.append(entry)
+            print(f"Issue #{number}: Appended {action} for {url}")
             close_issue(number)
+            appended += 1
             continue
 
+        # Default: add operation
         print(f"Issue #{number}: Processing {url}")
 
-        # Fetch metadata (YouTube-specific or generic title)
+        # Fetch metadata (YouTube-specific or generic title) only for new URLs
+        title = fields.get("title")
         yt_meta = {}
-        if is_youtube_url(url):
-            yt_meta = fetch_youtube_metadata(url)
-            title = yt_meta.get("title")
-        else:
-            title = fetch_title(url)
-        if title:
-            print(f"  Found title: {title}")
+        if url not in existing_urls:
+            if is_youtube_url(url):
+                yt_meta = fetch_youtube_metadata(url)
+                if not title:
+                    title = yt_meta.get("title")
+            elif not title:
+                title = fetch_title(url)
+            if title:
+                print(f"  Found title: {title}")
+            trigger_archive(url)
 
-        # Build link entry
-        link = create_link_entry(url, title, fields.get("tags"), fields.get("notes"),
-                                 duration=yt_meta.get("duration"),
-                                 channel=yt_meta.get("channel"),
-                                 thumbnail=yt_meta.get("thumbnail"))
+        link = create_link_entry(
+            url, title, fields.get("tags"), fields.get("notes"),
+            duration=yt_meta.get("duration"), channel=yt_meta.get("channel"),
+            thumbnail=yt_meta.get("thumbnail"), op="add",
+            submitted_by=submitted_by)
 
         links.append(link)
         existing_urls.add(url)
-
-        # Trigger archive.org
-        trigger_archive(url)
-
-        # Close the issue
         close_issue(number)
-        processed += 1
+        appended += 1
 
-    if processed > 0 or merged > 0 or renamed > 0:
+    if appended > 0:
         save_trove(links)
-        if processed > 0:
-            print(f"Added {processed} link(s) to {TROVE_FILE}")
-        if merged > 0:
-            print(f"Merged tags for {merged} existing link(s)")
-        if renamed > 0:
-            print(f"Renamed tags on {renamed} link(s)")
+        print(f"Appended {appended} entry/entries to {TROVE_FILE}")
     else:
-        print("No new links to add")
+        print("No new entries to append")
 
 
 def fill_titles():
