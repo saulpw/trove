@@ -1,5 +1,21 @@
 # CHANGELOG
 
+## 2026-02-12
+
+- Friendlier link-adding experience:
+  - Notes field changed from single-line input to resizable textarea
+  - Tag autocomplete: typing in the tags field shows matching suggestions from existing tags, fetched from `/tags.json`
+  - `tags.json` generated during `make build` from `trove.jsonl`
+  - New bookmarklet (`bookmarklet.js`): injects a floating shadow-DOM panel on external pages instead of opening a popup window
+    - Pre-fills URL from current page, selected text as notes
+    - Tag autocomplete works in the widget
+    - Credentials embedded in bookmarklet if signed in on trove
+  - Footer updated: "drag to bookmark bar: + trove"
+  - Updated help.html with bookmarklet and autocomplete documentation
+- Bumped version to 0.23
+
+---
+
 ## 2026-02-11
 
 - Card layout: thumbnail/image now appears smaller on the right side of the card, with title/URL/tags left-aligned

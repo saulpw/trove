@@ -16,10 +16,17 @@ add:
 	python3 add_link.py ${URL} ${TAGS} $(if ${TITLE},-t "${TITLE}")
 
 # Build for Netlify deployment
-build:
+build: _build/tags.json
 	mkdir -p _build
-	cp index.html help.html style.css frontend.js trove.jsonl _build/
+	cp index.html help.html style.css frontend.js bookmarklet.js trove.jsonl _build/
 	sed -i='' 's/BUILD_TIMESTAMP/$(shell date +%s)/' _build/index.html
+
+# Build tags files
+_build/tags.json: tags.json
+	cp $< $@
+
+tags.json: trove.jsonl
+	python3 -c "import json; import fileinput; tags=sorted(set(t for line in fileinput.input() for t in json.loads(line).get('tags','').split() if t)); print(json.dumps(tags))" < $< > $@
 
 # Syntax check all Python files, then run tests
 test:
@@ -55,3 +62,6 @@ import-url:
 # Import links from a reviewed PSV file into trove.jsonl
 import-psv:
 	python3 import_web_links.py import ${PSV}
+
+clean:
+	rm -f _build/* tags.json

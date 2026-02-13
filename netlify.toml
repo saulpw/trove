@@ -10,6 +10,16 @@
   [headers.values]
     Cache-Control = "max-age=60"
 
+[[headers]]
+  for = "/tags.json"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+
+[[headers]]
+  for = "/bookmarklet.js"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"

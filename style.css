@@ -97,7 +97,18 @@ header nav a:hover { text-decoration: underline; }
 .link .tag:hover { text-decoration: underline; color: var(--color-link); }
 .empty { color: var(--color-text-faint); font-style: italic; }
 #add-form { margin-bottom: 1.5rem; display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
-#add-form input[type="text"] { flex: 1; padding: 0.5rem; font-size: 1rem; border: 1px solid var(--color-border-input); border-radius: 4px; min-width: 150px; }
+#add-form input[type="text"], #add-form textarea { flex: 1; padding: 0.5rem; font-size: 1rem; border: 1px solid var(--color-border-input); border-radius: 4px; min-width: 150px; font-family: inherit; }
+#add-form textarea { resize: vertical; min-height: 2.5rem; }
+#tags-input-wrap { flex: 1; position: relative; min-width: 150px; }
+#tags-input-wrap input { width: 100%; box-sizing: border-box; }
+#tag-suggestions {
+  display: none; position: absolute; left: 0; right: 0; top: 100%;
+  background: var(--color-bg); border: 1px solid var(--color-border); border-radius: 4px;
+  box-shadow: 0 2px 8px var(--color-shadow); z-index: 200; max-height: 200px; overflow-y: auto;
+}
+#tag-suggestions.open { display: block; }
+#tag-suggestions .tag-option { padding: 0.3rem 0.6rem; cursor: pointer; font-size: var(--text-md); }
+#tag-suggestions .tag-option:hover, #tag-suggestions .tag-option.active { background: var(--color-link-hover-bg); }
 #add-form button { padding: 0.5rem 1rem; font-size: 1rem; cursor: pointer; border: 1px solid var(--color-border-input); border-radius: 4px; background: var(--color-bg-btn); white-space: nowrap; }
 #add-form button:hover { background: var(--color-bg-btn-hover); }
 #submit-status { font-size: var(--text-base); margin-left: 0.5rem; }
@@ -190,5 +201,5 @@ header nav a + a { margin-left: 1rem; }
 body.bookmarklet-mode { max-width: 400px; margin: 1rem auto; }
 body.bookmarklet-mode header h1 { font-size: 1.2rem; }
 body.bookmarklet-mode #add-form { flex-direction: column; align-items: stretch; }
-body.bookmarklet-mode #add-form input[type="text"] { width: 100%; min-width: auto; }
+body.bookmarklet-mode #add-form input[type="text"], body.bookmarklet-mode #add-form textarea { width: 100%; min-width: auto; }
 body.bookmarklet-mode footer { display: none; }

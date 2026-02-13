@@ -775,6 +775,7 @@ function signOut() {
   clearCredentials();
   document.getElementById('auth-menu').style.display = 'none';
   document.getElementById('auth-btn').style.display = '';
+  updateBookmarkletHref();
 
   if (currentLinks.length > 0) {
     applySort();
@@ -785,6 +786,7 @@ function onAuthSuccess(username) {
   document.getElementById('auth-user').textContent = username;
   document.getElementById('auth-menu').style.display = '';
   document.getElementById('auth-btn').style.display = 'none';
+  updateBookmarkletHref();
 
   if (!bookmarkletMode && currentLinks.length > 0) {
     applySort();
@@ -846,6 +848,78 @@ async function submitLink() {
   }
 }
 
+// Tag autocomplete
+let allTags = [];
+
+async function loadTags() {
+  try {
+    const resp = await fetch('/tags.json');
+    if (resp.ok) allTags = await resp.json();
+  } catch {}
+}
+
+function initTagAutocomplete() {
+  const input = document.getElementById('link-tags');
+  const dropdown = document.getElementById('tag-suggestions');
+  if (!input || !dropdown) return;
+
+  let activeIdx = -1;
+
+  function currentPartial() {
+    const val = input.value;
+    const cursor = input.selectionStart;
+    const before = val.slice(0, cursor);
+    const lastSpace = before.lastIndexOf(' ');
+    return before.slice(lastSpace + 1);
+  }
+
+  function existingTags() {
+    return input.value.split(' ').filter(t => t);
+  }
+
+  function showSuggestions() {
+    const partial = currentPartial().toLowerCase();
+    if (!partial) { dropdown.classList.remove('open'); return; }
+    const existing = new Set(existingTags());
+    const matches = allTags.filter(t => !existing.has(t) && t.toLowerCase().includes(partial)).slice(0, 10);
+    if (matches.length === 0) { dropdown.classList.remove('open'); return; }
+    activeIdx = -1;
+    dropdown.innerHTML = matches.map(t => `<div class="tag-option">${t}</div>`).join('');
+    dropdown.classList.add('open');
+  }
+
+  function pickTag(tag) {
+    const val = input.value;
+    const cursor = input.selectionStart;
+    const before = val.slice(0, cursor);
+    const lastSpace = before.lastIndexOf(' ');
+    const after = val.slice(cursor);
+    const nextSpace = after.indexOf(' ');
+    const afterCut = nextSpace >= 0 ? after.slice(nextSpace) : '';
+    input.value = before.slice(0, lastSpace + 1) + tag + ' ' + afterCut.trimStart();
+    dropdown.classList.remove('open');
+    input.focus();
+  }
+
+  input.addEventListener('input', showSuggestions);
+  input.addEventListener('keydown', (e) => {
+    if (!dropdown.classList.contains('open')) return;
+    const items = dropdown.querySelectorAll('.tag-option');
+    if (e.key === 'ArrowDown') { e.preventDefault(); activeIdx = Math.min(activeIdx + 1, items.length - 1); items.forEach((el, i) => el.classList.toggle('active', i === activeIdx)); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); activeIdx = Math.max(activeIdx - 1, 0); items.forEach((el, i) => el.classList.toggle('active', i === activeIdx)); }
+    else if (e.key === 'Enter' && activeIdx >= 0) { e.preventDefault(); pickTag(items[activeIdx].textContent); }
+    else if (e.key === 'Escape') { dropdown.classList.remove('open'); }
+  });
+
+  dropdown.addEventListener('mousedown', (e) => {
+    e.preventDefault(); // keep focus on input
+    const opt = e.target.closest('.tag-option');
+    if (opt) pickTag(opt.textContent);
+  });
+
+  input.addEventListener('blur', () => { setTimeout(() => dropdown.classList.remove('open'), 150); });
+}
+
 // Handle browser back/forward navigation
 window.addEventListener('popstate', () => {
   if (allLinks.length > 0) {
@@ -892,10 +966,17 @@ function initBookmarkletMode() {
 // Set bookmarklet link href with current origin
 function initBookmarkletLink() {
   const link = document.getElementById('bookmarklet');
-  if (link) {
-    const origin = location.origin;
-    link.href = "javascript:window.open('" + origin + "/?submit=1&url='+encodeURIComponent(location.href),'trove','width=450,height=350')";
-  }
+  if (!link) return;
+  updateBookmarkletHref();
+}
+
+function updateBookmarkletHref() {
+  const link = document.getElementById('bookmarklet');
+  if (!link) return;
+  const origin = location.origin;
+  const creds = getCredentials();
+  const userAttr = creds ? `s.dataset.troveUser=${JSON.stringify(creds.username)};s.dataset.trovePass=${JSON.stringify(creds.password)};` : '';
+  link.href = `javascript:void(function(){var s=document.createElement('script');s.dataset.troveOrigin=${JSON.stringify(origin)};s.dataset.troveUrl=location.href;s.dataset.troveSelection=window.getSelection().toString();${userAttr}s.src=${JSON.stringify(origin+'/bookmarklet.js')};document.body.appendChild(s);}())`;
 }
 
 // Check for existing credentials on page load
@@ -935,6 +1016,8 @@ function initBreadcrumbNav() {
 initBookmarkletLink();
 initAuth();
 initSignInForm();
+loadTags();
+initTagAutocomplete();
 if (document.getElementById('links') && !initBookmarkletMode()) {
   initBreadcrumbNav();
   initTagMenu();

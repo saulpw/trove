@@ -44,8 +44,11 @@
     <div id="main-content">
       <div id="add-form">
         <input type="text" id="link-url" placeholder="https://..." />
-        <input type="text" id="link-tags" placeholder="Tags (space-separated)" />
-        <input type="text" id="link-notes" placeholder="Notes (optional)" />
+        <div id="tags-input-wrap">
+          <input type="text" id="link-tags" placeholder="Tags (space-separated)" autocomplete="off" />
+          <div id="tag-suggestions"></div>
+        </div>
+        <textarea id="link-notes" placeholder="Notes (optional)" rows="2"></textarea>
         <button id="submit-btn" onclick="submitLink()">Add</button>
         <span id="submit-status"></span>
       </div>
@@ -75,8 +78,8 @@
   </div>
 
   <footer>
-    <div>a <a href="https://saul.pw">saul.pw</a> project | <a href="/privacy">privacy policy</a> | bookmarklet: <a id="bookmarklet" href="#">add to trove</a></div>
-    <div id="version">v0.22</div>
+    <div>a <a href="https://saul.pw">saul.pw</a> project | <a href="/privacy">privacy policy</a> | drag to bookmark bar: <a id="bookmarklet" href="#">+ trove</a></div>
+    <div id="version">v0.23</div>
   </footer>
 
   <!-- Main frontend code -->

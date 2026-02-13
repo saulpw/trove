@@ -1,8 +1,30 @@
 # TODO
 
-- bookmarklet popup widget on same page to be added
+! once/day update of trove.jsonl  "todays submission's will be here tomorrow"
+
+- move trove.jsonl to a separate repo?
 
 - convert login dropdown to signout link only.
+
+- make link adding box more friendly:
+   - autopull title of page into title field (editable)
+   - autocomplete tags, possibly using a separate smaller aggregated tags.jsonl
+
+
+   - in widget, auto select tags field (so just typing and enter submits the link)
+
+bug: two different links with same url posted, they should have already been unified.
+
+- make renaming a tag actually creating a tag alias, so that future adds of that tag create the other one instead.
+    - delete and recreate to use that tag again in the future
+
+- allow editable tag description
+  - show on tag hover
+- add local tags
+   - maybe all tags should start local and then be synced to the server?
+
+- show number 
+  - omit favs/peeves from tag list if none of the elements on the page are on it
 
 - delete tag association
 
