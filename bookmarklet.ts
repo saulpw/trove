@@ -1,16 +1,22 @@
-// Bookmarklet widget — injected onto external pages via bookmarklet
-// Loaded as: javascript:(function(){...load this script with data attrs...})()
+// Bookmarklet widget — injected onto external pages via inline javascript: URL
+// Closure variables (__TROVE_ORIGIN__ etc.) are defined in the wrapping scope
+// constructed by frontend.ts updateBookmarkletHref()
 import { initAutocomplete } from './autocomplete';
+
+declare var __TROVE_ORIGIN__: string;
+declare var __TROVE_URL__: string;
+declare var __TROVE_SEL__: string;
+declare var __TROVE_USER__: string;
+declare var __TROVE_PASS__: string;
 
 (function() {
   if (document.getElementById('trove-bookmarklet-widget')) return;
 
-  const script = document.currentScript || document.querySelector('script[data-trove-origin]');
-  const origin = (script instanceof HTMLElement && script.dataset.troveOrigin) || 'https://trove.saul.pw';
-  const pageUrl = (script instanceof HTMLElement && script.dataset.troveUrl) || location.href;
-  const selection = (script instanceof HTMLElement && script.dataset.troveSelection) || '';
-  const username = (script instanceof HTMLElement && script.dataset.troveUser) || '';
-  const password = (script instanceof HTMLElement && script.dataset.trovePass) || '';
+  const origin = (typeof __TROVE_ORIGIN__ !== 'undefined' && __TROVE_ORIGIN__) || location.origin;
+  const pageUrl = (typeof __TROVE_URL__ !== 'undefined' && __TROVE_URL__) || location.href;
+  const selection = (typeof __TROVE_SEL__ !== 'undefined' && __TROVE_SEL__) || '';
+  const username = (typeof __TROVE_USER__ !== 'undefined' && __TROVE_USER__) || '';
+  const password = (typeof __TROVE_PASS__ !== 'undefined' && __TROVE_PASS__) || '';
 
   // Create host element with shadow DOM
   const host = document.createElement('div');
@@ -88,6 +94,11 @@ import { initAutocomplete } from './autocomplete';
 
   const $ = (id: string) => shadow.getElementById(id);
   ($('tw-tags') as HTMLInputElement).focus();
+
+  // Stop keyboard events from reaching the host page (e.g. YouTube shortcuts)
+  panel.addEventListener('keydown', (e) => e.stopPropagation());
+  panel.addEventListener('keyup', (e) => e.stopPropagation());
+  panel.addEventListener('keypress', (e) => e.stopPropagation());
 
   // Close
   panel.querySelector('.close')!.addEventListener('click', () => host.remove());

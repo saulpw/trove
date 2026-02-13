@@ -33,6 +33,7 @@ A simple static website to share lists of links at a public mnemonic url.  e.g. 
 - When something unexpected happens (file empty/missing, command fails strangely), ask the user before proceeding.
 - When corrected, add a meta rule to prevent the mistake in the future.
 - When learning new info about codebase, update CLAUDE.md immediately.
+- Document architecture decisions in ARCHITECTURE.md, not CLAUDE.md.
 - When user says "learn to do X", update CLAUDE.md with the rule.
 - When a change doesn't work and you fix it elsewhere, revert the failed change.
 - Keep implementations minimal - prototype first, polish later.

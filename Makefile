@@ -19,7 +19,8 @@ add:
 # Build for Netlify deployment
 build: tags.json
 	mkdir -p _build
-	npx esbuild frontend.ts --bundle --outfile=_build/frontend.js
+	npx esbuild bookmarklet.ts --bundle --minify --outfile=_build/bookmarklet-code.txt
+	npx esbuild frontend.ts --bundle --loader:.txt=text --outfile=_build/frontend.js
 	npx esbuild bookmarklet.ts --bundle --outfile=_build/bookmarklet.js
 	cp tags.json index.html help.html style.css trove.jsonl _build/
 	sed -i='' 's/BUILD_TIMESTAMP/$(shell date +%s)/' _build/index.html

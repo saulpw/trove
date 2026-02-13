@@ -2,6 +2,18 @@
 
 ## 2026-02-13
 
+- Inline bookmarklet to bypass CSP:
+  - Bookmarklet code is now fully inlined in the `javascript:` URL instead of injecting an external `<script>` tag
+  - Fixes bookmarklet on CSP-strict sites (YouTube, etc.) that block external script loading
+  - Build step minifies `bookmarklet.ts` → `bookmarklet-code.txt`, imported as text by `frontend.ts`
+  - Bookmarklet reads closure variables (`__TROVE_ORIGIN__`, `__TROVE_URL__`, etc.) instead of `script.dataset.*`
+  - Added `text.d.ts` for TypeScript `.txt` import support
+- Bumped version to 0.25
+
+---
+
+## 2026-02-13
+
 - Simplified auth UI:
   - Sign in form now a centered popup panel (matches bookmarklet design)
   - Auth links ("Sign in" / "Sign out") styled as proper links with underline on hover

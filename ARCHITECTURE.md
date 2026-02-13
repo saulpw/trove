@@ -94,6 +94,12 @@ GitHub Actions (cron)
 - Submissions are visible as GitHub Issues (public audit trail)
 - Content is sanitized when written to JSONL
 
+## Bookmarklet (Inline)
+
+The bookmarklet is inlined as a `javascript:` URL rather than injecting a `<script src=...>` tag. This bypasses Content Security Policy (CSP) restrictions on sites like YouTube that block external script loading. The entire minified bookmarklet bundle (~6KB, ~9.4KB URL-encoded) is embedded in the href, well within browser limits (~100KB).
+
+At build time, `bookmarklet.ts` is minified into `_build/bookmarklet-code.txt`, then imported as a text string by `frontend.ts` via esbuild's `--loader:.txt=text`. The `updateBookmarkletHref()` function wraps the code in an IIFE with closure variables (`__TROVE_ORIGIN__`, `__TROVE_URL__`, `__TROVE_SEL__`, `__TROVE_USER__`, `__TROVE_PASS__`) that the bookmarklet reads at runtime.
+
 ## Tradeoffs Accepted
 
 - **Latency:** Submissions appear after next cron run + rebuild (minutes, not seconds)

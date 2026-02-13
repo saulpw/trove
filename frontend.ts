@@ -1,4 +1,5 @@
 import { initAutocomplete } from './autocomplete';
+import bookmarkletCode from './_build/bookmarklet-code.txt';
 
 interface Link {
   url: string;
@@ -946,8 +947,9 @@ function updateBookmarkletHref(): void {
   if (!link) return;
   const origin = location.origin;
   const creds = getCredentials();
-  const userAttr = creds ? `s.dataset.troveUser=${JSON.stringify(creds.username)};s.dataset.trovePass=${JSON.stringify(creds.password)};` : '';
-  link.href = `javascript:void(function(){var s=document.createElement('script');s.dataset.troveOrigin=${JSON.stringify(origin)};s.dataset.troveUrl=location.href;s.dataset.troveSelection=window.getSelection().toString();${userAttr}s.src=${JSON.stringify(origin+'/bookmarklet.js')};document.body.appendChild(s);}())`;
+  const userVar = creds ? JSON.stringify(creds.username) : '""';
+  const passVar = creds ? JSON.stringify(creds.password) : '""';
+  link.href = `javascript:void((function(){var __TROVE_ORIGIN__=${JSON.stringify(origin)},__TROVE_URL__=location.href,__TROVE_SEL__=(window.getSelection()||"").toString(),__TROVE_USER__=${userVar},__TROVE_PASS__=${passVar};${bookmarkletCode}})())`;
 }
 
 // Check for existing credentials on page load
