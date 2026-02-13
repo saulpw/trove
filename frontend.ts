@@ -836,7 +836,7 @@ async function submitLink(): Promise<void> {
 
   const creds = getCredentials();
   if (!creds) {
-    showSignIn();
+    showSignIn(true);
     return;
   }
 
