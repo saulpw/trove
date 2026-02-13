@@ -83,6 +83,7 @@ let allLinks: Link[] = [];
 let currentLinks: Link[] = [];
 // Store current page tags to exclude from display
 let currentPageTags: string[] = [];
+const currentPath = () => currentPageTags.length ? '/' + currentPageTags.join('/') : '';
 // Track hidden count for current filter
 let currentHiddenCount = 0;
 // Whether current page truncates display
@@ -159,14 +160,13 @@ function sortLinks(links: Link[], sortBy: string): Link[] {
   return sorted;
 }
 
-function renderTag(t: string, currentPath: string): string {
+function renderTag(t: string): string {
   const renameOpt = isSignedIn() ? `<span class="rename-tag-trigger" data-tag="${t}">✎ rename</span>` : '';
-  return `<span class="tag-wrap"><span class="tag" data-tag="${t}">#${t}</span><span class="tag-menu"><span data-href="/${t}">→ /${t}</span><span data-href="${currentPath}/${t}">+ ${currentPath}/${t}</span><span data-href="${currentPath}/-${t}">− ${currentPath}/-${t}</span>${renameOpt}</span></span>`;
+  return `<span class="tag-wrap"><span class="tag" data-tag="${t}">#${t}</span><span class="tag-menu"><span data-href="/${t}">→ /${t}</span><span data-href="${currentPath()}/${t}">+ ${currentPath()}/${t}</span><span data-href="${currentPath()}/-${t}">− ${currentPath()}/-${t}</span>${renameOpt}</span></span>`;
 }
 
 function renderLinks(links: Link[]): void {
   const container = document.getElementById('links')!;
-  const currentPath = '/' + currentPageTags.join('/');
   const ratings = getRatings();
   container.innerHTML = links.map(link => {
     const tags = parseTags(link.tags).filter(t => !currentPageTags.includes(t)).sort();
@@ -201,7 +201,7 @@ function renderLinks(links: Link[]): void {
             </div>
             <span class="meta-line">${metaParts.join(' · ')}</span>
             ${link.notes ? `<div class="notes">${link.notes}</div>` : ''}
-            <div class="card-bottom"><span class="tags">${tags.map(t => renderTag(t, currentPath)).join(' ')}</span><button class="add-tag-btn" onclick="handleAddTagClick(event, this)">+</button></div>
+            <div class="card-bottom"><span class="tags">${tags.map(t => renderTag(t)).join(' ')}</span><button class="add-tag-btn" onclick="handleAddTagClick(event, this)">+</button></div>
           </div>
           ${imgSrc ? `<div class="card-thumb"><img src="${imgSrc}" alt="${imgAlt}" loading="lazy"></div>` : ''}
         </div>
@@ -314,9 +314,8 @@ function initSidebarTagMenu(): void {
         closeSidebarMenu();
         return;
       }
-      const currentPath = '/' + currentPageTags.join('/');
       const renameOpt = isSignedIn() ? `<span class="rename-tag-trigger" data-tag="${tag}">✎ rename</span>` : '';
-      menu.innerHTML = `<span data-href="/${tag}">→ /${tag}</span><span data-href="${currentPath}/${tag}">+ ${currentPath}/${tag}</span><span data-href="${currentPath}/-${tag}">− ${currentPath}/-${tag}</span>${renameOpt}`;
+      menu.innerHTML = `<span data-href="/${tag}">→ /${tag}</span><span data-href="${currentPath()}/${tag}">+ ${currentPath()}/${tag}</span><span data-href="${currentPath()}/-${tag}">− ${currentPath()}/-${tag}</span>${renameOpt}`;
       // Position menu next to the clicked tag
       const tagRect = tagEl.getBoundingClientRect();
       const sidebarRect = sidebar.getBoundingClientRect();
@@ -386,7 +385,7 @@ function getPageConfig(): PageConfig {
       title: tagFilters.join('/') + ' - trove',
       heading: crumbs.join(' <span class="breadcrumb-sep">&#x2229;</span> '),
       filter: tagFilter,
-      pageTags: includeTags,
+      pageTags: tagFilters,
       tagFilters,
       truncate: false,
     };
@@ -396,7 +395,7 @@ function getPageConfig(): PageConfig {
     title: 'trove',
     heading: '<a href="/" data-nav>trove</a>',
     filter: tagFilter,
-    pageTags: includeTags,
+    pageTags: tagFilters,
     tagFilters,
     truncate: true,
   };
@@ -412,7 +411,7 @@ function filterAndRender(): void {
 
   // Pre-populate tags input with current filters (exclude negated tags)
   const tagsInput = document.getElementById('link-tags') as HTMLInputElement | null;
-  if (tagsInput) tagsInput.value = page.pageTags.join(' ');
+  if (tagsInput) tagsInput.value = page.pageTags.filter(t => !t.startsWith('-')).join(' ');
 
   // Update heading
   const h1 = document.querySelector('h1')!;
@@ -615,13 +614,12 @@ async function submitToBackend(fields: Record<string, string>): Promise<void> {
 async function submitTagsForLink(url: string, tags: string, linkEl: HTMLElement, input: HTMLInputElement, btn: HTMLElement): Promise<void> {
   // Optimistically add tags to UI
   const tagsEl = linkEl.querySelector('.tags')!;
-  const currentPath = '/' + currentPageTags.join('/');
   const newTags = tags.split(' ').filter(t => t && !currentPageTags.includes(t));
 
   newTags.forEach(t => {
     const wrap = document.createElement('span');
     wrap.className = 'tag-wrap';
-    wrap.innerHTML = `<span class="tag" data-tag="${t}">#${t}</span><span class="tag-menu"><span data-href="/${t}">→ /${t}</span><span data-href="${currentPath}/${t}">+ ${currentPath}/${t}</span><span data-href="${currentPath}/-${t}">− ${currentPath}/-${t}</span></span>`;
+    wrap.innerHTML = `<span class="tag" data-tag="${t}">#${t}</span><span class="tag-menu"><span data-href="/${t}">→ /${t}</span><span data-href="${currentPath()}/${t}">+ ${currentPath()}/${t}</span><span data-href="${currentPath()}/-${t}">− ${currentPath()}/-${t}</span></span>`;
     tagsEl.appendChild(wrap);
     tagsEl.appendChild(document.createTextNode(' '));
   });
@@ -661,9 +659,8 @@ function showRenameInput(hideEl: HTMLElement, tagName: string, onConfirm: (newTa
 function handleRenameTagClick(tagName: string, linkEl: HTMLElement): void {
   const tagWrap = linkEl.querySelector(`.tag-wrap .tag[data-tag="${tagName}"]`)!.closest('.tag-wrap') as HTMLElement;
   showRenameInput(tagWrap, tagName, (newTags) => {
-    const currentPath = '/' + currentPageTags.join('/');
-    newTags.forEach(t => {
-      tagWrap.insertAdjacentHTML('beforebegin', renderTag(t, currentPath) + ' ');
+      newTags.forEach(t => {
+      tagWrap.insertAdjacentHTML('beforebegin', renderTag(t) + ' ');
     });
     tagWrap.remove();
     const oldTags = (linkEl.dataset.tags || '').split(' ').filter(t => t);
@@ -678,8 +675,7 @@ function handleRenameSidebarTag(tagName: string): void {
   if (!sidebarTag) return;
 
   showRenameInput(sidebarTag, tagName, (newTags) => {
-    const currentPath = '/' + currentPageTags.join('/');
-    const affectedUrls: string[] = [];
+      const affectedUrls: string[] = [];
 
     document.querySelectorAll<HTMLElement>('#links .link').forEach(linkEl => {
       const tags = (linkEl.dataset.tags || '').split(' ').filter(t => t);
@@ -687,7 +683,7 @@ function handleRenameSidebarTag(tagName: string): void {
       affectedUrls.push(linkEl.dataset.url!);
       const updatedTags = tags.filter(t => t !== tagName).concat(newTags);
       linkEl.dataset.tags = updatedTags.join(' ');
-      linkEl.querySelector('.tags')!.innerHTML = updatedTags.filter(t => !currentPageTags.includes(t)).map(t => renderTag(t, currentPath)).join(' ');
+      linkEl.querySelector('.tags')!.innerHTML = updatedTags.filter(t => !currentPageTags.includes(t)).map(t => renderTag(t)).join(' ');
     });
 
     const visibleLinks: Array<{ tags: string }> = [];
