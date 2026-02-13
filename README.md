@@ -1,4 +1,4 @@
-# trove.pw
+# trove.saul.pw
 
 This trove of links is a record of things that are interesting, or meaningful, or relevant in some context.
 
@@ -6,7 +6,7 @@ It's a fairly basic one-page-app webpage, and hopefully straightforward to imple
 By virtue of being a static website, it should require virtually no ongoing cost or maintenance.
 
 - User submit links along with tags.
-- `trove.pw/puzzles` is a list of links tagged '#puzzles'.
+- `trove.saul.pw/puzzles` is a list of links tagged '#puzzles'.
 - User can view lists of links by tags, sorted any number of ways.
 - The interface feels really snappy because all filtering and data manipulation is done in the user's browser.
 
@@ -124,8 +124,8 @@ See [ARCHITECTURE.md](ARCHITECTURE.md).
 3. **Netlify** — rebuilds static site on commit
 4. **Frontend** — static HTML/CSS/JS loads JSON, populates DOM
 
-## Example: trove.pw/puzzles
+## Example: trove.saul.pw/puzzles
 
-I find a puzzle site, go to `trove.pw/puzzles`, and submit the link.
+I find a puzzle site, go to `trove.saul.pw/puzzles`, and submit the link.
 I'm signed in with my username/password, so the submission goes to a Netlify Function that creates a GitHub Issue.
 The next GitHub Action run processes it into `trove.jsonl` and commits, triggering a rebuild.

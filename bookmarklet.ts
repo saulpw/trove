@@ -6,7 +6,7 @@ import { initAutocomplete } from './autocomplete';
   if (document.getElementById('trove-bookmarklet-widget')) return;
 
   const script = document.currentScript || document.querySelector('script[data-trove-origin]');
-  const origin = (script instanceof HTMLElement && script.dataset.troveOrigin) || 'https://trove.pw';
+  const origin = (script instanceof HTMLElement && script.dataset.troveOrigin) || 'https://trove.saul.pw';
   const pageUrl = (script instanceof HTMLElement && script.dataset.troveUrl) || location.href;
   const selection = (script instanceof HTMLElement && script.dataset.troveSelection) || '';
   const username = (script instanceof HTMLElement && script.dataset.troveUser) || '';

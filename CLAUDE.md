@@ -1,6 +1,6 @@
 # Link Tagger - Dev Guide
 
-A simple static website to share lists of links at a public mnemonic url.  e.g. trove.pw/games is a list of games
+A simple static website to share lists of links at a public mnemonic url.  e.g. trove.saul.pw/games is a list of games
 
 ## Project Structure
 - `index.html` - Static frontend HTML structure

@@ -1,13 +1,12 @@
 # TODO
 
+- bug: bookmarklet does not work on youtube page
 - bug: two different links with same url posted, they should have already been unified.
 - bug: adding a tag (pos or neg) at toplevel trove does not do anything. either it should be disabled/not appear, or do the same as replacing.
 
 ! once/day update of trove.jsonl  "todays submission's will be here tomorrow"
 
 - move trove.jsonl to a separate repo?
-
-- convert login dropdown to signout link only.
 
 - make link adding box more friendly:
    - autopull title of page into title field (editable)
