@@ -1,5 +1,8 @@
 # TODO
 
+- bug: two different links with same url posted, they should have already been unified.
+- bug: adding a tag (pos or neg) at toplevel trove does not do anything. either it should be disabled/not appear, or do the same as replacing.
+
 ! once/day update of trove.jsonl  "todays submission's will be here tomorrow"
 
 - move trove.jsonl to a separate repo?
@@ -9,12 +12,10 @@
 - make link adding box more friendly:
    - autopull title of page into title field (editable)
 
-- bug: two different links with same url posted, they should have already been unified.
 - remove auth from bookmarklet?
 - make renaming a tag actually creating a tag alias, so that future adds of that tag create the other one instead.
     - delete and recreate to use that tag again in the future
 
-- bug: adding a tag (pos or neg) at toplevel trove does not do anything. either it should be disabled/not appear, or do the same as replacing.
 - allow editable tag description
   - show on tag hover
 
@@ -53,11 +54,12 @@
 
 - add sort links by # of tags (so /-xyz will show untagged links first)
 
+- sort tags alphabetically
+
 ## Discoverability
 
 ## Dev/Testing
 
-- convert to typescript
 - run tests from cli outside browser
 - tell claude to create unit tests for public functions/interfaces
 

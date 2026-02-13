@@ -35,25 +35,36 @@ header nav a { color: var(--color-link); text-decoration: none; font-size: var(-
 header nav a:hover { text-decoration: underline; }
 .breadcrumb-sep { color: var(--color-text-light); font-weight: normal; margin: 0 0.1em; }
 #auth-container { font-size: var(--text-md); display: flex; align-items: center; gap: 0.5rem; margin-right: max(0px, calc(100% - 200px - 2rem - 800px)); }
-#auth-menu { position: relative; cursor: pointer; }
-#auth-user { color: var(--color-text-muted); }
-#auth-user::after { content: ' ▾'; font-size: 0.7em; }
-#auth-dropdown {
-  display: none; position: absolute; right: 0; top: 100%;
-  background: var(--color-bg); border: 1px solid var(--color-border); border-radius: 4px;
-  box-shadow: 0 2px 8px var(--color-shadow); z-index: 100; white-space: nowrap;
+#auth-container a { color: var(--color-link); text-decoration: none; cursor: pointer; }
+#auth-container a:hover { text-decoration: underline; }
+#signin-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.15); z-index: 1000;
+  display: flex; align-items: flex-start; justify-content: center; padding-top: 80px;
 }
-#auth-menu:hover #auth-dropdown { display: block; }
-#auth-dropdown span { display: block; padding: 0.4rem 0.8rem; color: var(--color-text); cursor: pointer; }
-#auth-dropdown span:hover { background: var(--color-link-hover-bg); }
-#signin-form { display: flex; gap: 0.5rem; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; }
-#signin-form input { padding: 0.4rem; font-size: var(--text-md); border: 1px solid var(--color-border-input); border-radius: 4px; width: 10rem; }
-.password-wrap { position: relative; display: inline-block; }
-.password-wrap input { width: 10rem; padding-right: 2rem; }
+#signin-panel {
+  width: 340px; background: var(--color-bg); border: 1px solid var(--color-border-input);
+  border-radius: 8px; box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+  font-family: system-ui, sans-serif; font-size: 14px; color: var(--color-text);
+}
+.signin-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 14px; border-bottom: 1px solid var(--color-border-light);
+}
+.signin-header strong { font-size: 15px; }
+.signin-close { cursor: pointer; font-size: 20px; color: var(--color-text-light); line-height: 1; background: none; border: none; }
+.signin-close:hover { color: var(--color-text); }
+.signin-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.signin-body label { font-size: 12px; color: var(--color-text-muted); }
+.signin-body input { width: 100%; padding: 6px 8px; font-size: 14px; border: 1px solid var(--color-border-input); border-radius: 4px; box-sizing: border-box; }
+.signin-body .password-wrap { position: relative; }
+.signin-body .password-wrap input { padding-right: 2rem; }
 .password-toggle { position: absolute; right: 0.4rem; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--color-text-light); line-height: 0; }
 .password-toggle:hover { color: var(--color-text); }
-#signin-form button { padding: 0.4rem 0.8rem; font-size: var(--text-md); cursor: pointer; border: 1px solid var(--color-border-input); border-radius: 4px; background: var(--color-bg-btn); }
-#signin-form button:hover { background: var(--color-bg-btn-hover); }
+.signin-body button { padding: 8px; font-size: 14px; cursor: pointer; border: 1px solid var(--color-border-input); border-radius: 4px; background: var(--color-bg-btn); width: 100%; }
+.signin-body button:hover { background: var(--color-bg-btn-hover); }
+#auth-status { font-size: 13px; text-align: center; min-height: 1.2em; }
+#auth-status.status-error { color: var(--color-error); }
 #links { list-style: none; padding: 0; }
 #link-count { color: var(--color-text-muted); font-size: var(--text-md); margin-right: auto; }
 .link-anchor { text-decoration: none; color: inherit; }

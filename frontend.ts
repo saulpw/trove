@@ -599,7 +599,7 @@ function restoreAddButton(input: HTMLInputElement, btn: HTMLElement): void {
 
 async function submitToBackend(fields: Record<string, string>): Promise<void> {
   const creds = getCredentials();
-  if (!creds) { showSignIn(); return; }
+  if (!creds) { showSignIn(true); return; }
   try {
     await fetch('/.netlify/functions/submit', {
       method: 'POST',
@@ -755,9 +755,10 @@ function togglePasswordVisibility(): void {
   shut.style.display = isHidden ? '' : 'none';
 }
 
-function showSignIn(): void {
-  document.getElementById('signin-form')!.style.display = 'flex';
-  (document.getElementById('auth-username') as HTMLInputElement).focus();
+function showSignIn(show: boolean): void {
+  const overlay = document.getElementById('signin-overlay')!;
+  overlay.style.display = show ? 'flex' : 'none';
+  if (show) (document.getElementById('auth-username') as HTMLInputElement).focus();
 }
 
 async function handleSignIn(): Promise<void> {
@@ -784,7 +785,7 @@ async function handleSignIn(): Promise<void> {
     if (response.ok) {
       saveCredentials(username, password);
       status.textContent = '';
-      document.getElementById('signin-form')!.style.display = 'none';
+      showSignIn(false);
       onAuthSuccess(username);
     } else {
       const result = await response.json();
@@ -799,7 +800,7 @@ async function handleSignIn(): Promise<void> {
 
 function signOut(): void {
   clearCredentials();
-  document.getElementById('auth-menu')!.style.display = 'none';
+  document.getElementById('auth-signout')!.style.display = 'none';
   document.getElementById('auth-btn')!.style.display = '';
   updateBookmarkletHref();
 
@@ -809,8 +810,7 @@ function signOut(): void {
 }
 
 function onAuthSuccess(username: string): void {
-  document.getElementById('auth-user')!.textContent = username;
-  document.getElementById('auth-menu')!.style.display = '';
+  document.getElementById('auth-signout')!.style.display = '';
   document.getElementById('auth-btn')!.style.display = 'none';
   updateBookmarkletHref();
 
@@ -958,15 +958,16 @@ function initAuth(): void {
   }
 }
 
-// Allow Enter key to submit sign-in form
+// Allow Enter key to submit sign-in form, Escape to close
 function initSignInForm(): void {
-  const form = document.getElementById('signin-form');
-  if (form) {
-    form.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        handleSignIn();
-      }
+  const overlay = document.getElementById('signin-overlay');
+  if (overlay) {
+    overlay.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); handleSignIn(); }
+      else if (e.key === 'Escape') { showSignIn(false); }
+    });
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) showSignIn(false);
     });
   }
 }

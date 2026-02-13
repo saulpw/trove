@@ -29,7 +29,7 @@ A simple static website to share lists of links at a public mnemonic url.  e.g. 
 - Use `${FOO}` variable syntax in Makefiles (not `$(FOO)`), because it is directly compatible with shell env var syntax for easy copy-paste.
 
 ## Meta Rules
-- When the user asks a question, answer it. Don't start implementing a solution without asking first.
+- **NEVER implement code changes in response to a question.** Questions get answers. Wait for explicit confirmation before touching any files.
 - When something unexpected happens (file empty/missing, command fails strangely), ask the user before proceeding.
 - When corrected, add a meta rule to prevent the mistake in the future.
 - When learning new info about codebase, update CLAUDE.md immediately.

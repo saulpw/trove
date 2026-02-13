@@ -2,6 +2,18 @@
 
 ## 2026-02-13
 
+- Simplified auth UI:
+  - Sign in form now a centered popup panel (matches bookmarklet design)
+  - Auth links ("Sign in" / "Sign out") styled as proper links with underline on hover
+  - Removed dropdown menu and username display
+  - Close popup with Escape, overlay click, or close button
+  - `showSignIn(bool)` replaces separate show/hide functions
+- Strengthened meta rule: NEVER implement code changes in response to questions
+
+---
+
+## 2026-02-13
+
 - Converted frontend.js and bookmarklet.js to TypeScript
   - New `autocomplete.ts`: shared tag autocomplete logic extracted from both files (~70 duplicate lines removed)
   - `frontend.ts`: typed all functions, interfaces (`Link`, `PageConfig`, `Credentials`), DOM element casts
