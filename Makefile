@@ -16,15 +16,12 @@ add:
 	python3 add_link.py ${URL} ${TAGS} $(if ${TITLE},-t "${TITLE}")
 
 # Build for Netlify deployment
-build: _build/tags.json
+build: tags.json
 	mkdir -p _build
-	cp index.html help.html style.css frontend.js bookmarklet.js trove.jsonl _build/
+	cp tags.json index.html help.html style.css frontend.js bookmarklet.js trove.jsonl _build/
 	sed -i='' 's/BUILD_TIMESTAMP/$(shell date +%s)/' _build/index.html
 
-# Build tags files
-_build/tags.json: tags.json
-	cp $< $@
-
+# Build tags file
 tags.json: trove.jsonl
 	python3 -c "import json; import fileinput; tags=sorted(set(t for line in fileinput.input() for t in json.loads(line).get('tags','').split() if t)); print(json.dumps(tags))" < $< > $@
 
