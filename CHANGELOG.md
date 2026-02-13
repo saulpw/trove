@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## 2026-02-13
+
+- Converted frontend.js and bookmarklet.js to TypeScript
+  - New `autocomplete.ts`: shared tag autocomplete logic extracted from both files (~70 duplicate lines removed)
+  - `frontend.ts`: typed all functions, interfaces (`Link`, `PageConfig`, `Credentials`), DOM element casts
+  - `bookmarklet.ts`: typed with shared autocomplete import
+  - Build uses esbuild to bundle TS → JS (two entry points → two output files)
+  - `tsconfig.json`: strict mode, noEmit (type checking only)
+  - `package.json`: devDependencies for esbuild and typescript
+  - Makefile: `make build` runs esbuild, new `make typecheck` target, `make setup` runs `npm install`
+- Bumped version to 0.24
+
+---
+
 ## 2026-02-12
 
 - Friendlier link-adding experience:

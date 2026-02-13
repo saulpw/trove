@@ -6,3 +6,4 @@ client_secret_*.json
 config.js
 .env
 .envrc
+node_modules/

@@ -1,6 +1,28 @@
+import { initAutocomplete } from './autocomplete';
+
+interface Link {
+  url: string;
+  added: string;
+  title?: string;
+  tags?: string;
+  notes?: string;
+  thumbnail?: string;
+  duration?: string;
+  channel?: string;
+}
+
+interface PageConfig {
+  title: string;
+  heading: string;
+  filter: (link: Link) => boolean;
+  pageTags: string[];
+  tagFilters: string[];
+  truncate: boolean;
+}
+
 // Parse path or hash to get tag filters: /foo/bar or #foo/bar → ['foo', 'bar']
 // Tags starting with '-' are exclusions: /foo/-bar → include 'foo', exclude 'bar'
-function getTagFilters() {
+function getTagFilters(): string[] {
   const hash = window.location.hash.replace(/^#\/?/, '');
   if (hash) {
     return hash.split('/').filter(s => s.length > 0);
@@ -11,7 +33,7 @@ function getTagFilters() {
 }
 
 // Filter links by time period based on their added date
-function filterLinksByTime(links, period) {
+function filterLinksByTime(links: Link[], period: string): Link[] {
   if (period === 'all') return links;
 
   const now = new Date();
@@ -42,24 +64,24 @@ function filterLinksByTime(links, period) {
 }
 
 // Parse tags from space-separated string to array
-const parseTags = (tags) => tags ? tags.split(' ').filter(t => t) : [];
+const parseTags = (tags: string | undefined): string[] => tags ? tags.split(' ').filter(t => t) : [];
 
 // Ratings stored in localStorage: { url: number }
 const RATINGS_KEY = 'trove_ratings';
-const getRatings = () => JSON.parse(localStorage.getItem(RATINGS_KEY) || '{}');
-const getRating = (url) => getRatings()[url] || 0;
-const setRating = (url, n) => {
+const getRatings = (): Record<string, number> => JSON.parse(localStorage.getItem(RATINGS_KEY) || '{}');
+const getRating = (url: string): number => getRatings()[url] || 0;
+const setRating = (url: string, n: number): void => {
   const ratings = getRatings();
   if (n === 0) { delete ratings[url]; } else { ratings[url] = n; }
   localStorage.setItem(RATINGS_KEY, JSON.stringify(ratings));
 };
 
 // Store all loaded links for client-side filtering
-let allLinks = [];
+let allLinks: Link[] = [];
 // Store current filtered links for re-sorting
-let currentLinks = [];
+let currentLinks: Link[] = [];
 // Store current page tags to exclude from display
-let currentPageTags = [];
+let currentPageTags: string[] = [];
 // Track hidden count for current filter
 let currentHiddenCount = 0;
 // Whether current page truncates display
@@ -72,10 +94,10 @@ let showingHidden = false;
 // - Same year         → "2026-01"
 // - Same month        → "2026-02-01"
 // - Same day          → "2026-02-02 14:30"
-const formatDate = (iso) => {
+const formatDate = (iso: string): string => {
   const d = new Date(iso);
   const now = new Date();
-  const pad = n => String(n).padStart(2, '0');
+  const pad = (n: number) => String(n).padStart(2, '0');
 
   if (d.getFullYear() !== now.getFullYear()) {
     return `${d.getFullYear()}`;
@@ -90,10 +112,10 @@ const formatDate = (iso) => {
 };
 
 // Format duration from "M:SS" or "H:MM:SS" to compact form: "45s", "3m", "1h45m"
-const formatDuration = (dur) => {
+const formatDuration = (dur: string | undefined): string => {
   if (!dur) return '';
   const parts = dur.split(':').map(Number);
-  let secs, mins, hrs;
+  let secs: number, mins: number, hrs: number;
   if (parts.length === 3) { [hrs, mins, secs] = parts; }
   else if (parts.length === 2) { [mins, secs] = parts; hrs = 0; }
   else return dur;
@@ -106,14 +128,14 @@ const formatDuration = (dur) => {
 };
 
 // Normalize URL: prepend https:// if missing protocol
-const normalizeUrl = (url) => {
+const normalizeUrl = (url: string): string => {
   if (url && !url.includes('://')) {
     return 'https://' + url;
   }
   return url;
 };
 
-function sortLinks(links, sortBy) {
+function sortLinks(links: Link[], sortBy: string): Link[] {
   const sorted = [...links];
   switch (sortBy) {
     case 'oldest':
@@ -136,13 +158,13 @@ function sortLinks(links, sortBy) {
   return sorted;
 }
 
-function renderTag(t, currentPath) {
+function renderTag(t: string, currentPath: string): string {
   const renameOpt = isSignedIn() ? `<span class="rename-tag-trigger" data-tag="${t}">✎ rename</span>` : '';
   return `<span class="tag-wrap"><span class="tag" data-tag="${t}">#${t}</span><span class="tag-menu"><span data-href="/${t}">→ /${t}</span><span data-href="${currentPath}/${t}">+ ${currentPath}/${t}</span><span data-href="${currentPath}/-${t}">− ${currentPath}/-${t}</span>${renameOpt}</span></span>`;
 }
 
-function renderLinks(links) {
-  const container = document.getElementById('links');
+function renderLinks(links: Link[]): void {
+  const container = document.getElementById('links')!;
   const currentPath = '/' + currentPageTags.join('/');
   const ratings = getRatings();
   container.innerHTML = links.map(link => {
@@ -187,48 +209,48 @@ function renderLinks(links) {
   }).join('');
 }
 
-function applySort() {
-  const sortBy = document.getElementById('sort-select').value;
+function applySort(): void {
+  const sortBy = (document.getElementById('sort-select') as HTMLSelectElement).value;
   const sorted = sortLinks(currentLinks, sortBy);
   renderLinks(sorted);
 }
 
 // Navigate to a tag without full page reload
-function navigateToTag(tag) {
+function navigateToTag(tag: string): void {
   history.pushState(null, '', '/' + tag);
   filterAndRender();
 }
 
 // Set up tag click handlers (delegated)
-function initTagMenu() {
-  document.getElementById('links').addEventListener('click', (e) => {
-    const renameTrigger = e.target.closest('.rename-tag-trigger');
+function initTagMenu(): void {
+  document.getElementById('links')!.addEventListener('click', (e) => {
+    const renameTrigger = (e.target as HTMLElement).closest('.rename-tag-trigger') as HTMLElement | null;
     if (renameTrigger) {
       e.preventDefault();
       e.stopPropagation();
-      const tagName = renameTrigger.dataset.tag;
-      const linkEl = renameTrigger.closest('.link');
+      const tagName = renameTrigger.dataset.tag!;
+      const linkEl = renameTrigger.closest('.link') as HTMLElement;
       handleRenameTagClick(tagName, linkEl);
       return;
     }
-    const menuItem = e.target.closest('.tag-menu [data-href]');
-    const tag = e.target.closest('.tag[data-tag]');
+    const menuItem = (e.target as HTMLElement).closest('.tag-menu [data-href]') as HTMLElement | null;
+    const tag = (e.target as HTMLElement).closest('.tag[data-tag]') as HTMLElement | null;
     if (menuItem) {
       e.preventDefault();
       e.stopPropagation();
-      history.pushState(null, '', menuItem.dataset.href);
+      history.pushState(null, '', menuItem.dataset.href!);
       filterAndRender();
     } else if (tag) {
       e.preventDefault();
       e.stopPropagation();
-      navigateToTag(tag.dataset.tag);
+      navigateToTag(tag.dataset.tag!);
     }
   });
 }
 
-function renderTagSidebar(links, pageTags) {
-  const sidebar = document.getElementById('tag-sidebar');
-  const tagCounts = {};
+function renderTagSidebar(links: Array<{ tags?: string }>, pageTags: string[]): void {
+  const sidebar = document.getElementById('tag-sidebar')!;
+  const tagCounts: Record<string, number> = {};
   links.forEach(link => {
     parseTags(link.tags).forEach(tag => {
       if (!pageTags.includes(tag)) {
@@ -242,7 +264,6 @@ function renderTagSidebar(links, pageTags) {
     sidebar.style.display = 'none';
     return;
   }
-  const currentPath = '/' + pageTags.join('/');
   sidebar.style.display = '';
   const pseudoTags = `<span class="sidebar-tag sidebar-pseudo" data-tag="_favs"><span class="tag">#_favs</span></span><span class="sidebar-tag sidebar-pseudo" data-tag="_peeves"><span class="tag">#_peeves</span></span>`;
   sidebar.innerHTML = pseudoTags + sorted.map(([tag, count]) =>
@@ -250,44 +271,44 @@ function renderTagSidebar(links, pageTags) {
   ).join('') + `<div class="sidebar-menu"></div>`;
 }
 
-function closeSidebarMenu() {
-  const menu = document.querySelector('#tag-sidebar .sidebar-menu');
-  if (menu) { menu.classList.remove('open'); menu._tag = null; }
+function closeSidebarMenu(): void {
+  const menu = document.querySelector('#tag-sidebar .sidebar-menu') as HTMLElement & { _tag?: string } | null;
+  if (menu) { menu.classList.remove('open'); menu._tag = undefined; }
 }
 
-function initSidebarTagMenu() {
-  const sidebar = document.getElementById('tag-sidebar');
+function initSidebarTagMenu(): void {
+  const sidebar = document.getElementById('tag-sidebar')!;
   sidebar.addEventListener('click', (e) => {
-    const renameTrigger = e.target.closest('.sidebar-menu .rename-tag-trigger');
+    const renameTrigger = (e.target as HTMLElement).closest('.sidebar-menu .rename-tag-trigger') as HTMLElement | null;
     if (renameTrigger) {
       e.preventDefault();
       e.stopPropagation();
-      const tagName = renameTrigger.dataset.tag;
+      const tagName = renameTrigger.dataset.tag!;
       closeSidebarMenu();
       handleRenameSidebarTag(tagName);
       return;
     }
-    const menuItem = e.target.closest('.sidebar-menu [data-href]');
+    const menuItem = (e.target as HTMLElement).closest('.sidebar-menu [data-href]') as HTMLElement | null;
     if (menuItem) {
       e.preventDefault();
       e.stopPropagation();
       closeSidebarMenu();
-      history.pushState(null, '', menuItem.dataset.href);
+      history.pushState(null, '', menuItem.dataset.href!);
       filterAndRender();
       return;
     }
-    const tagEl = e.target.closest('.sidebar-tag[data-tag]');
+    const tagEl = (e.target as HTMLElement).closest('.sidebar-tag[data-tag]') as HTMLElement | null;
     if (tagEl) {
       e.preventDefault();
       e.stopPropagation();
       // Pseudo-tags navigate directly
       if (tagEl.classList.contains('sidebar-pseudo')) {
-        history.pushState(null, '', '/' + tagEl.dataset.tag);
+        history.pushState(null, '', '/' + tagEl.dataset.tag!);
         filterAndRender();
         return;
       }
-      const menu = sidebar.querySelector('.sidebar-menu');
-      const tag = tagEl.dataset.tag;
+      const menu = sidebar.querySelector('.sidebar-menu') as HTMLElement & { _tag?: string; _entered?: boolean };
+      const tag = tagEl.dataset.tag!;
       if (menu._tag === tag) {
         closeSidebarMenu();
         return;
@@ -305,20 +326,20 @@ function initSidebarTagMenu() {
     }
   });
   sidebar.addEventListener('mouseenter', (e) => {
-    const menu = sidebar.querySelector('.sidebar-menu');
+    const menu = sidebar.querySelector('.sidebar-menu') as HTMLElement & { _entered?: boolean } | null;
     if (menu && e.target === menu) menu._entered = true;
   }, true);
   sidebar.addEventListener('mouseleave', (e) => {
-    const menu = sidebar.querySelector('.sidebar-menu');
+    const menu = sidebar.querySelector('.sidebar-menu') as HTMLElement & { _entered?: boolean } | null;
     if (menu && e.target === menu && menu._entered) closeSidebarMenu();
   }, true);
   document.addEventListener('click', (e) => {
-    if (!e.target.closest('#tag-sidebar')) closeSidebarMenu();
+    if (!(e.target as HTMLElement).closest('#tag-sidebar')) closeSidebarMenu();
   });
 }
 
 // Resolve page config from current route: title, heading, filter, pageTags
-function getPageConfig() {
+function getPageConfig(): PageConfig {
   const tagFilters = getTagFilters();
   const includeTags = tagFilters.filter(t => !t.startsWith('-'));
   const excludeTags = tagFilters.filter(t => t.startsWith('-')).map(t => t.slice(1));
@@ -348,7 +369,7 @@ function getPageConfig() {
     };
   }
 
-  const tagFilter = link => {
+  const tagFilter = (link: Link): boolean => {
     const linkTags = parseTags(link.tags);
     return includeTags.every(tag => linkTags.includes(tag))
         && excludeTags.every(tag => !linkTags.includes(tag));
@@ -381,25 +402,25 @@ function getPageConfig() {
 }
 
 // Filter allLinks by current URL and render
-function filterAndRender() {
+function filterAndRender(): void {
   showingHidden = false;
-  const container = document.getElementById('links');
-  const sortControls = document.getElementById('sort-controls');
-  const timeFilterControls = document.getElementById('time-filter-controls');
+  const container = document.getElementById('links')!;
+  const sortControls = document.getElementById('sort-controls')!;
+  const timeFilterControls = document.getElementById('time-filter-controls')!;
   const page = getPageConfig();
 
   // Pre-populate tags input with current filters (exclude negated tags)
-  const tagsInput = document.getElementById('link-tags');
+  const tagsInput = document.getElementById('link-tags') as HTMLInputElement | null;
   if (tagsInput) tagsInput.value = page.pageTags.join(' ');
 
   // Update heading
-  const h1 = document.querySelector('h1');
+  const h1 = document.querySelector('h1')!;
   h1.innerHTML = page.heading;
   document.title = page.title;
 
   // Apply time filter once for all pages
   timeFilterControls.style.display = 'block';
-  const timePeriod = document.getElementById('time-filter-select').value;
+  const timePeriod = (document.getElementById('time-filter-select') as HTMLSelectElement).value;
   const filteredLinks = filterLinksByTime(allLinks, timePeriod);
 
   // Filter links using page-specific filter
@@ -432,25 +453,25 @@ function filterAndRender() {
   currentPageTags = page.pageTags;
   currentTruncate = page.truncate;
   updateLinkCountDisplay();
-  const sortBy = document.getElementById('sort-select').value;
+  const sortBy = (document.getElementById('sort-select') as HTMLSelectElement).value;
   const sorted = sortLinks(links, sortBy);
   const displayLinks = page.truncate ? sorted.slice(0, 100) : sorted;
   renderLinks(displayLinks);
   renderTagSidebar(links, page.pageTags);
 }
 
-function handleRateUp(event, url, btn) {
+function handleRateUp(event: Event, url: string, btn: HTMLElement): void {
   event.preventDefault();
   event.stopPropagation();
   const newRating = getRating(url) + 1;
   setRating(url, newRating);
-  const ratingEl = btn.closest('.card-rating');
-  const valueEl = ratingEl.querySelector('.rating-value');
-  valueEl.textContent = newRating;
+  const ratingEl = btn.closest('.card-rating')!;
+  const valueEl = ratingEl.querySelector('.rating-value')!;
+  valueEl.textContent = String(newRating);
   valueEl.className = 'rating-value ' + (newRating > 0 ? 'positive' : newRating < 0 ? 'negative' : 'zero');
 }
 
-function handleRateDown(event, url, btn) {
+function handleRateDown(event: Event, url: string, btn: HTMLElement): void {
   event.preventDefault();
   event.stopPropagation();
   const oldRating = getRating(url);
@@ -458,26 +479,26 @@ function handleRateDown(event, url, btn) {
   setRating(url, newRating);
   // If rating just went negative, hide the card (unless showing hidden)
   if (oldRating >= 0 && newRating < 0 && !showingHidden) {
-    btn.closest('.link-anchor').remove();
+    btn.closest('.link-anchor')!.remove();
     currentLinks = currentLinks.filter(l => l.url !== url);
     currentHiddenCount++;
     updateLinkCountDisplay();
     return;
   }
-  const ratingEl = btn.closest('.card-rating');
-  const valueEl = ratingEl.querySelector('.rating-value');
-  valueEl.textContent = newRating;
+  const ratingEl = btn.closest('.card-rating')!;
+  const valueEl = ratingEl.querySelector('.rating-value')!;
+  valueEl.textContent = String(newRating);
   valueEl.className = 'rating-value ' + (newRating > 0 ? 'positive' : newRating < 0 ? 'negative' : 'zero');
 }
 
-function toggleShowHidden() {
+function toggleShowHidden(): void {
   showingHidden = !showingHidden;
   filterAndRender();
 }
 
-function updateLinkCountDisplay() {
+function updateLinkCountDisplay(): void {
   const count = currentLinks.length;
-  let suffix;
+  let suffix: string;
   if (showingHidden) {
     suffix = ` (<a href="#" onclick="toggleShowHidden(); return false;">show visible</a>)`;
   } else if (currentHiddenCount > 0) {
@@ -488,16 +509,16 @@ function updateLinkCountDisplay() {
   const truncated = currentTruncate && count > 100;
   const displayCount = truncated ? 100 : count;
   const truncSuffix = truncated ? ` of ${count}` : '';
-  document.getElementById('link-count').innerHTML = `${displayCount}${truncSuffix} link${count === 1 ? '' : 's'}${suffix}`;
+  document.getElementById('link-count')!.innerHTML = `${displayCount}${truncSuffix} link${count === 1 ? '' : 's'}${suffix}`;
 }
 
-function handleEditTitleClick(event, btn) {
+function handleEditTitleClick(event: Event, btn: HTMLElement): void {
   event.preventDefault();
   event.stopPropagation();
 
-  const linkEl = btn.closest('.link');
-  const titleEl = linkEl.querySelector('.title');
-  const url = linkEl.dataset.url;
+  const linkEl = btn.closest('.link') as HTMLElement;
+  const titleEl = linkEl.querySelector('.title') as HTMLElement;
+  const url = linkEl.dataset.url!;
   const currentTitle = linkEl.dataset.title || '';
 
   const input = document.createElement('input');
@@ -524,12 +545,12 @@ function handleEditTitleClick(event, btn) {
 
   titleEl.style.display = 'none';
   btn.style.display = 'none';
-  titleEl.parentNode.insertBefore(input, titleEl);
+  titleEl.parentNode!.insertBefore(input, titleEl);
   input.focus();
   input.select();
 }
 
-function handleAddTagClick(event, btn) {
+function handleAddTagClick(event: Event, btn: HTMLElement): void {
   event.preventDefault();
   event.stopPropagation();
 
@@ -538,8 +559,8 @@ function handleAddTagClick(event, btn) {
   input.className = 'add-tag-input';
   input.placeholder = 'tag tag...';
 
-  const linkEl = btn.closest('.link');
-  const url = linkEl.dataset.url;
+  const linkEl = btn.closest('.link') as HTMLElement;
+  const url = linkEl.dataset.url!;
 
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
@@ -565,18 +586,18 @@ function handleAddTagClick(event, btn) {
   });
 
   btn.style.display = 'none';
-  btn.parentNode.insertBefore(input, btn);
+  btn.parentNode!.insertBefore(input, btn);
   input.focus();
 }
 
-function restoreAddButton(input, btn) {
+function restoreAddButton(input: HTMLInputElement, btn: HTMLElement): void {
   if (input.parentNode) {
     input.remove();
   }
   btn.style.display = '';
 }
 
-async function submitToBackend(fields) {
+async function submitToBackend(fields: Record<string, string>): Promise<void> {
   const creds = getCredentials();
   if (!creds) { showSignIn(); return; }
   try {
@@ -590,9 +611,9 @@ async function submitToBackend(fields) {
   }
 }
 
-async function submitTagsForLink(url, tags, linkEl, input, btn) {
+async function submitTagsForLink(url: string, tags: string, linkEl: HTMLElement, input: HTMLInputElement, btn: HTMLElement): Promise<void> {
   // Optimistically add tags to UI
-  const tagsEl = linkEl.querySelector('.tags');
+  const tagsEl = linkEl.querySelector('.tags')!;
   const currentPath = '/' + currentPageTags.join('/');
   const newTags = tags.split(' ').filter(t => t && !currentPageTags.includes(t));
 
@@ -608,7 +629,7 @@ async function submitTagsForLink(url, tags, linkEl, input, btn) {
   submitToBackend({ url, tags });
 }
 
-function showRenameInput(hideEl, tagName, onConfirm) {
+function showRenameInput(hideEl: HTMLElement, tagName: string, onConfirm: (newTags: string[]) => void): void {
   const input = document.createElement('input');
   input.type = 'text';
   input.className = 'rename-tag-input';
@@ -631,13 +652,13 @@ function showRenameInput(hideEl, tagName, onConfirm) {
   input.addEventListener('blur', () => { setTimeout(() => { if (document.body.contains(input)) cancel(); }, 100); });
 
   hideEl.style.display = 'none';
-  hideEl.parentNode.insertBefore(input, hideEl);
+  hideEl.parentNode!.insertBefore(input, hideEl);
   input.focus();
   input.select();
 }
 
-function handleRenameTagClick(tagName, linkEl) {
-  const tagWrap = linkEl.querySelector(`.tag-wrap .tag[data-tag="${tagName}"]`).closest('.tag-wrap');
+function handleRenameTagClick(tagName: string, linkEl: HTMLElement): void {
+  const tagWrap = linkEl.querySelector(`.tag-wrap .tag[data-tag="${tagName}"]`)!.closest('.tag-wrap') as HTMLElement;
   showRenameInput(tagWrap, tagName, (newTags) => {
     const currentPath = '/' + currentPageTags.join('/');
     newTags.forEach(t => {
@@ -646,30 +667,30 @@ function handleRenameTagClick(tagName, linkEl) {
     tagWrap.remove();
     const oldTags = (linkEl.dataset.tags || '').split(' ').filter(t => t);
     linkEl.dataset.tags = oldTags.filter(t => t !== tagName).concat(newTags).join(' ');
-    submitToBackend({ action: 'rename_tag', remove_tag: tagName, add_tags: newTags.join(' '), urls: linkEl.dataset.url });
+    submitToBackend({ action: 'rename_tag', remove_tag: tagName, add_tags: newTags.join(' '), urls: linkEl.dataset.url! });
   });
 }
 
-function handleRenameSidebarTag(tagName) {
-  const sidebar = document.getElementById('tag-sidebar');
-  const sidebarTag = sidebar.querySelector(`.sidebar-tag[data-tag="${tagName}"]`);
+function handleRenameSidebarTag(tagName: string): void {
+  const sidebar = document.getElementById('tag-sidebar')!;
+  const sidebarTag = sidebar.querySelector(`.sidebar-tag[data-tag="${tagName}"]`) as HTMLElement | null;
   if (!sidebarTag) return;
 
   showRenameInput(sidebarTag, tagName, (newTags) => {
     const currentPath = '/' + currentPageTags.join('/');
-    const affectedUrls = [];
+    const affectedUrls: string[] = [];
 
-    document.querySelectorAll('#links .link').forEach(linkEl => {
+    document.querySelectorAll<HTMLElement>('#links .link').forEach(linkEl => {
       const tags = (linkEl.dataset.tags || '').split(' ').filter(t => t);
       if (!tags.includes(tagName)) return;
-      affectedUrls.push(linkEl.dataset.url);
+      affectedUrls.push(linkEl.dataset.url!);
       const updatedTags = tags.filter(t => t !== tagName).concat(newTags);
       linkEl.dataset.tags = updatedTags.join(' ');
-      linkEl.querySelector('.tags').innerHTML = updatedTags.filter(t => !currentPageTags.includes(t)).map(t => renderTag(t, currentPath)).join(' ');
+      linkEl.querySelector('.tags')!.innerHTML = updatedTags.filter(t => !currentPageTags.includes(t)).map(t => renderTag(t, currentPath)).join(' ');
     });
 
-    const visibleLinks = [];
-    document.querySelectorAll('#links .link').forEach(linkEl => {
+    const visibleLinks: Array<{ tags: string }> = [];
+    document.querySelectorAll<HTMLElement>('#links .link').forEach(linkEl => {
       visibleLinks.push({ tags: linkEl.dataset.tags || '' });
     });
     renderTagSidebar(visibleLinks, currentPageTags);
@@ -680,14 +701,14 @@ function handleRenameSidebarTag(tagName) {
   });
 }
 
-async function loadLinks() {
-  const container = document.getElementById('links');
+async function loadLinks(): Promise<void> {
+  const container = document.getElementById('links')!;
 
   try {
     const response = await fetch('/trove.jsonl');
     const text = await response.text();
     allLinks = text.trim().split('\n').filter(line => line).map(line => {
-      const link = JSON.parse(line);
+      const link: Link = JSON.parse(line);
       link.url = normalizeUrl(link.url);
       return link;
     });
@@ -702,42 +723,47 @@ async function loadLinks() {
 // Auth: per-user password stored in localStorage
 const CREDS_KEY = 'trove_credentials';
 
-function getCredentials() {
+interface Credentials {
+  username: string;
+  password: string;
+}
+
+function getCredentials(): Credentials | null {
   const stored = localStorage.getItem(CREDS_KEY);
   if (!stored) return null;
   try { return JSON.parse(stored); } catch { return null; }
 }
 
-function saveCredentials(username, password) {
+function saveCredentials(username: string, password: string): void {
   localStorage.setItem(CREDS_KEY, JSON.stringify({ username, password }));
 }
 
-function clearCredentials() {
+function clearCredentials(): void {
   localStorage.removeItem(CREDS_KEY);
 }
 
-function isSignedIn() {
+function isSignedIn(): boolean {
   return getCredentials() !== null;
 }
 
-function togglePasswordVisibility() {
-  const input = document.getElementById('auth-password');
-  const svg = input.nextElementSibling.querySelector('svg');
-  const shut = svg.querySelector('.eye-shut');
+function togglePasswordVisibility(): void {
+  const input = document.getElementById('auth-password') as HTMLInputElement;
+  const svg = input.nextElementSibling!.querySelector('svg')!;
+  const shut = svg.querySelector('.eye-shut') as HTMLElement;
   const isHidden = input.type === 'password';
   input.type = isHidden ? 'text' : 'password';
   shut.style.display = isHidden ? '' : 'none';
 }
 
-function showSignIn() {
-  document.getElementById('signin-form').style.display = 'flex';
-  document.getElementById('auth-username').focus();
+function showSignIn(): void {
+  document.getElementById('signin-form')!.style.display = 'flex';
+  (document.getElementById('auth-username') as HTMLInputElement).focus();
 }
 
-async function handleSignIn() {
-  const username = document.getElementById('auth-username').value.trim();
-  const password = document.getElementById('auth-password').value;
-  const status = document.getElementById('auth-status');
+async function handleSignIn(): Promise<void> {
+  const username = (document.getElementById('auth-username') as HTMLInputElement).value.trim();
+  const password = (document.getElementById('auth-password') as HTMLInputElement).value;
+  const status = document.getElementById('auth-status')!;
 
   if (!username || !password) {
     status.textContent = 'Enter username and password';
@@ -758,7 +784,7 @@ async function handleSignIn() {
     if (response.ok) {
       saveCredentials(username, password);
       status.textContent = '';
-      document.getElementById('signin-form').style.display = 'none';
+      document.getElementById('signin-form')!.style.display = 'none';
       onAuthSuccess(username);
     } else {
       const result = await response.json();
@@ -771,10 +797,10 @@ async function handleSignIn() {
   }
 }
 
-function signOut() {
+function signOut(): void {
   clearCredentials();
-  document.getElementById('auth-menu').style.display = 'none';
-  document.getElementById('auth-btn').style.display = '';
+  document.getElementById('auth-menu')!.style.display = 'none';
+  document.getElementById('auth-btn')!.style.display = '';
   updateBookmarkletHref();
 
   if (currentLinks.length > 0) {
@@ -782,10 +808,10 @@ function signOut() {
   }
 }
 
-function onAuthSuccess(username) {
-  document.getElementById('auth-user').textContent = username;
-  document.getElementById('auth-menu').style.display = '';
-  document.getElementById('auth-btn').style.display = 'none';
+function onAuthSuccess(username: string): void {
+  document.getElementById('auth-user')!.textContent = username;
+  document.getElementById('auth-menu')!.style.display = '';
+  document.getElementById('auth-btn')!.style.display = 'none';
   updateBookmarkletHref();
 
   if (!bookmarkletMode && currentLinks.length > 0) {
@@ -793,11 +819,11 @@ function onAuthSuccess(username) {
   }
 }
 
-async function submitLink() {
-  const urlInput = document.getElementById('link-url');
-  const tagsInput = document.getElementById('link-tags');
-  const notesInput = document.getElementById('link-notes');
-  const status = document.getElementById('submit-status');
+async function submitLink(): Promise<void> {
+  const urlInput = document.getElementById('link-url') as HTMLInputElement;
+  const tagsInput = document.getElementById('link-tags') as HTMLInputElement;
+  const notesInput = document.getElementById('link-notes') as HTMLTextAreaElement;
+  const status = document.getElementById('submit-status')!;
   const url = urlInput.value.trim();
   const tags = tagsInput.value.trim();
   const notes = notesInput.value.trim();
@@ -849,75 +875,20 @@ async function submitLink() {
 }
 
 // Tag autocomplete
-let allTags = [];
+let allTags: string[] = [];
 
-async function loadTags() {
+async function loadTags(): Promise<void> {
   try {
     const resp = await fetch('/tags.json');
     if (resp.ok) allTags = await resp.json();
   } catch {}
 }
 
-function initTagAutocomplete() {
-  const input = document.getElementById('link-tags');
-  const dropdown = document.getElementById('tag-suggestions');
+function initTagAutocomplete(): void {
+  const input = document.getElementById('link-tags') as HTMLInputElement | null;
+  const dropdown = document.getElementById('tag-suggestions') as HTMLElement | null;
   if (!input || !dropdown) return;
-
-  let activeIdx = -1;
-
-  function currentPartial() {
-    const val = input.value;
-    const cursor = input.selectionStart;
-    const before = val.slice(0, cursor);
-    const lastSpace = before.lastIndexOf(' ');
-    return before.slice(lastSpace + 1);
-  }
-
-  function existingTags() {
-    return input.value.split(' ').filter(t => t);
-  }
-
-  function showSuggestions() {
-    const partial = currentPartial().toLowerCase();
-    if (!partial) { dropdown.classList.remove('open'); return; }
-    const existing = new Set(existingTags());
-    const matches = allTags.filter(t => !existing.has(t) && t.toLowerCase().includes(partial)).slice(0, 10);
-    if (matches.length === 0) { dropdown.classList.remove('open'); return; }
-    activeIdx = -1;
-    dropdown.innerHTML = matches.map(t => `<div class="tag-option">${t}</div>`).join('');
-    dropdown.classList.add('open');
-  }
-
-  function pickTag(tag) {
-    const val = input.value;
-    const cursor = input.selectionStart;
-    const before = val.slice(0, cursor);
-    const lastSpace = before.lastIndexOf(' ');
-    const after = val.slice(cursor);
-    const nextSpace = after.indexOf(' ');
-    const afterCut = nextSpace >= 0 ? after.slice(nextSpace) : '';
-    input.value = before.slice(0, lastSpace + 1) + tag + ' ' + afterCut.trimStart();
-    dropdown.classList.remove('open');
-    input.focus();
-  }
-
-  input.addEventListener('input', showSuggestions);
-  input.addEventListener('keydown', (e) => {
-    if (!dropdown.classList.contains('open')) return;
-    const items = dropdown.querySelectorAll('.tag-option');
-    if (e.key === 'ArrowDown') { e.preventDefault(); activeIdx = Math.min(activeIdx + 1, items.length - 1); items.forEach((el, i) => el.classList.toggle('active', i === activeIdx)); }
-    else if (e.key === 'ArrowUp') { e.preventDefault(); activeIdx = Math.max(activeIdx - 1, 0); items.forEach((el, i) => el.classList.toggle('active', i === activeIdx)); }
-    else if (e.key === 'Enter' && activeIdx >= 0) { e.preventDefault(); pickTag(items[activeIdx].textContent); }
-    else if (e.key === 'Escape') { dropdown.classList.remove('open'); }
-  });
-
-  dropdown.addEventListener('mousedown', (e) => {
-    e.preventDefault(); // keep focus on input
-    const opt = e.target.closest('.tag-option');
-    if (opt) pickTag(opt.textContent);
-  });
-
-  input.addEventListener('blur', () => { setTimeout(() => dropdown.classList.remove('open'), 150); });
+  initAutocomplete(input, dropdown, () => allTags);
 }
 
 // Handle browser back/forward navigation
@@ -937,7 +908,7 @@ window.addEventListener('hashchange', () => {
 // Bookmarklet popup mode
 let bookmarkletMode = false;
 
-function getUrlParams() {
+function getUrlParams(): { submit: boolean; url: string } {
   const params = new URLSearchParams(window.location.search);
   return {
     submit: params.get('submit') === '1',
@@ -945,7 +916,7 @@ function getUrlParams() {
   };
 }
 
-function initBookmarkletMode() {
+function initBookmarkletMode(): boolean {
   const params = getUrlParams();
   if (!params.submit) return false;
 
@@ -953,25 +924,25 @@ function initBookmarkletMode() {
   document.body.classList.add('bookmarklet-mode');
 
   // Hide main content, show only add form
-  document.getElementById('sort-controls').style.display = 'none';
-  document.getElementById('link-count').style.display = 'none';
-  document.getElementById('links').style.display = 'none';
+  document.getElementById('sort-controls')!.style.display = 'none';
+  document.getElementById('link-count')!.style.display = 'none';
+  document.getElementById('links')!.style.display = 'none';
 
   // Pre-fill URL
-  document.getElementById('link-url').value = params.url;
+  (document.getElementById('link-url') as HTMLInputElement).value = params.url;
 
   return true;
 }
 
 // Set bookmarklet link href with current origin
-function initBookmarkletLink() {
-  const link = document.getElementById('bookmarklet');
+function initBookmarkletLink(): void {
+  const link = document.getElementById('bookmarklet') as HTMLAnchorElement | null;
   if (!link) return;
   updateBookmarkletHref();
 }
 
-function updateBookmarkletHref() {
-  const link = document.getElementById('bookmarklet');
+function updateBookmarkletHref(): void {
+  const link = document.getElementById('bookmarklet') as HTMLAnchorElement | null;
   if (!link) return;
   const origin = location.origin;
   const creds = getCredentials();
@@ -980,7 +951,7 @@ function updateBookmarkletHref() {
 }
 
 // Check for existing credentials on page load
-function initAuth() {
+function initAuth(): void {
   const creds = getCredentials();
   if (creds) {
     onAuthSuccess(creds.username);
@@ -988,7 +959,7 @@ function initAuth() {
 }
 
 // Allow Enter key to submit sign-in form
-function initSignInForm() {
+function initSignInForm(): void {
   const form = document.getElementById('signin-form');
   if (form) {
     form.addEventListener('keydown', (e) => {
@@ -1001,16 +972,45 @@ function initSignInForm() {
 }
 
 // Handle breadcrumb navigation without page reload
-function initBreadcrumbNav() {
-  document.querySelector('h1').addEventListener('click', (e) => {
-    const link = e.target.closest('a[data-nav]');
+function initBreadcrumbNav(): void {
+  document.querySelector('h1')!.addEventListener('click', (e) => {
+    const link = (e.target as HTMLElement).closest('a[data-nav]') as HTMLAnchorElement | null;
     if (link) {
       e.preventDefault();
-      history.pushState(null, '', link.getAttribute('href'));
+      history.pushState(null, '', link.getAttribute('href')!);
       filterAndRender();
     }
   });
 }
+
+// Expose functions to global scope for onclick handlers in HTML
+declare const window: Window & {
+  handleRateUp: typeof handleRateUp;
+  handleRateDown: typeof handleRateDown;
+  toggleShowHidden: typeof toggleShowHidden;
+  handleEditTitleClick: typeof handleEditTitleClick;
+  handleAddTagClick: typeof handleAddTagClick;
+  showSignIn: typeof showSignIn;
+  handleSignIn: typeof handleSignIn;
+  signOut: typeof signOut;
+  togglePasswordVisibility: typeof togglePasswordVisibility;
+  submitLink: typeof submitLink;
+  applySort: typeof applySort;
+  filterAndRender: typeof filterAndRender;
+};
+
+(window as any).handleRateUp = handleRateUp;
+(window as any).handleRateDown = handleRateDown;
+(window as any).toggleShowHidden = toggleShowHidden;
+(window as any).handleEditTitleClick = handleEditTitleClick;
+(window as any).handleAddTagClick = handleAddTagClick;
+(window as any).showSignIn = showSignIn;
+(window as any).handleSignIn = handleSignIn;
+(window as any).signOut = signOut;
+(window as any).togglePasswordVisibility = togglePasswordVisibility;
+(window as any).submitLink = submitLink;
+(window as any).applySort = applySort;
+(window as any).filterAndRender = filterAndRender;
 
 // Initialize on page load
 initBookmarkletLink();

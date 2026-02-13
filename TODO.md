@@ -8,37 +8,38 @@
 
 - make link adding box more friendly:
    - autopull title of page into title field (editable)
-   - autocomplete tags, possibly using a separate smaller aggregated tags.jsonl
 
-
-   - in widget, auto select tags field (so just typing and enter submits the link)
-
-bug: two different links with same url posted, they should have already been unified.
-
+- bug: two different links with same url posted, they should have already been unified.
+- remove auth from bookmarklet?
 - make renaming a tag actually creating a tag alias, so that future adds of that tag create the other one instead.
     - delete and recreate to use that tag again in the future
 
+- bug: adding a tag (pos or neg) at toplevel trove does not do anything. either it should be disabled/not appear, or do the same as replacing.
 - allow editable tag description
   - show on tag hover
-- add local tags
-   - maybe all tags should start local and then be synced to the server?
 
-- show number 
+- replace bomb downvote icon with spade ("bury")
+
+
+- show number of favs/peeves
+  - show heart and bomb instead of "#\_favs"/"#\_peeves".
+  - allow heart and bomb in url too.
   - omit favs/peeves from tag list if none of the elements on the page are on it
 
 - delete tag association
 
+- clickable bomb icon to delete link entirely
+
+- add @contributor tags
+
 - /help.html -> /help URL
 
-- add a #u/contributor tag
 
 - import bulk lines from web page: include link to source in notes (markdown, converted to html in js?)
 
 - under tag breadcrumb: rename tag (possibly to multiple tags)
    - implementation may be better as an 'action' rather resubmitting all links
    - predictive autocomplete (most popular tags preferentially)
-
-- delete button to delete link entirely
 
 - add local notes (when present, a unicode "note" character is a link to edit them)
 
@@ -62,7 +63,6 @@ bug: two different links with same url posted, they should have already been uni
 
 ## Later
 
-- [ ] Browser plugin to submit current page + text selection
 - [ ] Per-tag custom item templates
 - [ ] Preview images for links
 
@@ -71,9 +71,6 @@ bug: two different links with same url posted, they should have already been uni
   - so /-* filters out anything with a tag of any kind
 
    - separate 'personal' tag?
-
-- remove tag: regarded as a downvote for that link/tag combo
-- remove link entirely: moderator action (do not implement right now) for "bad" links
 
 - auto-tag [tagless] links with llm and using current list of tags
 
@@ -84,5 +81,8 @@ bug: two different links with same url posted, they should have already been uni
 
 - tag cloud?
 
-
 - Option to automatically remove tracking attributes from URLs: https://raindropio.canny.io/feature-requests/p/option-to-automatically-remove-tracking-attributes-from-urls
+
+- add local tags
+   - maybe all tags should start local and then be synced to the server?
+

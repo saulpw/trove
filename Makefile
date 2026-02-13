@@ -1,9 +1,10 @@
-.PHONY: setup serve add build test import process-issues fill-titles add-user remove-user list-users web-extract web-import
+.PHONY: setup serve add build typecheck test import process-issues fill-titles add-user remove-user list-users web-extract web-import
 
 all: build
 
 # Install dependencies
 setup:
+	npm install
 	npm install -g netlify-cli
 	pip3 install pytest yt-dlp
 
@@ -18,8 +19,14 @@ add:
 # Build for Netlify deployment
 build: tags.json
 	mkdir -p _build
-	cp tags.json index.html help.html style.css frontend.js bookmarklet.js trove.jsonl _build/
+	npx esbuild frontend.ts --bundle --outfile=_build/frontend.js
+	npx esbuild bookmarklet.ts --bundle --outfile=_build/bookmarklet.js
+	cp tags.json index.html help.html style.css trove.jsonl _build/
 	sed -i='' 's/BUILD_TIMESTAMP/$(shell date +%s)/' _build/index.html
+
+# Type check TypeScript (no output)
+typecheck:
+	npx tsc --noEmit
 
 # Build tags file
 tags.json: trove.jsonl

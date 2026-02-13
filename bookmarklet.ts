@@ -1,14 +1,16 @@
 // Bookmarklet widget — injected onto external pages via bookmarklet
 // Loaded as: javascript:(function(){...load this script with data attrs...})()
+import { initAutocomplete } from './autocomplete';
+
 (function() {
   if (document.getElementById('trove-bookmarklet-widget')) return;
 
   const script = document.currentScript || document.querySelector('script[data-trove-origin]');
-  const origin = (script && script.dataset.troveOrigin) || 'https://trove.pw';
-  const pageUrl = (script && script.dataset.troveUrl) || location.href;
-  const selection = (script && script.dataset.troveSelection) || '';
-  const username = (script && script.dataset.troveUser) || '';
-  const password = (script && script.dataset.trovePass) || '';
+  const origin = (script instanceof HTMLElement && script.dataset.troveOrigin) || 'https://trove.pw';
+  const pageUrl = (script instanceof HTMLElement && script.dataset.troveUrl) || location.href;
+  const selection = (script instanceof HTMLElement && script.dataset.troveSelection) || '';
+  const username = (script instanceof HTMLElement && script.dataset.troveUser) || '';
+  const password = (script instanceof HTMLElement && script.dataset.trovePass) || '';
 
   // Create host element with shadow DOM
   const host = document.createElement('div');
@@ -40,8 +42,8 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-height: 150px; overflow-y: auto; z-index: 10;
     }
     .suggestions.open { display: block; }
-    .suggestions div { padding: 4px 8px; cursor: pointer; }
-    .suggestions div:hover, .suggestions div.active { background: #f0f6ff; }
+    .suggestions .tag-option { padding: 4px 8px; cursor: pointer; }
+    .suggestions .tag-option:hover, .suggestions .tag-option.active { background: #f0f6ff; }
     .auth-row { display: flex; gap: 6px; }
     .auth-row input { flex: 1; }
     button.submit {
@@ -84,77 +86,30 @@
     </div>`;
   shadow.appendChild(panel);
 
-  const $ = (id) => shadow.getElementById(id);
-  $('tw-tags').focus();
+  const $ = (id: string) => shadow.getElementById(id);
+  ($('tw-tags') as HTMLInputElement).focus();
 
   // Close
-  panel.querySelector('.close').addEventListener('click', () => host.remove());
+  panel.querySelector('.close')!.addEventListener('click', () => host.remove());
 
   // Tag autocomplete
-  let allTags = [];
-  let activeIdx = -1;
+  let allTags: string[] = [];
 
   fetch(origin + '/tags.json').then(r => r.ok ? r.json() : []).then(t => allTags = t).catch(() => {});
 
-  const tagsInput = $('tw-tags');
-  const dropdown = $('tw-suggestions');
+  const tagsInput = $('tw-tags') as HTMLInputElement;
+  const dropdown = $('tw-suggestions') as HTMLElement;
 
-  function currentPartial() {
-    const val = tagsInput.value;
-    const cursor = tagsInput.selectionStart;
-    const before = val.slice(0, cursor);
-    const lastSpace = before.lastIndexOf(' ');
-    return before.slice(lastSpace + 1);
-  }
-
-  function showSuggestions() {
-    const partial = currentPartial().toLowerCase();
-    if (!partial) { dropdown.classList.remove('open'); return; }
-    const existing = new Set(tagsInput.value.split(' ').filter(t => t));
-    const matches = allTags.filter(t => !existing.has(t) && t.toLowerCase().includes(partial)).slice(0, 8);
-    if (!matches.length) { dropdown.classList.remove('open'); return; }
-    activeIdx = -1;
-    dropdown.innerHTML = matches.map(t => `<div>${t}</div>`).join('');
-    dropdown.classList.add('open');
-  }
-
-  function pickTag(tag) {
-    const val = tagsInput.value;
-    const cursor = tagsInput.selectionStart;
-    const before = val.slice(0, cursor);
-    const lastSpace = before.lastIndexOf(' ');
-    const after = val.slice(cursor);
-    const nextSpace = after.indexOf(' ');
-    const afterCut = nextSpace >= 0 ? after.slice(nextSpace) : '';
-    tagsInput.value = before.slice(0, lastSpace + 1) + tag + ' ' + afterCut.trimStart();
-    dropdown.classList.remove('open');
-    tagsInput.focus();
-  }
-
-  tagsInput.addEventListener('input', showSuggestions);
-  tagsInput.addEventListener('keydown', (e) => {
-    if (!dropdown.classList.contains('open')) return;
-    const items = dropdown.querySelectorAll('div');
-    if (e.key === 'ArrowDown') { e.preventDefault(); activeIdx = Math.min(activeIdx + 1, items.length - 1); items.forEach((el, i) => el.classList.toggle('active', i === activeIdx)); }
-    else if (e.key === 'ArrowUp') { e.preventDefault(); activeIdx = Math.max(activeIdx - 1, 0); items.forEach((el, i) => el.classList.toggle('active', i === activeIdx)); }
-    else if (e.key === 'Enter' && activeIdx >= 0) { e.preventDefault(); pickTag(items[activeIdx].textContent); }
-    else if (e.key === 'Escape') { dropdown.classList.remove('open'); }
-  });
-  dropdown.addEventListener('mousedown', (e) => {
-    e.preventDefault();
-    const opt = e.target.closest('div');
-    if (opt) pickTag(opt.textContent);
-  });
-  tagsInput.addEventListener('blur', () => { setTimeout(() => dropdown.classList.remove('open'), 150); });
+  initAutocomplete(tagsInput, dropdown, () => allTags, { maxResults: 8 });
 
   // Submit
-  $('tw-submit').addEventListener('click', async () => {
-    const status = $('tw-status');
-    const url = $('tw-url').value.trim();
-    const tags = $('tw-tags').value.trim();
-    const notes = $('tw-notes').value.trim();
-    const user = hasAuth ? username : ($('tw-user') ? $('tw-user').value.trim() : '');
-    const pass = hasAuth ? password : ($('tw-pass') ? $('tw-pass').value.trim() : '');
+  $('tw-submit')!.addEventListener('click', async () => {
+    const status = $('tw-status')!;
+    const url = ($('tw-url') as HTMLInputElement).value.trim();
+    const tags = ($('tw-tags') as HTMLInputElement).value.trim();
+    const notes = ($('tw-notes') as HTMLTextAreaElement).value.trim();
+    const user = hasAuth ? username : ($('tw-user') ? ($('tw-user') as HTMLInputElement).value.trim() : '');
+    const pass = hasAuth ? password : ($('tw-pass') ? ($('tw-pass') as HTMLInputElement).value.trim() : '');
 
     if (!user || !pass) { status.textContent = 'Enter credentials'; status.className = 'status err'; return; }
 

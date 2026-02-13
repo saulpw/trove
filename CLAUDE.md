@@ -5,14 +5,18 @@ A simple static website to share lists of links at a public mnemonic url.  e.g. 
 ## Project Structure
 - `index.html` - Static frontend HTML structure
 - `style.css` - Frontend CSS styles
-- `frontend.js` - Frontend JavaScript (link loading, filtering, sorting, auth, submission)
+- `frontend.ts` - Frontend TypeScript (link loading, filtering, sorting, auth, submission)
+- `bookmarklet.ts` - Bookmarklet widget TypeScript (IIFE injected on external pages)
+- `autocomplete.ts` - Shared tag autocomplete logic (used by both frontend and bookmarklet)
+- `tsconfig.json` - TypeScript config (strict, noEmit — type checking only)
+- `package.json` - devDependencies: esbuild (bundler), typescript (type checker)
 - `trove.jsonl` - Canonical link data in JSONL format (one JSON object per line): `{url, added, title?, tags?, notes?}`. Tags are space-separated strings (e.g., `"tags": "games retro"`), not JSON arrays.
 - `trove_utils.py` - Shared utilities: `load_trove()`, `save_trove()`, `create_link_entry()`
 - `add_link.py` - CLI to add links to trove.jsonl (auto-fetches title, triggers archive.org, commits)
 - `process_issues.py` - Processes GitHub issue submissions into trove.jsonl
 - `import_md_links.py` - One-time bulk import from markdown files
 - `manage_users.py` - CLI to add/remove users from Netlify `TROVE_USERS` env var
-- `Makefile` - Targets: `setup`, `serve`, `add`, `build`, `test`, `import`, `process-issues`, `add-user`, `remove-user`, `list-users`
+- `Makefile` - Targets: `setup`, `serve`, `add`, `build`, `typecheck`, `test`, `import`, `process-issues`, `add-user`, `remove-user`, `list-users`
 - `netlify.toml` - Netlify config (SPA fallback routing)
 - `ARCHITECTURE.md` - Design: GitHub Issues submissions + GitHub Actions processor
 - `docs/auth.md` - Auth approach options and tradeoffs
