@@ -2,6 +2,14 @@
 
 ## 2026-02-13
 
+- Search bar: full-text search over link titles, tags, and notes
+  - Text input in the filter bar, results update as you type
+  - Case-insensitive, combines with tag filters and time period filters
+
+---
+
+## 2026-02-13
+
 - Local issue processing for testable pipeline:
   - Extracted `process_issue_list(issues, trove_path, local)` from `process_issues.py`
   - `local=True` skips GitHub API calls (close_issue, fetch_title, trigger_archive, fetch_youtube_metadata)

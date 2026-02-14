@@ -59,6 +59,7 @@
       </div>
 
       <div id="filter-bar">
+        <input type="text" id="search-input" placeholder="Search titles, tags, notes..." oninput="filterAndRender()" />
         <div id="link-count"></div>
         <div id="sort-controls" style="display: none;">
           Sort: <select id="sort-select" onchange="applySort()">
@@ -84,7 +85,7 @@
 
   <footer>
     <div>a <a href="https://saul.pw">saul.pw</a> project | <a href="/privacy">privacy policy</a> | drag to bookmark bar: <a id="bookmarklet" href="#">+ trove</a></div>
-    <div id="version">v0.26</div>
+    <div id="version">v0.28</div>
   </footer>
 
   <!-- Main frontend code -->

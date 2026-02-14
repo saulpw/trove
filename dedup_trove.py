@@ -64,6 +64,7 @@ def dedup(entries):
                 "duration": None,
                 "channel": None,
                 "thumbnail": None,
+                "deleted": False,
             }
             url_order.append(url)
 
@@ -121,10 +122,15 @@ def dedup(entries):
             for t in entry.get("tags", "").split():
                 state["tags"].discard(t)
 
+        elif op == "delete":
+            state["deleted"] = True
+
     # Build output links
     result = []
     for url in url_order:
         state = merged[url]
+        if state["deleted"]:
+            continue
         link = {"url": url, "added": state["added"]}
         if state["title"]:
             link["title"] = state["title"]

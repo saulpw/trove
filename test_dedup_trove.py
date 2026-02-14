@@ -149,5 +149,16 @@ def test_add_without_op_field():
     assert result[0]["tags"] == "foo"
 
 
+def test_delete_removes_link():
+    entries = [
+        {"url": "https://a.com", "added": "2025-01-01", "title": "A", "tags": "games"},
+        {"url": "https://b.com", "added": "2025-01-02", "title": "B", "tags": "tools"},
+        {"op": "delete", "url": "https://a.com", "added": "2025-01-03"},
+    ]
+    result = dedup(entries)
+    assert len(result) == 1
+    assert result[0]["url"] == "https://b.com"
+
+
 def test_empty_input():
     assert dedup([]) == []

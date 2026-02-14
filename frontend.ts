@@ -192,12 +192,12 @@ function renderLinks(links: Link[]): void {
           <div class="card-rating">
             <span class="rate-up" onclick="handleRateUp(event, '${escapedUrl}', this)">❤️</span>
             <span class="rating-value ${ratingClass}">${rating}</span>
-            <span class="rate-down" onclick="handleRateDown(event, '${escapedUrl}', this)">💣</span>
+            <span class="rate-down" onclick="handleRateDown(event, '${escapedUrl}', this)">♠️</span>
           </div>
           <div class="card-left">
             <div class="title-row">
               <span class="title">${link.title || link.url}</span>
-              ${isSignedIn() ? `<span class="edit-title-btn" onclick="handleEditTitleClick(event, this)">✏️</span>` : ''}
+              ${isSignedIn() ? `<span class="edit-title-btn" onclick="handleEditTitleClick(event, this)">✏️</span><span class="delete-btn" onclick="handleDeleteClick(event, '${escapedUrl}', this)">💣</span>` : ''}
             </div>
             <span class="meta-line">${metaParts.join(' · ')}</span>
             ${link.notes ? `<div class="notes">${link.notes}</div>` : ''}
@@ -432,9 +432,21 @@ function filterAndRender(): void {
   const timePeriod = (document.getElementById('time-filter-select') as HTMLSelectElement).value;
   const filteredLinks = filterLinksByTime(allLinks, timePeriod);
 
+  // Apply search filter
+  const searchInput = document.getElementById('search-input') as HTMLInputElement | null;
+  const query = (searchInput?.value || '').trim().toLowerCase();
+  const searchedLinks = query
+    ? filteredLinks.filter(link => {
+        const title = (link.title || '').toLowerCase();
+        const tags = (link.tags || '').toLowerCase();
+        const notes = (link.notes || '').toLowerCase();
+        return title.includes(query) || tags.includes(query) || notes.includes(query);
+      })
+    : filteredLinks;
+
   // Filter links using page-specific filter
   const ratings = getRatings();
-  const tagMatchedLinks = filteredLinks.filter(page.filter);
+  const tagMatchedLinks = searchedLinks.filter(page.filter);
 
   currentHiddenCount = tagMatchedLinks.filter(link => (ratings[link.url] || 0) < 0).length;
   const visibleLinks = tagMatchedLinks.filter(link => (ratings[link.url] || 0) >= 0);
@@ -557,6 +569,16 @@ function handleEditTitleClick(event: Event, btn: HTMLElement): void {
   titleEl.parentNode!.insertBefore(input, titleEl);
   input.focus();
   input.select();
+}
+
+function handleDeleteClick(event: Event, url: string, btn: HTMLElement): void {
+  event.preventDefault();
+  event.stopPropagation();
+  if (!window.confirm('Delete this link?')) return;
+  submitToBackend({ action: 'delete', url });
+  btn.closest('.link-anchor')!.remove();
+  currentLinks = currentLinks.filter(l => l.url !== url);
+  updateLinkCountDisplay();
 }
 
 function handleAddTagClick(event: Event, btn: HTMLElement): void {
@@ -1005,6 +1027,7 @@ declare const window: Window & {
   handleRateDown: typeof handleRateDown;
   toggleShowHidden: typeof toggleShowHidden;
   handleEditTitleClick: typeof handleEditTitleClick;
+  handleDeleteClick: typeof handleDeleteClick;
   handleAddTagClick: typeof handleAddTagClick;
   showSignIn: typeof showSignIn;
   handleSignIn: typeof handleSignIn;
@@ -1019,6 +1042,7 @@ declare const window: Window & {
 (window as any).handleRateDown = handleRateDown;
 (window as any).toggleShowHidden = toggleShowHidden;
 (window as any).handleEditTitleClick = handleEditTitleClick;
+(window as any).handleDeleteClick = handleDeleteClick;
 (window as any).handleAddTagClick = handleAddTagClick;
 (window as any).showSignIn = showSignIn;
 (window as any).handleSignIn = handleSignIn;
