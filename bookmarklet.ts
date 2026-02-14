@@ -2,6 +2,7 @@
 // Closure variables (__TROVE_ORIGIN__ etc.) are defined in the wrapping scope
 // constructed by frontend.ts updateBookmarkletHref()
 import { initAutocomplete } from './autocomplete';
+import { submitLink } from './addlink';
 
 declare var __TROVE_ORIGIN__: string;
 declare var __TROVE_URL__: string;
@@ -122,28 +123,17 @@ declare var __TROVE_PASS__: string;
     const user = hasAuth ? username : ($('tw-user') ? ($('tw-user') as HTMLInputElement).value.trim() : '');
     const pass = hasAuth ? password : ($('tw-pass') ? ($('tw-pass') as HTMLInputElement).value.trim() : '');
 
-    if (!user || !pass) { status.textContent = 'Enter credentials'; status.className = 'status err'; return; }
-
     status.textContent = 'Submitting...';
     status.className = 'status';
 
-    try {
-      const resp = await fetch(origin + '/.netlify/functions/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url, tags, notes, username: user, password: pass }),
-      });
-      const result = await resp.json();
-      if (resp.ok) {
-        status.textContent = 'Added!';
-        status.className = 'status ok';
-        setTimeout(() => host.remove(), 1200);
-      } else {
-        status.textContent = result.error || 'Failed';
-        status.className = 'status err';
-      }
-    } catch {
-      status.textContent = 'Network error';
+    const result = await submitLink({ url, tags, notes, username: user, password: pass, origin });
+
+    if (result.success) {
+      status.textContent = 'Added!';
+      status.className = 'status ok';
+      setTimeout(() => host.remove(), 1200);
+    } else {
+      status.textContent = result.error || 'Failed';
       status.className = 'status err';
     }
   });

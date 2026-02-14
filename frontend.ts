@@ -1,4 +1,3 @@
-import { initAutocomplete } from './autocomplete';
 import bookmarkletCode from './_build/bookmarklet-code.txt';
 import { getCredentials, clearCredentials, isSignedIn, showSignIn, handleSignIn, togglePasswordVisibility, initSignInForm } from './auth';
 import { renderTag, renderTagSidebar, initTagMenu, initSidebarTagMenu, handleAddTagClick } from './tags';
@@ -190,7 +189,7 @@ function renderLinks(links: Link[]): void {
           <div class="card-rating">
             <span class="rate-up" onclick="handleRateUp(event, '${escapedUrl}', this)" title="Love">❤️</span>
             <span class="rating-value ${ratingClass}">${rating}</span>
-            <span class="rate-down" onclick="handleRateDown(event, '${escapedUrl}', this)" title="bury">♠️</span>
+            <span class="rate-down" onclick="handleRateDown(event, '${escapedUrl}', this)" title="Bury">♠️</span>
           </div>
           <div class="card-left">
             <div class="title-row">
@@ -284,10 +283,6 @@ export function filterAndRender(): void {
   const sortControls = document.getElementById('sort-controls')!;
   const timeFilterControls = document.getElementById('time-filter-controls')!;
   const page = getPageConfig();
-
-  // Pre-populate tags input with current filters (exclude negated tags)
-  const tagsInput = document.getElementById('link-tags') as HTMLInputElement | null;
-  if (tagsInput) tagsInput.value = page.pageTags.filter(t => !t.startsWith('-')).join(' ');
 
   // Update heading
   const h1 = document.querySelector('h1')!;
@@ -497,81 +492,9 @@ function onAuthSuccess(username: string): void {
   document.getElementById('auth-btn')!.style.display = 'none';
   updateBookmarkletHref();
 
-  if (!bookmarkletMode && currentLinks.length > 0) {
+  if (currentLinks.length > 0) {
     applySort();
   }
-}
-
-async function submitLink(): Promise<void> {
-  const urlInput = document.getElementById('link-url') as HTMLInputElement;
-  const tagsInput = document.getElementById('link-tags') as HTMLInputElement;
-  const notesInput = document.getElementById('link-notes') as HTMLTextAreaElement;
-  const status = document.getElementById('submit-status')!;
-  const url = urlInput.value.trim();
-  const tags = tagsInput.value.trim();
-  const notes = notesInput.value.trim();
-
-  if (!url) {
-    status.textContent = 'Enter a URL';
-    status.className = 'status-error';
-    return;
-  }
-
-  const creds = getCredentials();
-  if (!creds) {
-    showSignIn(true);
-    return;
-  }
-
-  status.textContent = 'Submitting...';
-  status.className = '';
-
-  try {
-    const response = await fetch('/.netlify/functions/submit', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url, tags, notes, username: creds.username, password: creds.password }),
-    });
-
-    const result = await response.json();
-
-    if (response.ok) {
-      status.textContent = 'Submitted!';
-      status.className = 'status-success';
-      if (bookmarkletMode) {
-        setTimeout(() => window.close(), 500);
-      } else {
-        urlInput.value = '';
-        // Re-populate tags from current page filters
-        const tagFilters = getTagFilters();
-        tagsInput.value = tagFilters.filter(t => !t.startsWith('-')).join(' ');
-        notesInput.value = '';
-      }
-    } else {
-      status.textContent = result.error || 'Failed';
-      status.className = 'status-error';
-    }
-  } catch (e) {
-    status.textContent = 'Network error';
-    status.className = 'status-error';
-  }
-}
-
-// Tag autocomplete
-let allTags: string[] = [];
-
-async function loadTags(): Promise<void> {
-  try {
-    const resp = await fetch('/tags.json');
-    if (resp.ok) allTags = await resp.json();
-  } catch {}
-}
-
-function initTagAutocomplete(): void {
-  const input = document.getElementById('link-tags') as HTMLInputElement | null;
-  const dropdown = document.getElementById('tag-suggestions') as HTMLElement | null;
-  if (!input || !dropdown) return;
-  initAutocomplete(input, dropdown, () => allTags);
 }
 
 // Handle browser back/forward navigation
@@ -588,42 +511,7 @@ window.addEventListener('hashchange', () => {
   }
 });
 
-// Bookmarklet popup mode
-let bookmarkletMode = false;
-
-function getUrlParams(): { submit: boolean; url: string } {
-  const params = new URLSearchParams(window.location.search);
-  return {
-    submit: params.get('submit') === '1',
-    url: params.get('url') || '',
-  };
-}
-
-function initBookmarkletMode(): boolean {
-  const params = getUrlParams();
-  if (!params.submit) return false;
-
-  bookmarkletMode = true;
-  document.body.classList.add('bookmarklet-mode');
-
-  // Hide main content, show only add form
-  document.getElementById('sort-controls')!.style.display = 'none';
-  document.getElementById('link-count')!.style.display = 'none';
-  document.getElementById('links')!.style.display = 'none';
-
-  // Pre-fill URL
-  (document.getElementById('link-url') as HTMLInputElement).value = params.url;
-
-  return true;
-}
-
 // Set bookmarklet link href with current origin
-function initBookmarkletLink(): void {
-  const link = document.getElementById('bookmarklet') as HTMLAnchorElement | null;
-  if (!link) return;
-  updateBookmarkletHref();
-}
-
 function updateBookmarkletHref(): void {
   const link = document.getElementById('bookmarklet') as HTMLAnchorElement | null;
   if (!link) return;
@@ -666,7 +554,6 @@ declare const window: Window & {
   handleSignIn: () => void;
   signOut: typeof signOut;
   togglePasswordVisibility: typeof togglePasswordVisibility;
-  submitLink: typeof submitLink;
   applySort: typeof applySort;
   filterAndRender: typeof filterAndRender;
 };
@@ -681,17 +568,14 @@ declare const window: Window & {
 (window as any).handleSignIn = () => handleSignIn(onAuthSuccess);
 (window as any).signOut = signOut;
 (window as any).togglePasswordVisibility = togglePasswordVisibility;
-(window as any).submitLink = submitLink;
 (window as any).applySort = applySort;
 (window as any).filterAndRender = filterAndRender;
 
 // Initialize on page load
-initBookmarkletLink();
+updateBookmarkletHref();
 initAuth();
 initSignInForm(() => handleSignIn(onAuthSuccess));
-loadTags();
-initTagAutocomplete();
-if (document.getElementById('links') && !initBookmarkletMode()) {
+if (document.getElementById('links')) {
   initBreadcrumbNav();
   initTagMenu();
   initSidebarTagMenu();

@@ -5,11 +5,12 @@ A simple static website to share lists of links at a public mnemonic url.  e.g. 
 ## Project Structure
 - `index.html` - Static frontend HTML structure
 - `style.css` - Frontend CSS styles
-- `frontend.ts` - Frontend TypeScript (link loading, filtering, sorting, submission, orchestration)
+- `frontend.ts` - Frontend TypeScript (link loading, filtering, sorting, orchestration)
 - `auth.ts` - Auth primitives (credentials, sign-in UI, password visibility)
 - `tags.ts` - Tag sidebar, tag menus, and tag editing operations
+- `addlink.ts` - Shared link submission logic (used by bookmarklet)
 - `bookmarklet.ts` - Bookmarklet widget TypeScript (IIFE injected on external pages)
-- `autocomplete.ts` - Shared tag autocomplete logic (used by both frontend and bookmarklet)
+- `autocomplete.ts` - Shared tag autocomplete logic (used by bookmarklet)
 - `tsconfig.json` - TypeScript config (strict, noEmit — type checking only)
 - `package.json` - devDependencies: esbuild (bundler), typescript (type checker)
 - `trove.jsonl` - Canonical link data in JSONL format (one JSON object per line): `{url, added, title?, tags?, notes?}`. Tags are space-separated strings (e.g., `"tags": "games retro"`), not JSON arrays.
@@ -27,6 +28,7 @@ A simple static website to share lists of links at a public mnemonic url.  e.g. 
 - `TODO.md` - Feature checklist
 
 ## Design Decisions
+- All link submission (adding new links) goes through the bookmarklet. There is no inline add form on the main page.
 - CLI interface (`add_link.py`) uses positional arguments for tags (not `--tags` flag): `python3 add_link.py URL tag1 tag2`
 - Use space-separated strings (not lists) for multi-value fields like tags and URLs in Python function interfaces. This matches the trove.jsonl storage format and keeps a consistent pattern across the codebase.
 - Use `${FOO}` variable syntax in Makefiles (not `$(FOO)`), because it is directly compatible with shell env var syntax for easy copy-paste.
