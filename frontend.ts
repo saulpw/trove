@@ -70,7 +70,7 @@ export const parseTags = (tags: string | undefined): string[] => tags ? tags.spl
 
 // Ratings stored in localStorage: { url: number }
 const RATINGS_KEY = 'trove_ratings';
-const getRatings = (): Record<string, number> => JSON.parse(localStorage.getItem(RATINGS_KEY) || '{}');
+export const getRatings = (): Record<string, number> => JSON.parse(localStorage.getItem(RATINGS_KEY) || '{}');
 const getRating = (url: string): number => getRatings()[url] || 0;
 const setRating = (url: string, n: number): void => {
   const ratings = getRatings();

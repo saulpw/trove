@@ -1,7 +1,7 @@
 // Tag sidebar, tag menus, and tag editing operations
 
 import { isSignedIn } from './auth';
-import { getCurrentPageTags, currentPath, parseTags, submitToBackend, filterAndRender } from './frontend';
+import { getCurrentPageTags, currentPath, parseTags, submitToBackend, filterAndRender, getRatings } from './frontend';
 
 function renderTagMenu(tag: string, opts?: { sidebar?: boolean }): string {
   const pathDisplay = currentPath().slice(1) || 'all';
@@ -13,7 +13,7 @@ export function renderTag(t: string): string {
   return `<span class="tag-wrap"><span class="tag" data-tag="${t}">#${t}</span><span class="tag-menu">${renderTagMenu(t)}</span></span>`;
 }
 
-export function renderTagSidebar(links: Array<{ tags?: string }>, pageTags: string[]): void {
+export function renderTagSidebar(links: Array<{ url: string; tags?: string }>, pageTags: string[]): void {
   const sidebar = document.getElementById('tag-sidebar')!;
   const tagCounts: Record<string, number> = {};
   links.forEach(link => {
@@ -30,7 +30,15 @@ export function renderTagSidebar(links: Array<{ tags?: string }>, pageTags: stri
     return;
   }
   sidebar.style.display = '';
-  const pseudoTags = `<span class="sidebar-tag sidebar-pseudo" data-tag="_favs"><span class="tag">#_favs</span></span><span class="sidebar-tag sidebar-pseudo" data-tag="_peeves"><span class="tag">#_peeves</span></span>`;
+  const ratings = getRatings();
+  let favsCount = 0, peevesCount = 0;
+  links.forEach(link => {
+    const r = ratings[link.url] || 0;
+    if (r > 0) favsCount++;
+    if (r < 0) peevesCount++;
+  });
+  const pseudoTags = (favsCount > 0 ? `<span class="sidebar-tag sidebar-pseudo" data-tag="_favs"><span class="tag">\u2665</span> <span class="sidebar-count">(${favsCount})</span></span>` : '')
+    + (peevesCount > 0 ? `<span class="sidebar-tag sidebar-pseudo" data-tag="_peeves"><span class="tag">\u2660</span> <span class="sidebar-count">(${peevesCount})</span></span>` : '');
   sidebar.innerHTML = pseudoTags + sorted.map(([tag, count]) =>
     `<span class="sidebar-tag" data-tag="${tag}"><span class="tag">#${tag}</span> <span class="sidebar-count">(${count})</span></span>`
   ).join('') + `<div class="sidebar-menu"></div>`;
@@ -250,9 +258,9 @@ function handleRenameSidebarTag(tagName: string): void {
       linkEl.querySelector('.tags')!.innerHTML = updatedTags.filter(t => !pageTags.includes(t)).map(t => renderTag(t)).join(' ');
     });
 
-    const visibleLinks: Array<{ tags: string }> = [];
+    const visibleLinks: Array<{ url: string; tags: string }> = [];
     document.querySelectorAll<HTMLElement>('#links .link').forEach(linkEl => {
-      visibleLinks.push({ tags: linkEl.dataset.tags || '' });
+      visibleLinks.push({ url: linkEl.dataset.url || '', tags: linkEl.dataset.tags || '' });
     });
     renderTagSidebar(visibleLinks, pageTags);
 

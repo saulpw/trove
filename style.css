@@ -172,7 +172,6 @@ footer a { color: var(--color-text-muted); }
   box-shadow: 0 2px 8px var(--color-shadow); z-index: 100; white-space: nowrap;
 }
 #tag-sidebar .sidebar-pseudo { margin-bottom: 0.5rem; }
-#tag-sidebar .sidebar-pseudo .tag { font-style: italic; }
 #tag-sidebar .sidebar-menu.open { display: block; }
 #tag-sidebar .sidebar-menu span { display: block; padding: 0.4rem 0.6rem; color: var(--color-text); cursor: pointer; }
 #tag-sidebar .sidebar-menu span:hover { background: var(--color-link-hover-bg); }
