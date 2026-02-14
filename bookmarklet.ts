@@ -91,7 +91,7 @@ declare var __TROVE_PASS__: string;
         <div class="suggestions" id="tw-suggestions"></div>
       </div>
       <label>Notes</label>
-      <textarea id="tw-notes" rows="3" placeholder="Notes (optional)">${selection.replace(/</g, '&lt;')}</textarea>
+      <textarea id="tw-notes" rows="3" placeholder="Select text on page to pull a quote">${selection.replace(/</g, '&lt;')}</textarea>
       <button class="submit" id="tw-submit">Add</button>
       <div class="status" id="tw-status"></div>
     </div>`;
