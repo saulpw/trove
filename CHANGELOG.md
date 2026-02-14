@@ -2,6 +2,15 @@
 
 ## 2026-02-13
 
+- Unified card edit mode: single ✏️ button opens inline panel with title input, tags input, vote-for-deletion, and save/cancel
+- Removed separate 💣 delete button and inline title-only editing
+- Card tag hover menus now show navigation only (no remove/rename); sidebar tag menus retain rename option
+- Version bump to v0.30
+
+---
+
+## 2026-02-13
+
 - Split frontend.ts into modules: auth.ts (91 lines), tags.ts (281 lines), frontend.ts (700 lines)
   - auth.ts: credential management, sign-in UI, password visibility
   - tags.ts: tag sidebar, tag menus, rename/remove/add tag operations

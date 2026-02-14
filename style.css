@@ -97,16 +97,23 @@ header nav a:hover { text-decoration: underline; }
   margin-left: 0.4rem; opacity: 0.5; transition: opacity 0.15s;
 }
 .edit-title-btn:hover { opacity: 1; }
-.delete-btn {
-  color: var(--color-text-faint); font-size: var(--text-sm); cursor: pointer;
-  margin-left: 0.3rem; opacity: 0.5; transition: opacity 0.15s;
-}
-.delete-btn:hover { opacity: 1; }
-.edit-title-input {
-  font-size: var(--text-lg); font-weight: 500; padding: 0.2rem 0.5rem;
+.edit-title-input, .edit-tags-input {
+  font-size: var(--text-md); padding: 0.2rem 0.5rem;
   border: 1px solid var(--color-link); border-radius: 4px;
-  width: 80%; max-width: 500px;
+  width: 80%; max-width: 500px; box-sizing: border-box;
 }
+.edit-card-actions {
+  display: flex; flex-direction: column; gap: 0.3rem; flex-shrink: 0;
+  align-items: stretch; justify-content: center;
+}
+.edit-card-actions button {
+  font-size: var(--text-sm); padding: 0.25rem 0.6rem; cursor: pointer;
+  border: 1px solid var(--color-border-input); border-radius: 4px; background: var(--color-bg-btn);
+  white-space: nowrap;
+}
+.edit-card-actions button:hover { background: var(--color-bg-btn-hover); }
+.edit-card-actions .vote-delete-btn { color: var(--color-error); border-color: var(--color-error); }
+.edit-card-actions .vote-delete-btn:hover { background: #fee; }
 .link .notes { color: #555; font-size: var(--text-md); margin: 0.15rem 0; font-style: italic; }
 .link .card-bottom { display: flex; justify-content: flex-start; margin-top: auto; }
 .link .tag { color: var(--color-text-muted); font-size: var(--text-base); cursor: pointer; }

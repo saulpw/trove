@@ -1,11 +1,14 @@
 # TODO
 
-- bug: two different links with same url posted, they should have already been unified.
+- edit card should edit whole card at once, including add/remove tags and "vote for deletion" (which effectively removes it pending another resubmission)
 
-- make link adding box more friendly:
-   - autopull title of page into title field (editable)
+- upvote/downvote applies to the current tagset (so upvotes on /classic/rock only affect the rankings of links on that page)
+
+
 
 ! once/day update of trove.jsonl  "todays submission's will be here tomorrow"
+
+- select items, tag multiple
 
 - move trove.jsonl to a separate repo?
 
@@ -38,8 +41,6 @@
 - under tag breadcrumb: rename tag (possibly to multiple tags)
    - implementation may be better as an 'action' rather resubmitting all links
    - predictive autocomplete (most popular tags preferentially)
-
-- add local notes (when present, a unicode "note" character is a link to edit them)
 
 - add fixup to import script:
    - note invalid links
@@ -83,5 +84,13 @@
 - Option to automatically remove tracking attributes from URLs: https://raindropio.canny.io/feature-requests/p/option-to-automatically-remove-tracking-attributes-from-urls
 
 - add local tags
-   - maybe all tags should start local and then be synced to the server?
+- add local notes (when present, a unicode "note" character is a link to edit them)
+
+- maybe all changes should start local, with button to sync (to keep down on individual issues)
+
+
+100/day * 300 = ^4.5/year, so ^6 lifetime
+1m links, 1k bytes apiece = 1GB.  easily storable in git/hub.
+
+
 

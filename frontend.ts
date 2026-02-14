@@ -194,7 +194,7 @@ function renderLinks(links: Link[]): void {
           <div class="card-left">
             <div class="title-row">
               <span class="title">${link.title || link.url}</span>
-              ${isSignedIn() ? `<span class="edit-title-btn" onclick="handleEditTitleClick(event, this)">✏️</span><span class="delete-btn" onclick="handleDeleteClick(event, '${escapedUrl}', this)">💣</span>` : ''}
+              ${isSignedIn() ? `<span class="edit-title-btn" onclick="handleEditCardClick(event, this)">✏️</span>` : ''}
             </div>
             <span class="meta-line">${metaParts.join(' · ')}</span>
             ${link.notes ? `<div class="notes">${link.notes}</div>` : ''}
@@ -395,52 +395,94 @@ function updateLinkCountDisplay(): void {
   document.getElementById('link-count')!.innerHTML = `${displayCount}${truncSuffix} link${count === 1 ? '' : 's'}${suffix}`;
 }
 
-function handleEditTitleClick(event: Event, btn: HTMLElement): void {
+function handleEditCardClick(event: Event, btn: HTMLElement): void {
   event.preventDefault();
   event.stopPropagation();
 
   const linkEl = btn.closest('.link') as HTMLElement;
-  const titleEl = linkEl.querySelector('.title') as HTMLElement;
   const url = linkEl.dataset.url!;
-  const currentTitle = linkEl.dataset.title || '';
+  const oldTitle = linkEl.dataset.title || '';
+  const oldTags = linkEl.dataset.tags || '';
 
-  const input = document.createElement('input');
-  input.type = 'text';
-  input.className = 'edit-title-input';
-  input.value = currentTitle;
+  // Prevent link navigation while editing
+  const anchor = linkEl.closest('.link-anchor') as HTMLAnchorElement;
+  const blockClick = (ev: Event) => { ev.preventDefault(); };
+  anchor.addEventListener('click', blockClick);
+  linkEl.classList.add('editing');
 
-  const cancel = () => { input.remove(); titleEl.style.display = ''; btn.style.display = ''; };
+  // Replace title with input
+  const titleRow = linkEl.querySelector('.title-row') as HTMLElement;
+  const titleRowHTML = titleRow.innerHTML;
+  titleRow.innerHTML = `<input class="edit-title-input" value="${oldTitle.replace(/"/g, '&quot;')}">`;
+  const titleInput = titleRow.querySelector('.edit-title-input') as HTMLInputElement;
 
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      const newTitle = input.value.trim();
-      if (newTitle && newTitle !== currentTitle) {
-        titleEl.textContent = newTitle;
-        linkEl.dataset.title = newTitle;
-        cancel();
-        submitToBackend({ action: 'set_title', url, title: newTitle });
-      } else { cancel(); }
-    } else if (e.key === 'Escape') { cancel(); }
-  });
+  // Replace tags + add-btn with tags input
+  const cardBottom = linkEl.querySelector('.card-bottom') as HTMLElement;
+  const cardBottomHTML = cardBottom.innerHTML;
+  cardBottom.innerHTML = `<input class="edit-tags-input" value="${oldTags.replace(/"/g, '&quot;')}" placeholder="space-separated tags">`;
+  const tagsInput = cardBottom.querySelector('.edit-tags-input') as HTMLInputElement;
 
-  input.addEventListener('blur', () => { setTimeout(() => { if (document.body.contains(input)) cancel(); }, 100); });
+  // Add stacked action buttons between card-left and thumbnail
+  const cardLeft = linkEl.querySelector('.card-left') as HTMLElement;
+  const actionsCol = document.createElement('div');
+  actionsCol.className = 'edit-card-actions';
+  actionsCol.innerHTML = `<button class="vote-delete-btn" title="Vote for deletion">🗑️</button><button class="edit-save-btn">Save</button><button class="edit-cancel-btn">Cancel</button>`;
+  cardLeft.insertAdjacentElement('afterend', actionsCol);
 
-  titleEl.style.display = 'none';
-  btn.style.display = 'none';
-  titleEl.parentNode!.insertBefore(input, titleEl);
-  input.focus();
-  input.select();
-}
+  const cancel = () => {
+    titleRow.innerHTML = titleRowHTML;
+    cardBottom.innerHTML = cardBottomHTML;
+    actionsCol.remove();
+    linkEl.classList.remove('editing');
+    anchor.removeEventListener('click', blockClick);
+  };
 
-function handleDeleteClick(event: Event, url: string, btn: HTMLElement): void {
-  event.preventDefault();
-  event.stopPropagation();
-  if (!window.confirm('Delete this link?')) return;
-  submitToBackend({ action: 'delete', url });
-  btn.closest('.link-anchor')!.remove();
-  currentLinks = currentLinks.filter(l => l.url !== url);
-  updateLinkCountDisplay();
+  const save = () => {
+    const newTitle = titleInput.value.trim();
+    const newTags = tagsInput.value.trim().split(/\s+/).filter(t => t).join(' ');
+
+    if (newTitle && newTitle !== oldTitle) {
+      linkEl.dataset.title = newTitle;
+      submitToBackend({ action: 'set_title', url, title: newTitle });
+    }
+
+    const oldTagSet = new Set(oldTags.split(/\s+/).filter(t => t));
+    const newTagSet = new Set(newTags.split(/\s+/).filter(t => t));
+    const addedTags = [...newTagSet].filter(t => !oldTagSet.has(t));
+    const removedTags = [...oldTagSet].filter(t => !newTagSet.has(t));
+    if (addedTags.length > 0) {
+      submitToBackend({ action: 'add_tag', url, tags: addedTags.join(' ') });
+    }
+    for (const tag of removedTags) {
+      submitToBackend({ action: 'remove_tag', url, tags: tag });
+    }
+
+    linkEl.dataset.tags = newTags;
+    cancel();
+
+    // Update restored DOM with new values
+    const titleEl = linkEl.querySelector('.title') as HTMLElement | null;
+    if (titleEl && newTitle) titleEl.textContent = newTitle;
+    const tagsEl = linkEl.querySelector('.tags') as HTMLElement | null;
+    if (tagsEl) {
+      const displayTags = newTags.split(/\s+/).filter(t => t && !currentPageTags.includes(t)).sort();
+      tagsEl.innerHTML = displayTags.map(t => renderTag(t)).join(' ');
+    }
+  };
+
+  const voteDelete = () => {
+    submitToBackend({ action: 'vote_delete', url });
+    anchor.removeEventListener('click', blockClick);
+    anchor.remove();
+    currentLinks = currentLinks.filter(l => l.url !== url);
+    updateLinkCountDisplay();
+  };
+
+  actionsCol.querySelector('.edit-cancel-btn')!.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); cancel(); });
+  actionsCol.querySelector('.edit-save-btn')!.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); save(); });
+  actionsCol.querySelector('.vote-delete-btn')!.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); voteDelete(); });
+
+  titleInput.focus();
 }
 
 export async function submitToBackend(fields: Record<string, string>): Promise<void> {
@@ -547,8 +589,7 @@ declare const window: Window & {
   handleRateUp: typeof handleRateUp;
   handleRateDown: typeof handleRateDown;
   toggleShowHidden: typeof toggleShowHidden;
-  handleEditTitleClick: typeof handleEditTitleClick;
-  handleDeleteClick: typeof handleDeleteClick;
+  handleEditCardClick: typeof handleEditCardClick;
   handleAddTagClick: typeof handleAddTagClick;
   showSignIn: typeof showSignIn;
   handleSignIn: () => void;
@@ -561,8 +602,7 @@ declare const window: Window & {
 (window as any).handleRateUp = handleRateUp;
 (window as any).handleRateDown = handleRateDown;
 (window as any).toggleShowHidden = toggleShowHidden;
-(window as any).handleEditTitleClick = handleEditTitleClick;
-(window as any).handleDeleteClick = handleDeleteClick;
+(window as any).handleEditCardClick = handleEditCardClick;
 (window as any).handleAddTagClick = handleAddTagClick;
 (window as any).showSignIn = showSignIn;
 (window as any).handleSignIn = () => handleSignIn(onAuthSuccess);

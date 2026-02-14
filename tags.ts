@@ -3,15 +3,14 @@
 import { isSignedIn } from './auth';
 import { getCurrentPageTags, currentPath, parseTags, submitToBackend, filterAndRender } from './frontend';
 
-function renderTagMenu(tag: string, opts?: { remove?: boolean }): string {
+function renderTagMenu(tag: string, opts?: { sidebar?: boolean }): string {
   const pathDisplay = currentPath().slice(1) || 'all';
-  const removeOpt = opts?.remove && isSignedIn() ? `<span class="remove-tag-trigger" data-tag="${tag}">✕ remove</span>` : '';
-  const renameOpt = isSignedIn() ? `<span class="rename-tag-trigger" data-tag="${tag}">✎ rename</span>` : '';
-  return `<span data-href="${currentPath()}/${tag}">${pathDisplay} ∩ ${tag}</span><span data-href="${currentPath()}/-${tag}">${pathDisplay} ∩ ~${tag}</span>${removeOpt}${renameOpt}`;
+  const renameOpt = opts?.sidebar && isSignedIn() ? `<span class="rename-tag-trigger" data-tag="${tag}">✎ rename</span>` : '';
+  return `<span data-href="${currentPath()}/${tag}">${pathDisplay} ∩ ${tag}</span><span data-href="${currentPath()}/-${tag}">${pathDisplay} ∩ ~${tag}</span>${renameOpt}`;
 }
 
 export function renderTag(t: string): string {
-  return `<span class="tag-wrap"><span class="tag" data-tag="${t}">#${t}</span><span class="tag-menu">${renderTagMenu(t, { remove: true })}</span></span>`;
+  return `<span class="tag-wrap"><span class="tag" data-tag="${t}">#${t}</span><span class="tag-menu">${renderTagMenu(t)}</span></span>`;
 }
 
 export function renderTagSidebar(links: Array<{ tags?: string }>, pageTags: string[]): void {
@@ -79,7 +78,7 @@ export function initSidebarTagMenu(): void {
         closeSidebarMenu();
         return;
       }
-      menu.innerHTML = renderTagMenu(tag);
+      menu.innerHTML = renderTagMenu(tag, { sidebar: true });
       // Position menu next to the clicked tag
       const tagRect = tagEl.getBoundingClientRect();
       const sidebarRect = sidebar.getBoundingClientRect();
@@ -110,24 +109,6 @@ function navigateToTag(tag: string): void {
 
 export function initTagMenu(): void {
   document.getElementById('links')!.addEventListener('click', (e) => {
-    const removeTrigger = (e.target as HTMLElement).closest('.remove-tag-trigger') as HTMLElement | null;
-    if (removeTrigger) {
-      e.preventDefault();
-      e.stopPropagation();
-      const tagName = removeTrigger.dataset.tag!;
-      const linkEl = removeTrigger.closest('.link') as HTMLElement;
-      handleRemoveTag(tagName, linkEl);
-      return;
-    }
-    const renameTrigger = (e.target as HTMLElement).closest('.rename-tag-trigger') as HTMLElement | null;
-    if (renameTrigger) {
-      e.preventDefault();
-      e.stopPropagation();
-      const tagName = renameTrigger.dataset.tag!;
-      const linkEl = renameTrigger.closest('.link') as HTMLElement;
-      handleRenameTagClick(tagName, linkEl);
-      return;
-    }
     const menuItem = (e.target as HTMLElement).closest('.tag-menu [data-href]') as HTMLElement | null;
     const tag = (e.target as HTMLElement).closest('.tag[data-tag]') as HTMLElement | null;
     if (menuItem) {
