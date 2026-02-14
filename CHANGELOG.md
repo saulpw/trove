@@ -2,6 +2,14 @@
 
 ## 2026-02-13
 
+- Split frontend.ts into modules: auth.ts (91 lines), tags.ts (281 lines), frontend.ts (700 lines)
+  - auth.ts: credential management, sign-in UI, password visibility
+  - tags.ts: tag sidebar, tag menus, rename/remove/add tag operations
+  - frontend.ts: rendering, filtering, ratings, bookmarklet, orchestration
+- Fix card layout bug: rate-up button used `<a>` tag nested inside link anchor, causing broken flex layout
+
+---
+
 - Search bar: full-text search over link titles, tags, and notes
   - Text input in the filter bar, results update as you type
   - Case-insensitive, combines with tag filters and time period filters

@@ -5,13 +5,15 @@ A simple static website to share lists of links at a public mnemonic url.  e.g. 
 ## Project Structure
 - `index.html` - Static frontend HTML structure
 - `style.css` - Frontend CSS styles
-- `frontend.ts` - Frontend TypeScript (link loading, filtering, sorting, auth, submission)
+- `frontend.ts` - Frontend TypeScript (link loading, filtering, sorting, submission, orchestration)
+- `auth.ts` - Auth primitives (credentials, sign-in UI, password visibility)
+- `tags.ts` - Tag sidebar, tag menus, and tag editing operations
 - `bookmarklet.ts` - Bookmarklet widget TypeScript (IIFE injected on external pages)
 - `autocomplete.ts` - Shared tag autocomplete logic (used by both frontend and bookmarklet)
 - `tsconfig.json` - TypeScript config (strict, noEmit — type checking only)
 - `package.json` - devDependencies: esbuild (bundler), typescript (type checker)
 - `trove.jsonl` - Canonical link data in JSONL format (one JSON object per line): `{url, added, title?, tags?, notes?}`. Tags are space-separated strings (e.g., `"tags": "games retro"`), not JSON arrays.
-- `trove_utils.py` - Shared utilities: `load_trove()`, `save_trove()`, `create_link_entry()`
+- `trove_utils.py` - Shared utilities. `load_trove()`, `save_trove()`, `create_link_entry()`
 - `add_link.py` - CLI to add links to trove.jsonl (auto-fetches title, triggers archive.org, commits)
 - `process_issues.py` - Processes GitHub issue submissions into trove.jsonl
 - `process_local_issues.py` - Offline issue processing from local JSON files (for testing)
