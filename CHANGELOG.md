@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 2026-02-14
+
+- Moved bookmarklet link ("add to trove") from footer to header nav
+- Moved help link next to sign out in header auth area
+- Tag menu actions now show just `tag` instead of `all ∩ tag` when on root page
+- Changed help URL from `/help.html` to `/help` (via netlify redirect)
+- Version bump to v0.31
+
+---
+
 ## 2026-02-13
 
 - Unified card edit mode: single ✏️ button opens inline panel with title input, tags input, vote-for-deletion, and save/cancel

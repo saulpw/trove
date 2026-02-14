@@ -4,9 +4,12 @@ import { isSignedIn } from './auth';
 import { getCurrentPageTags, currentPath, parseTags, submitToBackend, filterAndRender, getRatings } from './frontend';
 
 function renderTagMenu(tag: string, opts?: { sidebar?: boolean }): string {
-  const pathDisplay = currentPath().slice(1) || 'all';
+  const path = currentPath();
+  const pathDisplay = path.slice(1);
   const renameOpt = opts?.sidebar && isSignedIn() ? `<span class="rename-tag-trigger" data-tag="${tag}">✎ rename</span>` : '';
-  return `<span data-href="${currentPath()}/${tag}">${pathDisplay} ∩ ${tag}</span><span data-href="${currentPath()}/-${tag}">${pathDisplay} ∩ ~${tag}</span>${renameOpt}`;
+  const addLabel = pathDisplay ? `${pathDisplay} ∩ ${tag}` : tag;
+  const excludeLabel = pathDisplay ? `${pathDisplay} ∩ ~${tag}` : `~${tag}`;
+  return `<span data-href="${path}/${tag}">${addLabel}</span><span data-href="${path}/-${tag}">${excludeLabel}</span>${renameOpt}`;
 }
 
 export function renderTag(t: string): string {
