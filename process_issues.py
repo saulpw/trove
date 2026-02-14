@@ -41,19 +41,21 @@ def close_issue(number):
         print(f"Could not close issue #{number}: {result.stdout}\n{result.stderr}")
 
 
-def process_issues():
-    """Process all open submission issues.
+def process_issue_list(issues, trove_path=None, local=False):
+    """Process a list of issue dicts and append operations to trove.jsonl.
 
-    Appends operation entries to trove.jsonl. Deduplication happens at build
-    time via dedup_trove.py.
+    Args:
+        issues: list of {"number": N, "body": "..."} dicts
+        trove_path: optional Path override for load/save (defaults to TROVE_FILE)
+        local: when True, skip close_issue(), fetch_title(), trigger_archive(),
+               fetch_youtube_metadata()
     """
-    issues = get_submission_issues()
     if not issues:
-        print("No open submission issues found")
+        print("No issues to process")
         return
 
-    links = load_trove()
-    existing_urls = {link["url"] for link in links}
+    links = load_trove(trove_path)
+    existing_urls = {e["url"] for e in links if e.get("op", "add") == "add"}
     appended = 0
 
     for issue in issues:
@@ -69,7 +71,8 @@ def process_issues():
             urls_str = fields.get("urls", "")
             if not remove_tag or not add_tags_str or not urls_str:
                 print(f"Issue #{number}: Invalid rename_tag fields, skipping")
-                close_issue(number)
+                if not local:
+                    close_issue(number)
                 continue
             entry = {"op": "rename_tag", "remove_tag": remove_tag,
                      "add_tags": add_tags_str, "urls": urls_str,
@@ -79,7 +82,8 @@ def process_issues():
                 entry["submitted_by"] = submitted_by
             links.append(entry)
             print(f"Issue #{number}: Appended rename_tag '{remove_tag}' → '{add_tags_str}'")
-            close_issue(number)
+            if not local:
+                close_issue(number)
             appended += 1
             continue
 
@@ -89,13 +93,14 @@ def process_issues():
             continue
 
         # For set_title, set_notes, add_tag, remove_tag: just append the op
-        if action in ("set_title", "set_notes", "add_tag", "remove_tag"):
+        if action in ("set_title", "set_notes", "add_tag", "remove_tag", "delete"):
             entry = create_link_entry(
                 url, title=fields.get("title"), tags=fields.get("tags"),
                 notes=fields.get("notes"), op=action, submitted_by=submitted_by)
             links.append(entry)
             print(f"Issue #{number}: Appended {action} for {url}")
-            close_issue(number)
+            if not local:
+                close_issue(number)
             appended += 1
             continue
 
@@ -105,7 +110,7 @@ def process_issues():
         # Fetch metadata (YouTube-specific or generic title) only for new URLs
         title = fields.get("title")
         yt_meta = {}
-        if url not in existing_urls:
+        if not local and url not in existing_urls:
             if is_youtube_url(url):
                 yt_meta = fetch_youtube_metadata(url)
                 if not title:
@@ -124,14 +129,24 @@ def process_issues():
 
         links.append(link)
         existing_urls.add(url)
-        close_issue(number)
+        if not local:
+            close_issue(number)
         appended += 1
 
     if appended > 0:
-        save_trove(links)
-        print(f"Appended {appended} entry/entries to {TROVE_FILE}")
+        save_trove(links, trove_path)
+        print(f"Appended {appended} entry/entries")
     else:
         print("No new entries to append")
+
+
+def process_issues():
+    """Process all open GitHub submission issues."""
+    issues = get_submission_issues()
+    if not issues:
+        print("No open submission issues found")
+        return
+    process_issue_list(issues)
 
 
 def fill_titles():

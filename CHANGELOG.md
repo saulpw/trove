@@ -2,6 +2,31 @@
 
 ## 2026-02-13
 
+- Local issue processing for testable pipeline:
+  - Extracted `process_issue_list(issues, trove_path, local)` from `process_issues.py`
+  - `local=True` skips GitHub API calls (close_issue, fetch_title, trigger_archive, fetch_youtube_metadata)
+  - New `process_local_issues.py`: CLI to process JSON issue files from a directory
+  - Test fixtures in `test_issues/`: add.json, delete.json, add_tag.json
+  - Integration tests: test_process_local_add, test_process_local_delete, test_process_local_add_tag
+  - Makefile: new `process-local` target
+
+---
+
+## 2026-02-13
+
+- Link delete functionality:
+  - 💣 icon next to ✏️ on each card (signed-in only) permanently deletes a link
+  - Confirm dialog before deletion; card removed from DOM immediately
+  - `delete` op handled by `dedup_trove.py` (marks URL as deleted, skips in output)
+  - `process_issues.py` accepts `delete` action in submissions
+  - Updated `help.html` with delete button documentation
+  - Test added for dedup delete behavior
+- Bumped version to 0.27
+
+---
+
+## 2026-02-13
+
 - Build-time dedup for trove.jsonl:
   - trove.jsonl is now an append-only operation log; deduplication happens at build time
   - New `dedup_trove.py`: merges entries per URL with configurable ops (`add`, `set_title`, `set_notes`, `add_tag`, `remove_tag`, `rename_tag`)

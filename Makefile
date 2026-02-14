@@ -1,4 +1,4 @@
-.PHONY: setup serve add build typecheck test dedup import process-issues fill-titles add-user remove-user list-users web-extract web-import
+.PHONY: setup serve add build typecheck test dedup import process-issues process-local fill-titles add-user remove-user list-users web-extract web-import
 
 all: build
 
@@ -50,6 +50,10 @@ import:
 # Process GitHub issue submissions and add to trove.jsonl
 process-issues:
 	python3 process_issues.py
+
+# Process local JSON issue files (offline, for testing)
+process-local:
+	python3 process_local_issues.py --issues-dir ${ISSUES_DIR} --output ${OUTPUT}
 
 # Fill in missing titles for existing links
 fill-titles:
