@@ -2,6 +2,7 @@
 
 export interface SubmitLinkParams {
   url: string;
+  title: string;
   tags: string;
   notes: string;
   username: string;
@@ -18,7 +19,7 @@ export interface SubmitLinkResult {
  * Submit a link to the trove backend
  */
 export async function submitLink(params: SubmitLinkParams): Promise<SubmitLinkResult> {
-  const { url, tags, notes, username, password, origin = '' } = params;
+  const { url, title, tags, notes, username, password, origin = '' } = params;
 
   if (!username || !password) {
     return { success: false, error: 'Enter credentials' };
@@ -33,7 +34,7 @@ export async function submitLink(params: SubmitLinkParams): Promise<SubmitLinkRe
     const response = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url, tags, notes, username, password }),
+      body: JSON.stringify({ url, title: title || undefined, tags, notes, username, password }),
     });
 
     const result = await response.json();

@@ -6,6 +6,7 @@ import { submitLink } from './addlink';
 
 declare var __TROVE_ORIGIN__: string;
 declare var __TROVE_URL__: string;
+declare var __TROVE_TITLE__: string;
 declare var __TROVE_SEL__: string;
 declare var __TROVE_USER__: string;
 declare var __TROVE_PASS__: string;
@@ -15,6 +16,7 @@ declare var __TROVE_PASS__: string;
 
   const origin = (typeof __TROVE_ORIGIN__ !== 'undefined' && __TROVE_ORIGIN__) || location.origin;
   const pageUrl = (typeof __TROVE_URL__ !== 'undefined' && __TROVE_URL__) || location.href;
+  const pageTitle = (typeof __TROVE_TITLE__ !== 'undefined' && __TROVE_TITLE__) || document.title || '';
   const selection = (typeof __TROVE_SEL__ !== 'undefined' && __TROVE_SEL__) || '';
   const username = (typeof __TROVE_USER__ !== 'undefined' && __TROVE_USER__) || '';
   const password = (typeof __TROVE_PASS__ !== 'undefined' && __TROVE_PASS__) || '';
@@ -80,6 +82,8 @@ declare var __TROVE_PASS__: string;
     <div class="body">
       <label>URL</label>
       <input type="text" id="tw-url" value="${pageUrl.replace(/"/g, '&quot;')}" readonly />
+      <label>Title</label>
+      <input type="text" id="tw-title" value="${pageTitle.replace(/"/g, '&quot;')}" placeholder="Page title" />
       ${authHTML}
       <label>Tags</label>
       <div class="tags-wrap">
@@ -118,6 +122,7 @@ declare var __TROVE_PASS__: string;
   $('tw-submit')!.addEventListener('click', async () => {
     const status = $('tw-status')!;
     const url = ($('tw-url') as HTMLInputElement).value.trim();
+    const title = ($('tw-title') as HTMLInputElement).value.trim();
     const tags = ($('tw-tags') as HTMLInputElement).value.trim();
     const notes = ($('tw-notes') as HTMLTextAreaElement).value.trim();
     const user = hasAuth ? username : ($('tw-user') ? ($('tw-user') as HTMLInputElement).value.trim() : '');
@@ -126,7 +131,7 @@ declare var __TROVE_PASS__: string;
     status.textContent = 'Submitting...';
     status.className = 'status';
 
-    const result = await submitLink({ url, tags, notes, username: user, password: pass, origin });
+    const result = await submitLink({ url, title, tags, notes, username: user, password: pass, origin });
 
     if (result.success) {
       status.textContent = 'Added!';
