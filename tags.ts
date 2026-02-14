@@ -3,9 +3,15 @@
 import { isSignedIn } from './auth';
 import { getCurrentPageTags, currentPath, parseTags, submitToBackend, filterAndRender } from './frontend';
 
+function renderTagMenu(tag: string, opts?: { remove?: boolean }): string {
+  const pathDisplay = currentPath().slice(1) || 'all';
+  const removeOpt = opts?.remove && isSignedIn() ? `<span class="remove-tag-trigger" data-tag="${tag}">✕ remove</span>` : '';
+  const renameOpt = isSignedIn() ? `<span class="rename-tag-trigger" data-tag="${tag}">✎ rename</span>` : '';
+  return `<span data-href="${currentPath()}/${tag}">${pathDisplay} ∩ ${tag}</span><span data-href="${currentPath()}/-${tag}">${pathDisplay} ∩ ~${tag}</span>${removeOpt}${renameOpt}`;
+}
+
 export function renderTag(t: string): string {
-  const authOpts = isSignedIn() ? `<span class="remove-tag-trigger" data-tag="${t}">✕ remove</span><span class="rename-tag-trigger" data-tag="${t}">✎ rename</span>` : '';
-  return `<span class="tag-wrap"><span class="tag" data-tag="${t}">#${t}</span><span class="tag-menu"><span data-href="/${t}">→ /${t}</span><span data-href="${currentPath()}/${t}">+ ${currentPath()}/${t}</span><span data-href="${currentPath()}/-${t}">− ${currentPath()}/-${t}</span>${authOpts}</span></span>`;
+  return `<span class="tag-wrap"><span class="tag" data-tag="${t}">#${t}</span><span class="tag-menu">${renderTagMenu(t, { remove: true })}</span></span>`;
 }
 
 export function renderTagSidebar(links: Array<{ tags?: string }>, pageTags: string[]): void {
@@ -73,8 +79,7 @@ export function initSidebarTagMenu(): void {
         closeSidebarMenu();
         return;
       }
-      const renameOpt = isSignedIn() ? `<span class="rename-tag-trigger" data-tag="${tag}">✎ rename</span>` : '';
-      menu.innerHTML = `<span data-href="/${tag}">→ /${tag}</span><span data-href="${currentPath()}/${tag}">+ ${currentPath()}/${tag}</span><span data-href="${currentPath()}/-${tag}">− ${currentPath()}/-${tag}</span>${renameOpt}`;
+      menu.innerHTML = renderTagMenu(tag);
       // Position menu next to the clicked tag
       const tagRect = tagEl.getBoundingClientRect();
       const sidebarRect = sidebar.getBoundingClientRect();
@@ -190,11 +195,7 @@ async function submitTagsForLink(url: string, tags: string, linkEl: HTMLElement,
   const newTags = tags.split(' ').filter(t => t && !pageTags.includes(t));
 
   newTags.forEach(t => {
-    const wrap = document.createElement('span');
-    wrap.className = 'tag-wrap';
-    wrap.innerHTML = `<span class="tag" data-tag="${t}">#${t}</span><span class="tag-menu"><span data-href="/${t}">→ /${t}</span><span data-href="${currentPath()}/${t}">+ ${currentPath()}/${t}</span><span data-href="${currentPath()}/-${t}">− ${currentPath()}/-${t}</span></span>`;
-    tagsEl.appendChild(wrap);
-    tagsEl.appendChild(document.createTextNode(' '));
+    tagsEl.insertAdjacentHTML('beforeend', renderTag(t) + ' ');
   });
 
   restoreAddButton(input, btn);
