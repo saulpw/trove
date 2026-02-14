@@ -427,3 +427,4 @@
 {"op": "rename_tag", "remove_tag": "lower-fi-software", "add_tags": "lofi app piano", "urls": "https://furnacecreek.org/hanon/", "added": "2026-02-13T23:22:13.324916+00:00", "submitted_by": "saul"}
 {"op": "add", "url": "https://thepiratebay.org/index.html", "added": "2026-02-14T00:45:56.593331+00:00", "title": "Download music, movies, games, software! The Pirate Bay - The galaxy's most resilient BitTorrent site", "tags": "warez pirating video pr0n", "submitted_by": "DizzyPickle"}
 {"op": "delete", "url": "https://www.youtube.com/watch?v=1CLCOvZOh1o", "added": "2026-02-14T00:45:57.264584+00:00", "submitted_by": "kristine"}
+{"op": "delete", "url": "https://thepiratebay.org/index.html", "added": "2026-02-14T00:48:04.498045+00:00", "submitted_by": "DizzyPickle"}
