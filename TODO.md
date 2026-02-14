@@ -1,10 +1,11 @@
 # TODO
 
-- edit card should edit whole card at once, including add/remove tags and "vote for deletion" (which effectively removes it pending another resubmission)
+- edit card tag edit with autocomplete tags
 
 - upvote/downvote applies to the current tagset (so upvotes on /classic/rock only affect the rankings of links on that page)
 
-
+- move bookmarklet to header
+- move help next to signout
 
 ! once/day update of trove.jsonl  "todays submission's will be here tomorrow"
 
@@ -18,25 +19,16 @@
 
 - allow editable tag description
   - show on tag hover
-
-- replace bomb downvote icon with spade ("bury")
-
-
-- show number of favs/peeves
-  - show heart and bomb instead of "#\_favs"/"#\_peeves".
-  - allow heart and bomb in url too.
-  - omit favs/peeves from tag list if none of the elements on the page are on it
+  - heart/spade are "Love" and "Bury"
 
 - delete tag association
 
-- clickable bomb icon to delete link entirely
+- move edit icon to upper right to left of thumbnail
 
 - add @contributor tags
 
-- /help.html -> /help URL
-
-
 - import bulk lines from web page: include link to source in notes (markdown, converted to html in js?)
+- change bookmarklet link text to "add to trove"
 
 - under tag breadcrumb: rename tag (possibly to multiple tags)
    - implementation may be better as an 'action' rather resubmitting all links
