@@ -11,32 +11,7 @@
     <h1><a href="/">trove</a> <span class="breadcrumb-sep">/</span> help</h1>
     <nav>
     </nav>
-    <div id="auth-container">
-      <div id="auth-menu" style="display:none;">
-        <span id="auth-user"></span>
-        <div id="auth-dropdown">
-          <span onclick="signOut()">Sign out</span>
-        </div>
-      </div>
-      <button id="auth-btn" onclick="showSignIn()">Sign in</button>
-    </div>
   </header>
-
-  <div id="signin-form" style="display:none;">
-    <input type="text" id="auth-username" placeholder="Username" />
-    <div class="password-wrap">
-      <input type="password" id="auth-password" placeholder="Password" />
-      <span class="password-toggle" onclick="togglePasswordVisibility()">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-          <path class="eye-open" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-          <circle class="eye-open" cx="12" cy="12" r="3"/>
-          <line class="eye-shut" x1="1" y1="1" x2="23" y2="23" style="display:none"/>
-        </svg>
-      </span>
-    </div>
-    <button onclick="handleSignIn()">Sign in</button>
-    <span id="auth-status"></span>
-  </div>
 
   <div class="help-page">
     <nav class="help-toc"><ul>
@@ -75,16 +50,15 @@
       </ul>
 
       <h3 id="help-menu">The tag menu</h3>
-      <p>Hover over any tag on a link card to see a popup menu with navigation options:</p>
+      <p>Hover over any tag on a link card to see a popup menu with two options:</p>
       <ul>
-        <li><strong>&rarr; /tag</strong> &mdash; navigate to that tag's page (replaces current filters)</li>
-        <li><strong>+ /current/tag</strong> &mdash; add this tag to the current intersection (narrow results)</li>
-        <li><strong>&minus; /current/-tag</strong> &mdash; exclude this tag from the current view</li>
+        <li><strong>tag</strong> &mdash; add this tag to the current filter (narrow results)</li>
+        <li><strong>~tag</strong> &mdash; exclude this tag from the current view</li>
       </ul>
       <p>When signed in, the sidebar tag menu also includes a <strong>&#x270E; rename</strong> option to rename a tag across all links.</p>
 
       <h3 id="help-sidebar">The tag sidebar</h3>
-      <p>On wider screens, a sidebar appears on the right showing all tags present in the currently displayed links, sorted by frequency. Click a sidebar tag to see the same menu options. Tags already in the active filter are hidden from the sidebar.</p>
+      <p>On wider screens, a sidebar appears on the left showing all tags present in the currently displayed links, sorted by frequency. Click a sidebar tag to see the same menu options. Tags already in the active filter are hidden from the sidebar.</p>
 
       <h3 id="help-search">Search</h3>
       <p>The search bar in the filter bar performs full-text search across link titles, tags, and notes. Results update as you type. Search is case-insensitive and works in combination with tag filters and time period filters.</p>

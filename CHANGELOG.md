@@ -2,6 +2,7 @@
 
 ## 2026-02-15
 
+- Updated help.html: removed sign in/out UI, fixed tag menu docs (two options: `tag` and `~tag`), fixed sidebar position (left, not right)
 - Fixed bookmarklet on YouTube and other CSP-restricted sites by moving widget UI into an iframe on the trove origin (bypasses connect-src and trusted-types restrictions)
 - Bookmarklet injector is now a thin 889-byte stub that creates an iframe; all form logic lives in bookmarklet-frame.html/ts
 - Credentials passed to iframe via URL hash fragment (bypasses third-party storage partitioning)
