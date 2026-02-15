@@ -22,7 +22,8 @@ build: tags.json
 	npx esbuild bookmarklet.ts --bundle --minify --outfile=_build/bookmarklet-code.txt
 	npx esbuild frontend.ts --bundle --loader:.txt=text --outfile=_build/frontend.js
 	npx esbuild bookmarklet.ts --bundle --outfile=_build/bookmarklet.js
-	cp tags.json index.html help.html style.css _build/
+	npx esbuild bookmarklet-frame.ts --bundle --outfile=_build/bookmarklet-frame.js
+	cp tags.json index.html help.html bookmarklet-frame.html style.css _build/
 	python3 dedup_trove.py trove.jsonl _build/trove.jsonl
 	sed -i='' 's/BUILD_TIMESTAMP/$(shell date +%s)/' _build/index.html
 

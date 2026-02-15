@@ -553,7 +553,7 @@ window.addEventListener('hashchange', () => {
   }
 });
 
-// Set bookmarklet link href with current origin
+// Set bookmarklet link href with current origin and credentials
 function updateBookmarkletHref(): void {
   const link = document.getElementById('bookmarklet') as HTMLAnchorElement | null;
   if (!link) return;
@@ -561,7 +561,7 @@ function updateBookmarkletHref(): void {
   const creds = getCredentials();
   const userVar = creds ? JSON.stringify(creds.username) : '""';
   const passVar = creds ? JSON.stringify(creds.password) : '""';
-  link.href = `javascript:void((function(){var __TROVE_ORIGIN__=${JSON.stringify(origin)},__TROVE_URL__=location.href,__TROVE_TITLE__=document.title,__TROVE_SEL__=(window.getSelection()||"").toString(),__TROVE_USER__=${userVar},__TROVE_PASS__=${passVar};${bookmarkletCode}})())`;
+  link.href = `javascript:void((function(){var __TROVE_ORIGIN__=${JSON.stringify(origin)},__TROVE_USER__=${userVar},__TROVE_PASS__=${passVar};${bookmarkletCode}})())`;
 }
 
 // Check for existing credentials on page load
