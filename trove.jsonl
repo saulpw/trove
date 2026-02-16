@@ -446,3 +446,4 @@
 {"op": "add_tag", "url": "https://arstechnica.com/security/2024/10/ai-chatbots-can-read-and-write-invisible-text-creating-an-ideal-covert-channel/", "added": "2026-02-16T07:08:14.764584+00:00", "tags": "ai hack", "submitted_by": "saul"}
 {"op": "add_tag", "url": "https://github.com/cthulahoops/tfa", "added": "2026-02-16T07:08:46.037924+00:00", "tags": "cli", "submitted_by": "saul"}
 {"op": "add_tag", "url": "https://fossil.wanderinghorse.net/r/cwal/wiki?name=HowTo", "added": "2026-02-16T07:09:19.360362+00:00", "tags": "lang", "submitted_by": "saul"}
+{"op": "add", "url": "https://en.wikipedia.org/wiki/Jason_Rohrer", "added": "2026-02-16T07:10:05.526128+00:00", "title": "Jason Rohrer - Wikipedia", "tags": "gamedev indie people", "submitted_by": "saul"}
