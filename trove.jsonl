@@ -444,3 +444,4 @@
 {"op": "add_tag", "url": "https://www.youtube.com/watch?v=aJGXsVHkhrk", "added": "2026-02-15T21:29:44.266373+00:00", "tags": "trailer", "submitted_by": "kristine"}
 {"op": "add", "url": "https://sammyjankis.com/", "added": "2026-02-16T06:35:25.554687+00:00", "title": "Sammy Jankis", "tags": "ai indie", "submitted_by": "saul"}
 {"op": "add_tag", "url": "https://arstechnica.com/security/2024/10/ai-chatbots-can-read-and-write-invisible-text-creating-an-ideal-covert-channel/", "added": "2026-02-16T07:08:14.764584+00:00", "tags": "ai hack", "submitted_by": "saul"}
+{"op": "add_tag", "url": "https://github.com/cthulahoops/tfa", "added": "2026-02-16T07:08:46.037924+00:00", "tags": "cli", "submitted_by": "saul"}
