@@ -458,3 +458,4 @@
 {"op": "add", "url": "https://discoelysium.com/", "added": "2026-02-16T08:34:50.446843+00:00", "title": "Disco Elysium", "tags": "games adventure $saul", "submitted_by": "saul"}
 {"op": "add", "url": "https://handy.computer/", "added": "2026-02-17T03:28:32.664794+00:00", "title": "Handy: speak into any text field", "tags": "app oss text", "notes": "the free and open source app for speech to text", "submitted_by": "saul"}
 {"op": "set_title", "url": "https://www.alt.org/nethack/", "added": "2026-02-17T04:51:12.083422+00:00", "title": "NetHack: alt.org public NetHack Server", "submitted_by": "saul"}
+{"op": "set_title", "url": "https://www.seattletimes.com/seattle-news/seahawks-parade-will-draw-1-million-people-where-did-that-come-from/", "added": "2026-02-17T05:39:16.153658+00:00", "title": "Seahawks parade crowd predicted at 1M. Where did that come from?", "submitted_by": "saul"}
