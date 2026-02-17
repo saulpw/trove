@@ -24,7 +24,7 @@ exports.handler = async (event) => {
     return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'Invalid JSON' }) };
   }
 
-  const { url, title, tags, notes, username, password, action, remove_tag, add_tags, urls } = body;
+  const { url, title, tags, notes, username, password, action, remove_tag, add_tags, urls, tag, description } = body;
 
   if (!username || !password) {
     return { statusCode: 401, headers: corsHeaders, body: JSON.stringify({ error: 'Authentication required' }) };
@@ -43,7 +43,18 @@ exports.handler = async (event) => {
 
   let issueTitle, issueBody;
 
-  if (action === 'rename_tag') {
+  if (action === 'set_tag_desc') {
+    if (!tag) {
+      return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'set_tag_desc requires tag' }) };
+    }
+    issueTitle = `Set tag description: ${tag}`;
+    issueBody = [
+      `action: set_tag_desc`,
+      `tag: ${tag}`,
+      `description: ${description || ''}`,
+      `submitted_by: ${username}`,
+    ].join('\n');
+  } else if (action === 'rename_tag') {
     if (!remove_tag || !add_tags || !urls) {
       return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'rename_tag requires remove_tag, add_tags, and urls' }) };
     }

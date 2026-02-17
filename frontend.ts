@@ -78,6 +78,10 @@ const setRating = (url: string, n: number): void => {
   localStorage.setItem(RATINGS_KEY, JSON.stringify(ratings));
 };
 
+// Tag descriptions loaded from tags.jsonl
+let tagDescriptions: Record<string, string> = {};
+export const getTagDescriptions = (): Record<string, string> => tagDescriptions;
+
 // Store all loaded links for client-side filtering
 let allLinks: Link[] = [];
 // Store current filtered links for re-sorting
@@ -615,6 +619,19 @@ declare const window: Window & {
 (window as any).applySort = applySort;
 (window as any).filterAndRender = filterAndRender;
 
+// Load tag descriptions from tags.jsonl
+async function loadTagDescriptions(): Promise<void> {
+  try {
+    const resp = await fetch('/tags.jsonl');
+    if (!resp.ok) return;
+    const text = await resp.text();
+    text.trim().split('\n').filter(l => l).forEach(line => {
+      const obj = JSON.parse(line);
+      if (obj.description) tagDescriptions[obj.tag] = obj.description;
+    });
+  } catch {}
+}
+
 // Initialize on page load
 updateBookmarkletHref();
 initAuth();
@@ -623,5 +640,6 @@ if (document.getElementById('links')) {
   initBreadcrumbNav();
   initTagMenu();
   initSidebarTagMenu();
+  loadTagDescriptions();
   loadLinks();
 }

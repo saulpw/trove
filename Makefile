@@ -17,12 +17,12 @@ add:
 	python3 add_link.py ${URL} ${TAGS} $(if ${TITLE},-t "${TITLE}")
 
 # Build for Netlify deployment
-build: tags.json
+build: tags.jsonl
 	mkdir -p _build
 	npx esbuild bookmarklet.ts --bundle --minify --outfile=_build/bookmarklet-code.txt
 	npx esbuild frontend.ts --bundle --loader:.txt=text --outfile=_build/frontend.js
 	npx esbuild bookmarklet.ts --bundle --outfile=_build/bookmarklet.js
-	cp tags.json index.html help.html style.css _build/
+	cp tags.jsonl index.html help.html style.css _build/
 	python3 dedup_trove.py trove.jsonl _build/trove.jsonl
 	sed -i='' 's/BUILD_TIMESTAMP/$(shell date +%s)/' _build/index.html
 
@@ -31,8 +31,8 @@ typecheck:
 	npx tsc --noEmit
 
 # Build tags file
-tags.json: trove.jsonl
-	python3 -c "import json; import fileinput; tags=sorted(set(t for line in fileinput.input() for t in json.loads(line).get('tags','').split() if t)); print(json.dumps(tags))" < $< > $@
+tags.jsonl: trove.jsonl
+	python3 generate_tags.py
 
 # Syntax check all Python files, then run tests
 test:
@@ -78,4 +78,4 @@ import-psv:
 	python3 import_web_links.py import ${PSV}
 
 clean:
-	rm -f _build/* tags.json
+	rm -f _build/* tags.jsonl

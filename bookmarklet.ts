@@ -118,7 +118,9 @@ declare var __TROVE_PASS__: string;
   // Tag autocomplete
   let allTags: string[] = [];
 
-  fetch(origin + '/tags.json').then(r => r.ok ? r.json() : []).then(t => allTags = t).catch(() => {});
+  fetch(origin + '/tags.jsonl').then(r => r.ok ? r.text() : '').then(text => {
+    allTags = text.trim().split('\n').filter(l => l).map(l => JSON.parse(l).tag);
+  }).catch(() => {});
 
   const tagsInput = $('tw-tags') as HTMLInputElement;
   const dropdown = $('tw-suggestions') as HTMLElement;

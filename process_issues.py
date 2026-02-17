@@ -2,6 +2,7 @@
 """Process GitHub issues with 'submission' label and add links to trove.jsonl."""
 
 import argparse
+from datetime import datetime, timezone
 import json
 import subprocess
 
@@ -64,6 +65,26 @@ def process_issue_list(issues, trove_path=None, local=False):
         action = fields.get("action", "add")
         submitted_by = fields.get("submitted_by")
 
+        # Handle set_tag_desc action
+        if action == "set_tag_desc":
+            tag_name = fields.get("tag")
+            desc = fields.get("description", "")
+            if not tag_name:
+                print(f"Issue #{number}: Invalid set_tag_desc fields, skipping")
+                if not local:
+                    close_issue(number)
+                continue
+            entry = {"op": "set_tag_desc", "tag": tag_name, "description": desc,
+                     "added": datetime.now(timezone.utc).isoformat()}
+            if submitted_by:
+                entry["submitted_by"] = submitted_by
+            links.append(entry)
+            print(f"Issue #{number}: Appended set_tag_desc for '{tag_name}'")
+            if not local:
+                close_issue(number)
+            appended += 1
+            continue
+
         # Handle rename_tag action
         if action == "rename_tag":
             remove_tag = fields.get("remove_tag")
@@ -76,8 +97,7 @@ def process_issue_list(issues, trove_path=None, local=False):
                 continue
             entry = {"op": "rename_tag", "remove_tag": remove_tag,
                      "add_tags": add_tags_str, "urls": urls_str,
-                     "added": __import__('datetime').datetime.now(
-                         __import__('datetime').timezone.utc).isoformat()}
+                     "added": datetime.now(timezone.utc).isoformat()}
             if submitted_by:
                 entry["submitted_by"] = submitted_by
             links.append(entry)

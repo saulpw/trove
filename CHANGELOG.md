@@ -2,6 +2,18 @@
 
 ## 2026-02-17
 
+- Tag descriptions: optional descriptions for tags, stored as `set_tag_desc` ops in trove.jsonl
+- Replace sidebar "rename" with "edit" dialog for tag name and description
+- Sidebar tags with descriptions show tooltip on hover
+- New `generate_tags.py` build script outputs `tags.jsonl` (replaces inline `tags.json` generation)
+- Bookmarklet updated to use `tags.jsonl` format
+- Backend (`submit.js`, `process_issues.py`) handles `set_tag_desc` action
+- Version bump to v0.34
+
+---
+
+## 2026-02-17
+
 - Move edit icon (✏️) to upper-right corner of link card, visible on hover
 - Add delete icon (🗑️) to lower-right corner of link card, deletes link on click
 - Consolidate delete logic into single shared `handleDeleteClick` handler

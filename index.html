@@ -45,6 +45,25 @@
     </div>
   </div>
 
+  <div id="edit-tag-overlay" style="display:none;">
+    <div id="edit-tag-panel">
+      <div class="signin-header">
+        <strong>Edit tag</strong>
+        <button class="signin-close" id="edit-tag-close">&times;</button>
+      </div>
+      <div class="signin-body">
+        <label for="edit-tag-name">Tag name</label>
+        <input type="text" id="edit-tag-name" />
+        <label for="edit-tag-desc">Description</label>
+        <textarea id="edit-tag-desc" rows="3" placeholder="Optional description"></textarea>
+        <div class="edit-tag-buttons">
+          <button id="edit-tag-save">Save</button>
+          <button id="edit-tag-cancel">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="content-wrapper">
     <div id="tag-sidebar"></div>
     <div id="main-content">
@@ -75,7 +94,7 @@
 
   <footer>
     <div>a <a href="https://saul.pw">saul.pw</a> project | <a href="/privacy">privacy policy</a></div>
-    <div id="version">v0.33</div>
+    <div id="version">v0.34</div>
   </footer>
 
   <!-- Main frontend code -->

@@ -1,17 +1,16 @@
 # TODO
 
+- move trove.jsonl to a separate repo?
+
 - edit card tag edit with autocomplete tags
 
 - upvote/downvote applies to the current tagset (so upvotes on /classic/rock only affect the rankings of links on that page)
 
-- move bookmarklet to header
-- move help next to signout
+- move bookmarklet to header (change text)
 
 ! once/day update of trove.jsonl  "todays submission's will be here tomorrow"
 
 - select items, tag multiple
-
-- move trove.jsonl to a separate repo?
 
 - remove auth from bookmarklet?
 - make renaming a tag actually creating a tag alias, so that future adds of that tag create the other one instead.

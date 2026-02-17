@@ -1,15 +1,15 @@
 // Tag sidebar, tag menus, and tag editing operations
 
 import { isSignedIn } from './auth';
-import { getCurrentPageTags, currentPath, parseTags, submitToBackend, filterAndRender, getRatings } from './frontend';
+import { getCurrentPageTags, currentPath, parseTags, submitToBackend, filterAndRender, getRatings, getTagDescriptions } from './frontend';
 
 function renderTagMenu(tag: string, opts?: { sidebar?: boolean }): string {
   const path = currentPath();
   const pathDisplay = path.slice(1);
-  const renameOpt = opts?.sidebar && isSignedIn() ? `<span class="rename-tag-trigger" data-tag="${tag}">✎ rename</span>` : '';
+  const editOpt = opts?.sidebar && isSignedIn() ? `<span class="edit-tag-trigger" data-tag="${tag}">✎ edit</span>` : '';
   const addLabel = pathDisplay ? `${pathDisplay} ∩ ${tag}` : tag;
   const excludeLabel = pathDisplay ? `${pathDisplay} ∩ ~${tag}` : `~${tag}`;
-  return `<span data-href="${path}/${tag}">${addLabel}</span><span data-href="${path}/-${tag}">${excludeLabel}</span>${renameOpt}`;
+  return `<span data-href="${path}/${tag}">${addLabel}</span><span data-href="${path}/-${tag}">${excludeLabel}</span>${editOpt}`;
 }
 
 export function renderTag(t: string): string {
@@ -42,9 +42,12 @@ export function renderTagSidebar(links: Array<{ url: string; tags?: string }>, p
   });
   const pseudoTags = (favsCount > 0 ? `<span class="sidebar-tag sidebar-pseudo" data-tag="_favs"><span class="tag">\u2665</span> <span class="sidebar-count">(${favsCount})</span></span>` : '')
     + (peevesCount > 0 ? `<span class="sidebar-tag sidebar-pseudo" data-tag="_peeves"><span class="tag">\u2660</span> <span class="sidebar-count">(${peevesCount})</span></span>` : '');
-  sidebar.innerHTML = pseudoTags + sorted.map(([tag, count]) =>
-    `<span class="sidebar-tag" data-tag="${tag}"><span class="tag">#${tag}</span> <span class="sidebar-count">(${count})</span></span>`
-  ).join('') + `<div class="sidebar-menu"></div>`;
+  const descs = getTagDescriptions();
+  sidebar.innerHTML = pseudoTags + sorted.map(([tag, count]) => {
+    const desc = descs[tag];
+    const titleAttr = desc ? ` title="${desc.replace(/"/g, '&quot;')}"` : '';
+    return `<span class="sidebar-tag" data-tag="${tag}"${titleAttr}><span class="tag">#${tag}</span> <span class="sidebar-count">(${count})</span></span>`;
+  }).join('') + `<div class="sidebar-menu"></div>`;
 }
 
 export function closeSidebarMenu(): void {
@@ -55,13 +58,13 @@ export function closeSidebarMenu(): void {
 export function initSidebarTagMenu(): void {
   const sidebar = document.getElementById('tag-sidebar')!;
   sidebar.addEventListener('click', (e) => {
-    const renameTrigger = (e.target as HTMLElement).closest('.sidebar-menu .rename-tag-trigger') as HTMLElement | null;
-    if (renameTrigger) {
+    const editTrigger = (e.target as HTMLElement).closest('.sidebar-menu .edit-tag-trigger') as HTMLElement | null;
+    if (editTrigger) {
       e.preventDefault();
       e.stopPropagation();
-      const tagName = renameTrigger.dataset.tag!;
+      const tagName = editTrigger.dataset.tag!;
       closeSidebarMenu();
-      handleRenameSidebarTag(tagName);
+      handleEditSidebarTag(tagName);
       return;
     }
     const menuItem = (e.target as HTMLElement).closest('.sidebar-menu [data-href]') as HTMLElement | null;
@@ -243,32 +246,63 @@ function handleRenameTagClick(tagName: string, linkEl: HTMLElement): void {
   });
 }
 
-function handleRenameSidebarTag(tagName: string): void {
-  const sidebar = document.getElementById('tag-sidebar')!;
-  const sidebarTag = sidebar.querySelector(`.sidebar-tag[data-tag="${tagName}"]`) as HTMLElement | null;
-  if (!sidebarTag) return;
-
+function renameTagGlobally(tagName: string, newTags: string[]): void {
   const pageTags = getCurrentPageTags();
-  showRenameInput(sidebarTag, tagName, (newTags) => {
-    const affectedUrls: string[] = [];
-
-    document.querySelectorAll<HTMLElement>('#links .link').forEach(linkEl => {
-      const tags = (linkEl.dataset.tags || '').split(' ').filter(t => t);
-      if (!tags.includes(tagName)) return;
-      affectedUrls.push(linkEl.dataset.url!);
-      const updatedTags = tags.filter(t => t !== tagName).concat(newTags);
-      linkEl.dataset.tags = updatedTags.join(' ');
-      linkEl.querySelector('.tags')!.innerHTML = updatedTags.filter(t => !pageTags.includes(t)).map(t => renderTag(t)).join(' ');
-    });
-
-    const visibleLinks: Array<{ url: string; tags: string }> = [];
-    document.querySelectorAll<HTMLElement>('#links .link').forEach(linkEl => {
-      visibleLinks.push({ url: linkEl.dataset.url || '', tags: linkEl.dataset.tags || '' });
-    });
-    renderTagSidebar(visibleLinks, pageTags);
-
-    if (affectedUrls.length > 0) {
-      submitToBackend({ action: 'rename_tag', remove_tag: tagName, add_tags: newTags.join(' '), urls: affectedUrls.join(' ') });
-    }
+  const affectedUrls: string[] = [];
+  document.querySelectorAll<HTMLElement>('#links .link').forEach(linkEl => {
+    const tags = (linkEl.dataset.tags || '').split(' ').filter(t => t);
+    if (!tags.includes(tagName)) return;
+    affectedUrls.push(linkEl.dataset.url!);
+    const updatedTags = tags.filter(t => t !== tagName).concat(newTags);
+    linkEl.dataset.tags = updatedTags.join(' ');
+    linkEl.querySelector('.tags')!.innerHTML = updatedTags.filter(t => !pageTags.includes(t)).map(t => renderTag(t)).join(' ');
   });
+  const visibleLinks: Array<{ url: string; tags: string }> = [];
+  document.querySelectorAll<HTMLElement>('#links .link').forEach(linkEl => {
+    visibleLinks.push({ url: linkEl.dataset.url || '', tags: linkEl.dataset.tags || '' });
+  });
+  renderTagSidebar(visibleLinks, pageTags);
+  if (affectedUrls.length > 0) {
+    submitToBackend({ action: 'rename_tag', remove_tag: tagName, add_tags: newTags.join(' '), urls: affectedUrls.join(' ') });
+  }
+}
+
+function handleEditSidebarTag(tagName: string): void {
+  const overlay = document.getElementById('edit-tag-overlay')!;
+  const nameInput = document.getElementById('edit-tag-name') as HTMLInputElement;
+  const descInput = document.getElementById('edit-tag-desc') as HTMLTextAreaElement;
+  const descs = getTagDescriptions();
+
+  nameInput.value = tagName;
+  descInput.value = descs[tagName] || '';
+  overlay.style.display = '';
+
+  const close = () => { overlay.style.display = 'none'; };
+
+  const onSave = () => {
+    const newName = nameInput.value.trim();
+    const newDesc = descInput.value.trim();
+    close();
+
+    if (newDesc !== (descs[tagName] || '')) {
+      const effectiveTag = newName || tagName;
+      if (newDesc) descs[effectiveTag] = newDesc;
+      else delete descs[effectiveTag];
+      submitToBackend({ action: 'set_tag_desc', tag: effectiveTag, description: newDesc });
+    }
+
+    if (newName && newName !== tagName) {
+      renameTagGlobally(tagName, newName.split(/\s+/).filter(t => t));
+    } else {
+      // Update tooltip in place
+      const el = document.querySelector(`#tag-sidebar .sidebar-tag[data-tag="${tagName}"]`) as HTMLElement | null;
+      if (el) newDesc ? el.title = newDesc : el.removeAttribute('title');
+    }
+  };
+
+  document.getElementById('edit-tag-save')!.onclick = onSave;
+  document.getElementById('edit-tag-cancel')!.onclick = close;
+  document.getElementById('edit-tag-close')!.onclick = close;
+  overlay.onclick = (e) => { if (e.target === overlay) close(); };
+  nameInput.focus();
 }

@@ -204,3 +204,25 @@ footer a { color: var(--color-text-muted); }
 .help-page code { background: var(--color-border-light); padding: 0.15rem 0.4rem; border-radius: 3px; font-size: var(--text-md); }
 .tag-example { color: var(--color-text-muted); }
 header nav a + a { margin-left: 1rem; }
+
+/* Edit tag dialog */
+#edit-tag-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.15); z-index: 1000;
+  display: flex; align-items: flex-start; justify-content: center; padding-top: 80px;
+}
+#edit-tag-panel {
+  width: 340px; background: var(--color-bg); border: 1px solid var(--color-border-input);
+  border-radius: 8px; box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+  font-family: system-ui, sans-serif; font-size: 14px; color: var(--color-text);
+}
+#edit-tag-panel textarea {
+  width: 100%; padding: 6px 8px; font-size: 14px; border: 1px solid var(--color-border-input);
+  border-radius: 4px; font-family: inherit; resize: vertical; min-height: 48px; box-sizing: border-box;
+}
+.edit-tag-buttons { display: flex; gap: 8px; }
+.edit-tag-buttons button {
+  flex: 1; padding: 8px; font-size: 14px; cursor: pointer;
+  border: 1px solid var(--color-border-input); border-radius: 4px; background: var(--color-bg-btn);
+}
+.edit-tag-buttons button:hover { background: var(--color-bg-btn-hover); }
