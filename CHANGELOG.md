@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 2026-02-17
+
+- Move edit icon (✏️) to upper-right corner of link card, visible on hover
+- Add delete icon (🗑️) to lower-right corner of link card, deletes link on click
+- Consolidate delete logic into single shared `handleDeleteClick` handler
+- Version bump to v0.33
+
+---
+
 ## 2026-02-15
 
 - Updated help.html: removed sign in/out UI, fixed tag menu docs (two options: `tag` and `~tag`), fixed sidebar position (left, not right)

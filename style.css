@@ -92,11 +92,14 @@ header nav a:hover { text-decoration: underline; }
 .link .title-row { position: relative; }
 .link .title { color: var(--color-link); font-size: var(--text-lg); font-weight: 500; }
 .meta-line { color: var(--color-text-light); font-size: var(--text-sm); margin: 0.15rem 0; }
-.edit-title-btn {
-  color: var(--color-text-faint); font-size: var(--text-sm); cursor: pointer;
-  margin-left: 0.4rem; opacity: 0.5; transition: opacity 0.15s;
+.card-edit-btn, .card-delete-btn {
+  position: absolute; cursor: pointer; font-size: var(--text-sm);
+  opacity: 0; transition: opacity 0.15s; z-index: 1;
 }
-.edit-title-btn:hover { opacity: 1; }
+.link:hover .card-edit-btn, .link:hover .card-delete-btn { opacity: 0.5; }
+.card-edit-btn:hover, .card-delete-btn:hover { opacity: 1 !important; }
+.card-edit-btn { top: 0.4rem; right: 0.4rem; }
+.card-delete-btn { bottom: 0.4rem; right: 0.4rem; }
 .edit-title-input, .edit-tags-input {
   font-size: var(--text-md); padding: 0.2rem 0.5rem;
   border: 1px solid var(--color-link); border-radius: 4px;

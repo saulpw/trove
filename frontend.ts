@@ -194,7 +194,6 @@ function renderLinks(links: Link[]): void {
           <div class="card-left">
             <div class="title-row">
               <span class="title">${link.title || link.url}</span>
-              ${isSignedIn() ? `<span class="edit-title-btn" onclick="handleEditCardClick(event, this)">✏️</span>` : ''}
             </div>
             <span class="meta-line">${metaParts.join(' · ')}</span>
             ${link.notes ? `<div class="notes">${link.notes}</div>` : ''}
@@ -202,6 +201,7 @@ function renderLinks(links: Link[]): void {
           </div>
           ${imgSrc ? `<div class="card-thumb"><img src="${imgSrc}" alt="${imgAlt}" loading="lazy"></div>` : ''}
         </div>
+        ${isSignedIn() ? `<span class="card-edit-btn" onclick="handleEditCardClick(event, this)">✏️</span><span class="card-delete-btn" onclick="handleDeleteClick(event, '${escapedUrl}', this)">🗑️</span>` : ''}
       </div>
     </a>`;
   }).join('');
@@ -395,6 +395,16 @@ function updateLinkCountDisplay(): void {
   document.getElementById('link-count')!.innerHTML = `${displayCount}${truncSuffix} link${count === 1 ? '' : 's'}${suffix}`;
 }
 
+function handleDeleteClick(event: Event, url: string, btn: HTMLElement): void {
+  event.preventDefault();
+  event.stopPropagation();
+  submitToBackend({ action: 'vote_delete', url });
+  const anchor = btn.closest('.link-anchor') as HTMLElement;
+  anchor.remove();
+  currentLinks = currentLinks.filter(l => l.url !== url);
+  updateLinkCountDisplay();
+}
+
 function handleEditCardClick(event: Event, btn: HTMLElement): void {
   event.preventDefault();
   event.stopPropagation();
@@ -470,17 +480,9 @@ function handleEditCardClick(event: Event, btn: HTMLElement): void {
     }
   };
 
-  const voteDelete = () => {
-    submitToBackend({ action: 'vote_delete', url });
-    anchor.removeEventListener('click', blockClick);
-    anchor.remove();
-    currentLinks = currentLinks.filter(l => l.url !== url);
-    updateLinkCountDisplay();
-  };
-
   actionsCol.querySelector('.edit-cancel-btn')!.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); cancel(); });
   actionsCol.querySelector('.edit-save-btn')!.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); save(); });
-  actionsCol.querySelector('.vote-delete-btn')!.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); voteDelete(); });
+  actionsCol.querySelector('.vote-delete-btn')!.addEventListener('click', (e) => { handleDeleteClick(e, url, actionsCol); });
 
   titleInput.focus();
 }
@@ -589,6 +591,7 @@ declare const window: Window & {
   handleRateUp: typeof handleRateUp;
   handleRateDown: typeof handleRateDown;
   toggleShowHidden: typeof toggleShowHidden;
+  handleDeleteClick: typeof handleDeleteClick;
   handleEditCardClick: typeof handleEditCardClick;
   handleAddTagClick: typeof handleAddTagClick;
   showSignIn: typeof showSignIn;
@@ -602,6 +605,7 @@ declare const window: Window & {
 (window as any).handleRateUp = handleRateUp;
 (window as any).handleRateDown = handleRateDown;
 (window as any).toggleShowHidden = toggleShowHidden;
+(window as any).handleDeleteClick = handleDeleteClick;
 (window as any).handleEditCardClick = handleEditCardClick;
 (window as any).handleAddTagClick = handleAddTagClick;
 (window as any).showSignIn = showSignIn;
