@@ -100,6 +100,13 @@ The bookmarklet is inlined as a `javascript:` URL rather than injecting a `<scri
 
 At build time, `bookmarklet.ts` is minified into `_build/bookmarklet-code.txt`, then imported as a text string by `frontend.ts` via esbuild's `--loader:.txt=text`. The `updateBookmarkletHref()` function wraps the code in an IIFE with closure variables (`__TROVE_ORIGIN__`, `__TROVE_URL__`, `__TROVE_SEL__`, `__TROVE_USER__`, `__TROVE_PASS__`) that the bookmarklet reads at runtime.
 
+### CSP Hardening
+
+Sites like YouTube enforce strict Content Security Policy directives that would block the bookmarklet widget:
+
+- **`style-src`** — Blocks inline `<style>` elements. Bypassed by using `adoptedStyleSheets` on the shadow root instead.
+- **`require-trusted-types-for 'script'`** — Blocks raw `innerHTML` assignments. Bypassed by creating a Trusted Types policy (`trove`) that wraps HTML strings. The policy is a passthrough (no sanitization needed since the HTML is fully constructed by the bookmarklet). The autocomplete module accepts an optional `trustedHTML` wrapper via its options to handle its own `innerHTML` usage.
+
 ## Tradeoffs Accepted
 
 - **Latency:** Submissions appear after next cron run + rebuild (minutes, not seconds)
