@@ -94,19 +94,11 @@ GitHub Actions (cron)
 - Submissions are visible as GitHub Issues (public audit trail)
 - Content is sanitized when written to JSONL
 
-## Bookmarklet (Iframe Architecture)
+## Bookmarklet (Inline)
 
-The bookmarklet uses a two-part architecture to work on CSP-restricted sites like YouTube:
+The bookmarklet is inlined as a `javascript:` URL rather than injecting a `<script src=...>` tag. This bypasses Content Security Policy (CSP) restrictions on sites like YouTube that block external script loading. The entire minified bookmarklet bundle (~6KB, ~9.4KB URL-encoded) is embedded in the href, well within browser limits (~100KB).
 
-**Injector** (`bookmarklet.ts`, ~1KB minified) — A thin stub inlined as a `javascript:` URL. It creates a fixed-position iframe pointing to `bookmarklet-frame.html` on the trove origin, passing the page URL, title, and text selection as query params. Credentials are passed via the URL hash fragment (never sent to the server).
-
-**Frame page** (`bookmarklet-frame.html` + `bookmarklet-frame.ts`, ~7KB) — The full widget UI running same-origin with trove inside the iframe. Handles tag autocomplete, form display, and submission via the Netlify function. All network requests are same-origin, bypassing the host page's CSP `connect-src` and `trusted-types` restrictions.
-
-Communication between injector and frame uses `postMessage`: the frame sends `trove-resize` (height) and `trove-close` events to the parent.
-
-At build time, `bookmarklet.ts` is minified into `_build/bookmarklet-code.txt`, then imported as a text string by `frontend.ts` via esbuild's `--loader:.txt=text`. The `updateBookmarkletHref()` function wraps the code in an IIFE with closure variables (`__TROVE_ORIGIN__`, `__TROVE_USER__`, `__TROVE_PASS__`).
-
-**Local dev note:** Chrome's Private Network Access blocks public pages (e.g. YouTube) from loading iframes on localhost. Use `netlify dev --live` for a public tunnel URL when testing the bookmarklet on external sites.
+At build time, `bookmarklet.ts` is minified into `_build/bookmarklet-code.txt`, then imported as a text string by `frontend.ts` via esbuild's `--loader:.txt=text`. The `updateBookmarkletHref()` function wraps the code in an IIFE with closure variables (`__TROVE_ORIGIN__`, `__TROVE_URL__`, `__TROVE_SEL__`, `__TROVE_USER__`, `__TROVE_PASS__`) that the bookmarklet reads at runtime.
 
 ## Tradeoffs Accepted
 

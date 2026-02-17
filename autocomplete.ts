@@ -48,13 +48,7 @@ export function initAutocomplete(
     const matches = allTags.filter(t => !existing.has(t) && t.toLowerCase().includes(partial)).slice(0, maxResults);
     if (matches.length === 0) { dropdown.classList.remove('open'); return; }
     activeIdx = -1;
-    dropdown.textContent = '';
-    for (const t of matches) {
-      const div = document.createElement('div');
-      div.className = itemClass;
-      div.textContent = t;
-      dropdown.appendChild(div);
-    }
+    dropdown.innerHTML = matches.map(t => `<div class="${itemClass}">${t}</div>`).join('');
     dropdown.classList.add('open');
   }
 
