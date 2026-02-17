@@ -20,6 +20,9 @@ declare var __TROVE_PASS__: string;
   container.id = 'trove-bookmarklet-widget';
   container.style.cssText = 'position:fixed;top:12px;right:12px;z-index:2147483647;width:340px;border:none;';
 
+  // Force host visible — some sites (e.g. Shopify) set display:none on generic divs
+  container.style.cssText += 'display:block!important;position:static!important;visibility:visible!important;';
+
   const iframe = document.createElement('iframe');
   iframe.src = `${origin}/bookmarklet-frame.html?url=${url}&title=${title}&sel=${sel}#user=${encodeURIComponent(user)}&pass=${encodeURIComponent(pass)}`;
   iframe.style.cssText = 'width:100%;height:100%;border:none;border-radius:8px;box-shadow:0 4px 24px rgba(0,0,0,0.2);';
