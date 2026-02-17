@@ -3,6 +3,7 @@
 export interface AutocompleteOptions {
   maxResults?: number;
   itemClass?: string;
+  trustedHTML?: (html: string) => string;
 }
 
 function currentPartial(input: HTMLInputElement): string {
@@ -38,6 +39,7 @@ export function initAutocomplete(
 ): void {
   const maxResults = options.maxResults ?? 10;
   const itemClass = options.itemClass ?? 'tag-option';
+  const trustedHTML = options.trustedHTML ?? ((s: string) => s);
   let activeIdx = -1;
 
   function showSuggestions(): void {
@@ -48,7 +50,7 @@ export function initAutocomplete(
     const matches = allTags.filter(t => !existing.has(t) && t.toLowerCase().includes(partial)).slice(0, maxResults);
     if (matches.length === 0) { dropdown.classList.remove('open'); return; }
     activeIdx = -1;
-    dropdown.innerHTML = matches.map(t => `<div class="${itemClass}">${t}</div>`).join('');
+    dropdown.innerHTML = trustedHTML(matches.map(t => `<div class="${itemClass}">${t}</div>`).join('')) as unknown as string;
     dropdown.classList.add('open');
   }
 

@@ -4,6 +4,7 @@
 import { initAutocomplete } from './autocomplete';
 import { submitLink } from './addlink';
 
+declare var trustedTypes: { createPolicy(name: string, rules: { createHTML: (s: string) => string }): { createHTML: (s: string) => string } } | undefined;
 declare var __TROVE_ORIGIN__: string;
 declare var __TROVE_URL__: string;
 declare var __TROVE_TITLE__: string;
@@ -13,6 +14,11 @@ declare var __TROVE_PASS__: string;
 
 (function() {
   if (document.getElementById('trove-bookmarklet-widget')) return;
+
+  // Trusted Types policy to bypass YouTube's require-trusted-types-for directive
+  const tt = (typeof trustedTypes !== 'undefined' && trustedTypes.createPolicy)
+    ? trustedTypes.createPolicy('trove', { createHTML: (s: string) => s })
+    : { createHTML: (s: string) => s };
 
   const origin = (typeof __TROVE_ORIGIN__ !== 'undefined' && __TROVE_ORIGIN__) || location.origin;
   const pageUrl = (typeof __TROVE_URL__ !== 'undefined' && __TROVE_URL__) || location.href;
@@ -27,8 +33,9 @@ declare var __TROVE_PASS__: string;
   document.body.appendChild(host);
   const shadow = host.attachShadow({ mode: 'closed' });
 
-  const style = document.createElement('style');
-  style.textContent = `
+  // Use adoptedStyleSheets to bypass CSP restrictions (e.g. YouTube)
+  const sheet = new CSSStyleSheet();
+  sheet.replaceSync(`
     * { box-sizing: border-box; margin: 0; padding: 0; }
     .panel {
       position: fixed; top: 12px; right: 12px; z-index: 2147483647;
@@ -63,8 +70,8 @@ declare var __TROVE_PASS__: string;
     .status { font-size: 13px; text-align: center; min-height: 1.2em; }
     .status.ok { color: #2a2; }
     .status.err { color: #c22; }
-  `;
-  shadow.appendChild(style);
+  `);
+  shadow.adoptedStyleSheets = [sheet];
 
   const panel = document.createElement('div');
   panel.className = 'panel';
@@ -77,7 +84,7 @@ declare var __TROVE_PASS__: string;
       <input type="password" id="tw-pass" placeholder="Password" />
     </div>`;
 
-  panel.innerHTML = `
+  panel.innerHTML = tt.createHTML(`
     <div class="header"><strong>add to trove</strong><button class="close">&times;</button></div>
     <div class="body">
       <label>URL</label>
@@ -94,7 +101,7 @@ declare var __TROVE_PASS__: string;
       <textarea id="tw-notes" rows="3" placeholder="Select text on page to pull a quote">${selection.replace(/</g, '&lt;')}</textarea>
       <button class="submit" id="tw-submit">Add</button>
       <div class="status" id="tw-status"></div>
-    </div>`;
+    </div>`) as unknown as string;
   shadow.appendChild(panel);
 
   const $ = (id: string) => shadow.getElementById(id);
@@ -116,7 +123,7 @@ declare var __TROVE_PASS__: string;
   const tagsInput = $('tw-tags') as HTMLInputElement;
   const dropdown = $('tw-suggestions') as HTMLElement;
 
-  initAutocomplete(tagsInput, dropdown, () => allTags, { maxResults: 8 });
+  initAutocomplete(tagsInput, dropdown, () => allTags, { maxResults: 8, trustedHTML: (s) => tt.createHTML(s) as unknown as string });
 
   // Submit
   $('tw-submit')!.addEventListener('click', async () => {
