@@ -1,6 +1,7 @@
 import bookmarkletCode from './_build/bookmarklet-code.txt';
 import { getCredentials, clearCredentials, isSignedIn, showSignIn, handleSignIn, togglePasswordVisibility, initSignInForm } from './auth';
 import { renderTag, renderTagSidebar, initTagMenu, initSidebarTagMenu, handleAddTagClick } from './tags';
+import { initAutocomplete } from './autocomplete';
 
 interface Link {
   url: string;
@@ -433,8 +434,11 @@ function handleEditCardClick(event: Event, btn: HTMLElement): void {
   // Replace tags + add-btn with tags input
   const cardBottom = linkEl.querySelector('.card-bottom') as HTMLElement;
   const cardBottomHTML = cardBottom.innerHTML;
-  cardBottom.innerHTML = `<input class="edit-tags-input" value="${oldTags.replace(/"/g, '&quot;')}" placeholder="space-separated tags">`;
+  cardBottom.style.position = 'relative';
+  cardBottom.innerHTML = `<input class="edit-tags-input" value="${oldTags.replace(/"/g, '&quot;')}" placeholder="space-separated tags"><div class="tag-autocomplete-dropdown"></div>`;
   const tagsInput = cardBottom.querySelector('.edit-tags-input') as HTMLInputElement;
+  const tagsDropdown = cardBottom.querySelector('.tag-autocomplete-dropdown') as HTMLElement;
+  initAutocomplete(tagsInput, tagsDropdown, () => Object.keys(getTagDescriptions()));
 
   // Add stacked action buttons between card-left and thumbnail
   const cardLeft = linkEl.querySelector('.card-left') as HTMLElement;
@@ -446,6 +450,7 @@ function handleEditCardClick(event: Event, btn: HTMLElement): void {
   const cancel = () => {
     titleRow.innerHTML = titleRowHTML;
     cardBottom.innerHTML = cardBottomHTML;
+    cardBottom.style.position = '';
     actionsCol.remove();
     linkEl.classList.remove('editing');
     anchor.removeEventListener('click', blockClick);

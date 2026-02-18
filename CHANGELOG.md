@@ -2,6 +2,13 @@
 
 ## 2026-02-17
 
+- Wire up tag autocomplete in "add tag" button on cards and edit card tags input
+- Add autocomplete dropdown CSS to style.css
+
+---
+
+## 2026-02-17
+
 - Rename trove.jsonl → trove-log.jsonl on links branch to clarify it's the source log, not the processed output
   - Build produces trove.jsonl (deduplicated links) and tags.jsonl (tag list) from trove-log.jsonl
 

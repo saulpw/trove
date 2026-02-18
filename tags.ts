@@ -2,6 +2,7 @@
 
 import { isSignedIn } from './auth';
 import { getCurrentPageTags, currentPath, parseTags, submitToBackend, filterAndRender, getRatings, getTagDescriptions } from './frontend';
+import { initAutocomplete } from './autocomplete';
 
 function renderTagMenu(tag: string, opts?: { sidebar?: boolean }): string {
   const path = currentPath();
@@ -172,14 +173,24 @@ export function handleAddTagClick(event: Event, btn: HTMLElement): void {
     }, 100);
   });
 
+  const wrapper = document.createElement('span');
+  wrapper.style.position = 'relative';
+  wrapper.style.display = 'inline-block';
+  const dropdown = document.createElement('div');
+  dropdown.className = 'tag-autocomplete-dropdown';
+  wrapper.appendChild(input);
+  wrapper.appendChild(dropdown);
+
   btn.style.display = 'none';
-  btn.parentNode!.insertBefore(input, btn);
+  btn.parentNode!.insertBefore(wrapper, btn);
+  initAutocomplete(input, dropdown, () => Object.keys(getTagDescriptions()));
   input.focus();
 }
 
 function restoreAddButton(input: HTMLInputElement, btn: HTMLElement): void {
-  if (input.parentNode) {
-    input.remove();
+  const wrapper = input.parentElement;
+  if (wrapper && wrapper.parentNode) {
+    wrapper.remove();
   }
   btn.style.display = '';
 }

@@ -226,3 +226,18 @@ header nav a + a { margin-left: 1rem; }
   border: 1px solid var(--color-border-input); border-radius: 4px; background: var(--color-bg-btn);
 }
 .edit-tag-buttons button:hover { background: var(--color-bg-btn-hover); }
+
+/* Tag autocomplete dropdown */
+.tag-autocomplete-dropdown {
+  display: none; position: absolute; left: 0; top: 100%;
+  background: var(--color-bg); border: 1px solid var(--color-border); border-radius: 4px;
+  box-shadow: 0 2px 8px var(--color-shadow); z-index: 200; white-space: nowrap;
+  max-height: 200px; overflow-y: auto; min-width: 8rem;
+}
+.tag-autocomplete-dropdown.open { display: block; }
+.tag-autocomplete-dropdown .tag-option {
+  padding: 0.35rem 0.6rem; cursor: pointer; font-size: var(--text-base); color: var(--color-text);
+}
+.tag-autocomplete-dropdown .tag-option:hover, .tag-autocomplete-dropdown .tag-option.active {
+  background: var(--color-link-hover-bg);
+}
