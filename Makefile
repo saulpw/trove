@@ -18,7 +18,7 @@ add:
 
 # Fetch trove-log.jsonl from links branch
 pull-links:
-	git show links:trove-log.jsonl > trove-log.jsonl
+	git show origin/links:trove-log.jsonl > trove-log.jsonl 2>/dev/null || git show links:trove-log.jsonl > trove-log.jsonl
 
 # Commit and push local trove-log.jsonl to links branch (without checkout)
 push-links:
