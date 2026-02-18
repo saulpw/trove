@@ -183,7 +183,7 @@ function renderLinks(links: Link[]): void {
     if (link.duration) metaParts.push(formatDuration(link.duration));
     if (link.channel) metaParts.push(link.channel);
     return `
-    <a class="link-anchor" href="${link.url}" target="_blank" rel="noopener">
+    <a class="link-anchor" href="${link.url}" target="_blank" rel="noopener" draggable="false">
       <div class="link"
            data-url="${link.url}"
            data-added="${link.added || ''}"
