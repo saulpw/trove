@@ -129,6 +129,14 @@ declare var __TROVE_PASS__: string;
 
   initAutocomplete(tagsInput, dropdown, () => allTags, { maxResults: 8, trustedHTML: (s) => tt.createHTML(s) as unknown as string });
 
+  // Enter key submits
+  panel.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      ($('tw-submit') as HTMLButtonElement).click();
+    }
+  });
+
   // Submit
   $('tw-submit')!.addEventListener('click', async () => {
     const status = $('tw-status')!;
