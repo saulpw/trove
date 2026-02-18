@@ -88,18 +88,17 @@ header nav a:hover { text-decoration: underline; }
 .card-rating .rating-value.zero { color: var(--color-text-faint); }
 .card-left { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .card-thumb { flex-shrink: 0; width: 120px; margin: -0.75rem -0.75rem -0.75rem 0; overflow: hidden; border-radius: 0 6px 6px 0; }
+.card-thumb:has(+ .card-actions) { margin-right: 0; border-radius: 0; }
 .card-thumb img { width: 100%; height: 100%; object-fit: cover; }
 .link .title-row { position: relative; }
 .link .title { color: var(--color-link); font-size: var(--text-lg); font-weight: 500; }
 .meta-line { color: var(--color-text-light); font-size: var(--text-sm); margin: 0.15rem 0; }
-.card-edit-btn, .card-delete-btn {
-  position: absolute; cursor: pointer; font-size: var(--text-sm);
-  opacity: 0; transition: opacity 0.15s; z-index: 1;
-}
-.link:hover .card-edit-btn, .link:hover .card-delete-btn { opacity: 0.5; }
-.card-edit-btn:hover, .card-delete-btn:hover { opacity: 1 !important; }
-.card-edit-btn { top: 0.4rem; right: 0.4rem; }
-.card-delete-btn { bottom: 0.4rem; right: 0.4rem; }
+.card-actions { display: flex; flex-direction: column; justify-content: space-between; align-items: center; flex-shrink: 0; padding: 0.1rem 0; opacity: 0; transition: opacity 0.15s; }
+.link:hover .card-actions { opacity: 0.5; }
+.card-actions:hover { opacity: 1 !important; }
+.card-edit-btn, .card-delete-btn { cursor: pointer; font-size: var(--text-sm); }
+.card-edit-btn:hover, .card-delete-btn:hover { opacity: 1; }
+.link.editing .card-actions { display: none; }
 .edit-title-input, .edit-tags-input {
   font-size: var(--text-md); padding: 0.2rem 0.5rem;
   border: 1px solid var(--color-link); border-radius: 4px;
