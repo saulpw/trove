@@ -121,7 +121,12 @@ declare var __TROVE_PASS__: string;
   let allTags: string[] = [];
 
   fetch(origin + '/tags.jsonl').then(r => r.ok ? r.text() : '').then(text => {
-    allTags = text.trim().split('\n').filter(l => l).map(l => JSON.parse(l).tag);
+    const tags: string[] = [];
+    for (const line of text.trim().split(/\r?\n/)) {
+      if (!line) continue;
+      try { const t = JSON.parse(line).tag; if (t) tags.push(t); } catch {}
+    }
+    allTags = tags;
   }).catch(() => {});
 
   const tagsInput = $('tw-tags') as HTMLInputElement;

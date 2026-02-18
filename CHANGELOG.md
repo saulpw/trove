@@ -2,8 +2,9 @@
 
 ## 2026-02-17
 
-- Wire up tag autocomplete in "add tag" button on cards and edit card tags input
+- Wire up tag autocomplete in "add tag" button, edit card, and bookmarklet
 - Add autocomplete dropdown CSS to style.css
+- Fix bookmarklet tag fetch: CORS header for tags.jsonl, robust JSONL parsing, regex split to avoid literal newline in javascript: URL
 
 ---
 

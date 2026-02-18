@@ -83,6 +83,10 @@ const setRating = (url: string, n: number): void => {
 let tagDescriptions: Record<string, string> = {};
 export const getTagDescriptions = (): Record<string, string> => tagDescriptions;
 
+// All known tag names (from tags.jsonl)
+let allTagNames: string[] = [];
+export const getAllTagNames = (): string[] => allTagNames;
+
 // Store all loaded links for client-side filtering
 let allLinks: Link[] = [];
 // Store current filtered links for re-sorting
@@ -438,7 +442,7 @@ function handleEditCardClick(event: Event, btn: HTMLElement): void {
   cardBottom.innerHTML = `<input class="edit-tags-input" value="${oldTags.replace(/"/g, '&quot;')}" placeholder="space-separated tags"><div class="tag-autocomplete-dropdown"></div>`;
   const tagsInput = cardBottom.querySelector('.edit-tags-input') as HTMLInputElement;
   const tagsDropdown = cardBottom.querySelector('.tag-autocomplete-dropdown') as HTMLElement;
-  initAutocomplete(tagsInput, tagsDropdown, () => Object.keys(getTagDescriptions()));
+  initAutocomplete(tagsInput, tagsDropdown, () => getAllTagNames());
 
   // Add stacked action buttons between card-left and thumbnail
   const cardLeft = linkEl.querySelector('.card-left') as HTMLElement;
@@ -630,10 +634,13 @@ async function loadTagDescriptions(): Promise<void> {
     const resp = await fetch('/tags.jsonl');
     if (!resp.ok) return;
     const text = await resp.text();
+    const names: string[] = [];
     text.trim().split('\n').filter(l => l).forEach(line => {
       const obj = JSON.parse(line);
+      names.push(obj.tag);
       if (obj.description) tagDescriptions[obj.tag] = obj.description;
     });
+    allTagNames = names;
   } catch {}
 }
 

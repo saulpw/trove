@@ -11,7 +11,7 @@
     Cache-Control = "max-age=60"
 
 [[headers]]
-  for = "/tags.json"
+  for = "/tags.jsonl"
   [headers.values]
     Access-Control-Allow-Origin = "*"
 

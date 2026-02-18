@@ -1,7 +1,7 @@
 // Tag sidebar, tag menus, and tag editing operations
 
 import { isSignedIn } from './auth';
-import { getCurrentPageTags, currentPath, parseTags, submitToBackend, filterAndRender, getRatings, getTagDescriptions } from './frontend';
+import { getCurrentPageTags, currentPath, parseTags, submitToBackend, filterAndRender, getRatings, getTagDescriptions, getAllTagNames } from './frontend';
 import { initAutocomplete } from './autocomplete';
 
 function renderTagMenu(tag: string, opts?: { sidebar?: boolean }): string {
@@ -183,7 +183,7 @@ export function handleAddTagClick(event: Event, btn: HTMLElement): void {
 
   btn.style.display = 'none';
   btn.parentNode!.insertBefore(wrapper, btn);
-  initAutocomplete(input, dropdown, () => Object.keys(getTagDescriptions()));
+  initAutocomplete(input, dropdown, () => getAllTagNames());
   input.focus();
 }
 
