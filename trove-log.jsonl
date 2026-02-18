@@ -475,3 +475,4 @@
 {"op": "add_tag", "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2130424/", "added": "2026-02-18T20:22:28.754681+00:00", "tags": "bio paper huh", "submitted_by": "saul"}
 {"op": "add", "url": "https://www.fantasticfiction.com/", "added": "2026-02-18T21:44:45.624620+00:00", "title": "Fantastic Fiction", "tags": "writing search genre", "notes": "search fav genre authors by blurbs they've written to find their recs", "submitted_by": "saul"}
 {"op": "add", "url": "https://en.wikipedia.org/wiki/Seattle_windshield_pitting_epidemic", "added": "2026-02-18T22:13:02.751010+00:00", "title": "Seattle windshield pitting epidemic - Wikipedia", "tags": "seattle delusion history", "submitted_by": "saul"}
+{"op": "add", "url": "https://pudding.cool/2026/02/womens-sizing/", "added": "2026-02-18T23:39:24.621335+00:00", "title": "Sizing chaos", "tags": "clothes women dataviz", "submitted_by": "saul"}
