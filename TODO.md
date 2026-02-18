@@ -1,10 +1,6 @@
 # TODO
 
-- edit card tag edit with autocomplete tags
-
 - upvote/downvote applies to the current tagset (so upvotes on /classic/rock only affect the rankings of links on that page)
-
-- move bookmarklet to header (change text)
 
 ! once/day update of trove.jsonl  "todays submission's will be here tomorrow"
 
@@ -14,13 +10,7 @@
 - make renaming a tag actually creating a tag alias, so that future adds of that tag create the other one instead.
     - delete and recreate to use that tag again in the future
 
-- allow editable tag description
-  - show on tag hover
-  - heart/spade are "Love" and "Bury"
-
 - delete tag association
-
-- move edit icon to upper right to left of thumbnail
 
 - add @contributor tags
 

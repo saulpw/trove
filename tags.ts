@@ -1,8 +1,19 @@
 // Tag sidebar, tag menus, and tag editing operations
 
-import { isSignedIn } from './auth';
+import { isSignedIn, getCredentials } from './auth';
 import { getCurrentPageTags, currentPath, parseTags, submitToBackend, filterAndRender, getRatings, getTagDescriptions, getAllTagNames } from './frontend';
 import { initAutocomplete } from './autocomplete';
+
+// A user tag starts with a non-alphanumeric char followed by a username
+export function isUserTag(tag: string): boolean {
+  return /^[^a-zA-Z0-9]/.test(tag);
+}
+export function userTagSymbol(tag: string): string {
+  return tag.match(/^[^a-zA-Z0-9]+/)?.[0] || '';
+}
+export function userTagUsername(tag: string): string {
+  return tag.replace(/^[^a-zA-Z0-9]+/, '');
+}
 
 function renderTagMenu(tag: string, opts?: { sidebar?: boolean }): string {
   const path = currentPath();
@@ -14,7 +25,7 @@ function renderTagMenu(tag: string, opts?: { sidebar?: boolean }): string {
 }
 
 export function renderTag(t: string): string {
-  return `<span class="tag-wrap"><span class="tag" data-tag="${t}">#${t}</span><span class="tag-menu">${renderTagMenu(t)}</span></span>`;
+  return `<span class="tag-wrap"><span class="tag" data-tag="${t}">${t}</span><span class="tag-menu">${renderTagMenu(t)}</span></span>`;
 }
 
 export function renderTagSidebar(links: Array<{ url: string; tags?: string }>, pageTags: string[]): void {
@@ -27,7 +38,12 @@ export function renderTagSidebar(links: Array<{ url: string; tags?: string }>, p
       }
     });
   });
-  const sorted = Object.entries(tagCounts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+  const sorted = Object.entries(tagCounts).sort((a, b) => {
+    const aUser = isUserTag(a[0]) ? 0 : 1;
+    const bUser = isUserTag(b[0]) ? 0 : 1;
+    if (aUser !== bUser) return aUser - bUser;
+    return b[1] - a[1] || a[0].localeCompare(b[0]);
+  });
   if (sorted.length === 0) {
     sidebar.innerHTML = '';
     sidebar.style.display = 'none';
@@ -47,7 +63,7 @@ export function renderTagSidebar(links: Array<{ url: string; tags?: string }>, p
   sidebar.innerHTML = pseudoTags + sorted.map(([tag, count]) => {
     const desc = descs[tag];
     const titleAttr = desc ? ` title="${desc.replace(/"/g, '&quot;')}"` : '';
-    return `<span class="sidebar-tag" data-tag="${tag}"${titleAttr}><span class="tag">#${tag}</span> <span class="sidebar-count">(${count})</span></span>`;
+    return `<span class="sidebar-tag" data-tag="${tag}"${titleAttr}><span class="tag">${tag}</span> <span class="sidebar-count">(${count})</span></span>`;
   }).join('') + `<div class="sidebar-menu"></div>`;
 }
 
@@ -198,7 +214,13 @@ function restoreAddButton(input: HTMLInputElement, btn: HTMLElement): void {
 async function submitTagsForLink(url: string, tags: string, linkEl: HTMLElement, input: HTMLInputElement, btn: HTMLElement): Promise<void> {
   const pageTags = getCurrentPageTags();
   const tagsEl = linkEl.querySelector('.tags')!;
-  const newTags = tags.split(' ').filter(t => t && !pageTags.includes(t));
+  const creds = getCredentials();
+  const currentUser = creds?.username || '';
+  const newTags = tags.split(' ').filter(t => {
+    if (!t || pageTags.includes(t)) return false;
+    if (isUserTag(t) && userTagUsername(t) !== currentUser) return false;
+    return true;
+  });
 
   newTags.forEach(t => {
     tagsEl.insertAdjacentHTML('beforeend', renderTag(t) + ' ');

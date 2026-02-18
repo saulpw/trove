@@ -1,6 +1,6 @@
 import bookmarkletCode from './_build/bookmarklet-code.txt';
 import { getCredentials, clearCredentials, isSignedIn, showSignIn, handleSignIn, togglePasswordVisibility, initSignInForm } from './auth';
-import { renderTag, renderTagSidebar, initTagMenu, initSidebarTagMenu, handleAddTagClick } from './tags';
+import { renderTag, renderTagSidebar, initTagMenu, initSidebarTagMenu, handleAddTagClick, isUserTag, userTagUsername } from './tags';
 import { initAutocomplete } from './autocomplete';
 
 interface Link {
@@ -175,7 +175,10 @@ function renderLinks(links: Link[]): void {
   const container = document.getElementById('links')!;
   const ratings = getRatings();
   container.innerHTML = links.map(link => {
-    const tags = parseTags(link.tags).filter(t => !currentPageTags.includes(t)).sort();
+    const allTags = parseTags(link.tags).filter(t => !currentPageTags.includes(t));
+    const userTags = allTags.filter(t => isUserTag(t)).sort();
+    const regularTags = allTags.filter(t => !isUserTag(t)).sort();
+    const tags = [...userTags, ...regularTags];
     let domain = link.url;
     try { domain = new URL(link.url).hostname.replace(/^www\./, ''); } catch {}
     const escapedUrl = link.url.replace(/'/g, "\\'");
@@ -471,7 +474,9 @@ function handleEditCardClick(event: Event, btn: HTMLElement): void {
 
     const oldTagSet = new Set(oldTags.split(/\s+/).filter(t => t));
     const newTagSet = new Set(newTags.split(/\s+/).filter(t => t));
-    const addedTags = [...newTagSet].filter(t => !oldTagSet.has(t));
+    const creds2 = getCredentials();
+    const currentUser2 = creds2?.username || '';
+    const addedTags = [...newTagSet].filter(t => !oldTagSet.has(t) && (!isUserTag(t) || userTagUsername(t) === currentUser2));
     const removedTags = [...oldTagSet].filter(t => !newTagSet.has(t));
     if (addedTags.length > 0) {
       submitToBackend({ action: 'add_tag', url, tags: addedTags.join(' ') });

@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 2026-02-18
+
+- Add user tags: tags starting with a symbol + username (e.g. `@saul`, `!saul`) are per-user metadata
+- User tags sort to front of card taglist and top of sidebar
+- Frontend validation: can only add user tags matching own username
+- Remove `#` prefix from all tag display (cards and sidebar)
+
+---
+
 ## 2026-02-17
 
 - Wire up tag autocomplete in "add tag" button, edit card, and bookmarklet
