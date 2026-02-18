@@ -2,6 +2,15 @@
 
 ## 2026-02-17
 
+- Move trove.jsonl to orphan `links` branch to keep data commits separate from code commits
+- Add `pull-links` / `push-links` Makefile targets for syncing data
+- Update add_link.py, GitHub Actions workflow, and Netlify build to use links branch
+- Version bump to v0.35
+
+---
+
+## 2026-02-17
+
 - Tag descriptions: optional descriptions for tags, stored as `set_tag_desc` ops in trove.jsonl
 - Replace sidebar "rename" with "edit" dialog for tag name and description
 - Sidebar tags with descriptions show tooltip on hover

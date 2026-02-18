@@ -7,3 +7,5 @@ config.js
 .env
 .envrc
 node_modules/
+trove.jsonl
+tags.jsonl

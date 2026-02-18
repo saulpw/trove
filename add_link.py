@@ -88,12 +88,14 @@ def trigger_archive(url):
 
 
 def git_commit(url, title):
-    """Commit trove.jsonl with a descriptive message."""
+    """Commit trove.jsonl to the links branch (without checkout)."""
     msg = f"Add link: {title or url}"
     try:
-        subprocess.run(["git", "add", str(TROVE_FILE)], check=True, cwd=TROVE_FILE.parent)
-        subprocess.run(["git", "commit", "-m", msg], check=True, cwd=TROVE_FILE.parent)
-        print(f"Committed: {msg}")
+        subprocess.run(
+            ["make", "push-links", f"MSG={msg}"],
+            check=True, cwd=TROVE_FILE.parent,
+        )
+        print(f"Committed to links branch: {msg}")
     except subprocess.CalledProcessError as e:
         print(f"Warning: Git commit failed: {e}")
 

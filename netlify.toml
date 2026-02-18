@@ -1,5 +1,5 @@
 [build]
-  command = "make build"
+  command = "git fetch origin links && make build"
   publish = "_build"
 
 [functions]

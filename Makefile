@@ -1,4 +1,4 @@
-.PHONY: setup serve add build typecheck test dedup import process-issues process-local fill-titles add-user remove-user list-users web-extract web-import
+.PHONY: setup serve add build typecheck test dedup import process-issues process-local fill-titles add-user remove-user list-users web-extract web-import pull-links push-links
 
 all: build
 
@@ -16,8 +16,21 @@ serve:
 add:
 	python3 add_link.py ${URL} ${TAGS} $(if ${TITLE},-t "${TITLE}")
 
+# Fetch trove.jsonl from links branch
+pull-links:
+	git show links:trove.jsonl > trove.jsonl
+
+# Commit and push local trove.jsonl to links branch (without checkout)
+push-links:
+	@BLOB=$$(git hash-object -w trove.jsonl) && \
+	TREE=$$(printf "100644 blob %s\ttrove.jsonl\n" "$$BLOB" | git mktree) && \
+	PARENT=$$(git rev-parse links) && \
+	COMMIT=$$(git commit-tree "$$TREE" -p "$$PARENT" -m "$(MSG)") && \
+	git update-ref refs/heads/links "$$COMMIT" && \
+	echo "Committed to links branch: $(MSG)"
+
 # Build for Netlify deployment
-build: tags.jsonl
+build: pull-links tags.jsonl
 	mkdir -p _build
 	npx esbuild bookmarklet.ts --bundle --minify --outfile=_build/bookmarklet-code.txt
 	npx esbuild frontend.ts --bundle --loader:.txt=text --outfile=_build/frontend.js
@@ -31,7 +44,7 @@ typecheck:
 	npx tsc --noEmit
 
 # Build tags file
-tags.jsonl: trove.jsonl
+tags.jsonl: pull-links
 	python3 generate_tags.py
 
 # Syntax check all Python files, then run tests

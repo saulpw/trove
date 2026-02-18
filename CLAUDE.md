@@ -13,7 +13,7 @@ A simple static website to share lists of links at a public mnemonic url.  e.g. 
 - `autocomplete.ts` - Shared tag autocomplete logic (used by bookmarklet)
 - `tsconfig.json` - TypeScript config (strict, noEmit — type checking only)
 - `package.json` - devDependencies: esbuild (bundler), typescript (type checker)
-- `trove.jsonl` - Canonical link data in JSONL format (one JSON object per line): `{url, added, title?, tags?, notes?}`. Tags are space-separated strings (e.g., `"tags": "games retro"`), not JSON arrays.
+- `trove.jsonl` - Canonical link data in JSONL format (one JSON object per line): `{url, added, title?, tags?, notes?}`. Tags are space-separated strings (e.g., `"tags": "games retro"`), not JSON arrays. **Lives on the orphan `links` branch**, not `main`. Use `make pull-links` to fetch locally, `make push-links MSG="..."` to commit back.
 - `trove_utils.py` - Shared utilities. `load_trove()`, `save_trove()`, `create_link_entry()`
 - `add_link.py` - CLI to add links to trove.jsonl (auto-fetches title, triggers archive.org, commits)
 - `process_issues.py` - Processes GitHub issue submissions into trove.jsonl
