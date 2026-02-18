@@ -1,3 +1,0 @@
-[build]
-  command = "git fetch origin main && git checkout origin/main -- . && make build"
-  publish = "_build"
