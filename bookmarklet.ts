@@ -30,6 +30,8 @@ declare var __TROVE_PASS__: string;
   // Create host element with shadow DOM
   const host = document.createElement('div');
   host.id = 'trove-bookmarklet-widget';
+  // Force host visible — some sites (e.g. Shopify) set display:none on generic divs
+  host.style.cssText = 'display:block!important;visibility:visible!important;';
   document.body.appendChild(host);
   const shadow = host.attachShadow({ mode: 'closed' });
 
