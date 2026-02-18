@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Bulk import links from a webpage into trove.jsonl.
+"""Bulk import links from a webpage into trove-log.jsonl.
 
 Two-phase workflow:
   1. Extract: fetch a webpage, parse links, output a reviewable PSV file
-  2. Import: read the reviewed PSV file and add entries to trove.jsonl
+  2. Import: read the reviewed PSV file and add entries to trove-log.jsonl
 """
 
 import argparse
@@ -120,7 +120,7 @@ def extract(url, tags, output):
 
 
 def do_import(filepath, no_archive, no_commit):
-    """Import links from a PSV file into trove.jsonl."""
+    """Import links from a PSV file into trove-log.jsonl."""
     links = load_trove()
     existing_urls = {link["url"] for link in links}
     added = 0
@@ -185,7 +185,7 @@ def main():
     extract_parser.add_argument("-o", "--output", default="web_import.psv", help="Output PSV file (default: web_import.psv)")
 
     # Import subcommand
-    import_parser = subparsers.add_parser("import", help="Import links from a PSV file into trove.jsonl")
+    import_parser = subparsers.add_parser("import", help="Import links from a PSV file into trove-log.jsonl")
     import_parser.add_argument("file", help="PSV file to import")
     import_parser.add_argument("--no-archive", action="store_true", help="Skip archive.org snapshots")
     import_parser.add_argument("--no-commit", action="store_true", help="Skip git commit")

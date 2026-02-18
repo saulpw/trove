@@ -2,6 +2,13 @@
 
 ## 2026-02-17
 
+- Rename trove.jsonl → trove-log.jsonl on links branch to clarify it's the source log, not the processed output
+  - Build produces trove.jsonl (deduplicated links) and tags.jsonl (tag list) from trove-log.jsonl
+
+---
+
+## 2026-02-17
+
 - Move trove.jsonl to orphan `links` branch to keep data commits separate from code commits
 - Add `pull-links` / `push-links` Makefile targets for syncing data
 - Update add_link.py, GitHub Actions workflow, and Netlify build to use links branch

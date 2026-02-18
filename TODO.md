@@ -1,7 +1,5 @@
 # TODO
 
-- move trove.jsonl to a separate repo?
-
 - edit card tag edit with autocomplete tags
 
 - upvote/downvote applies to the current tagset (so upvotes on /classic/rock only affect the rankings of links on that page)

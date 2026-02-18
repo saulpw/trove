@@ -13,10 +13,10 @@ A simple static website to share lists of links at a public mnemonic url.  e.g. 
 - `autocomplete.ts` - Shared tag autocomplete logic (used by bookmarklet)
 - `tsconfig.json` - TypeScript config (strict, noEmit — type checking only)
 - `package.json` - devDependencies: esbuild (bundler), typescript (type checker)
-- `trove.jsonl` - Canonical link data in JSONL format (one JSON object per line): `{url, added, title?, tags?, notes?}`. Tags are space-separated strings (e.g., `"tags": "games retro"`), not JSON arrays. **Lives on the orphan `links` branch**, not `main`. Use `make pull-links` to fetch locally, `make push-links MSG="..."` to commit back.
+- `trove-log.jsonl` - Append-only operation log in JSONL format (one JSON object per line): `{url, added, title?, tags?, notes?, op?}`. Tags are space-separated strings (e.g., `"tags": "games retro"`), not JSON arrays. **Lives on the orphan `links` branch**, not `main`. Use `make pull-links` to fetch locally, `make push-links MSG="..."` to commit back. Processed at build time into `trove.jsonl` (deduplicated links) and `tags.jsonl` (tag list with descriptions).
 - `trove_utils.py` - Shared utilities. `load_trove()`, `save_trove()`, `create_link_entry()`
-- `add_link.py` - CLI to add links to trove.jsonl (auto-fetches title, triggers archive.org, commits)
-- `process_issues.py` - Processes GitHub issue submissions into trove.jsonl
+- `add_link.py` - CLI to add links to trove-log.jsonl (auto-fetches title, triggers archive.org, commits)
+- `process_issues.py` - Processes GitHub issue submissions into trove-log.jsonl
 - `process_local_issues.py` - Offline issue processing from local JSON files (for testing)
 - `import_md_links.py` - One-time bulk import from markdown files
 - `manage_users.py` - CLI to add/remove users from Netlify `TROVE_USERS` env var
@@ -30,7 +30,7 @@ A simple static website to share lists of links at a public mnemonic url.  e.g. 
 ## Design Decisions
 - All link submission (adding new links) goes through the bookmarklet. There is no inline add form on the main page.
 - CLI interface (`add_link.py`) uses positional arguments for tags (not `--tags` flag): `python3 add_link.py URL tag1 tag2`
-- Use space-separated strings (not lists) for multi-value fields like tags and URLs in Python function interfaces. This matches the trove.jsonl storage format and keeps a consistent pattern across the codebase.
+- Use space-separated strings (not lists) for multi-value fields like tags and URLs in Python function interfaces. This matches the trove-log.jsonl storage format and keeps a consistent pattern across the codebase.
 - Use `${FOO}` variable syntax in Makefiles (not `$(FOO)`), because it is directly compatible with shell env var syntax for easy copy-paste.
 
 ## Meta Rules

@@ -6,7 +6,7 @@ import re
 from datetime import datetime, timezone
 from pathlib import Path
 
-TROVE_FILE = Path(__file__).parent / "trove.jsonl"
+TROVE_FILE = Path(__file__).parent / "trove-log.jsonl"
 
 
 def slugify(text):

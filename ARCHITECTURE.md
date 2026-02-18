@@ -9,7 +9,7 @@ A low-maintenance architecture for a static site where authenticated users submi
 ### 1. Static Frontend (Netlify)
 
 - Hosts the UI (index.html)
-- Loads link data from `trove.jsonl`
+- Loads link data from `trove.jsonl` (built from `trove-log.jsonl`)
 - Implements Google OAuth for user identity (email scope only)
 - Submits links via Netlify Function
 
@@ -32,16 +32,17 @@ A low-maintenance architecture for a static site where authenticated users submi
 - Runs `process_issues.py` which:
   - Fetches open issues with `submission` label
   - Fetches page titles, triggers archive.org snapshots
-  - Appends entries to `trove.jsonl`
+  - Appends entries to `trove-log.jsonl`
   - Closes processed issues
   - Commits and pushes changes
 
-### 5. Canonical Data (trove.jsonl)
+### 5. Canonical Data (trove-log.jsonl)
 
-- Source of truth for all links
+- Append-only operation log — source of truth for all link data
 - JSONL format (one JSON object per line)
-- Fields: `url`, `added`, `title?`, `tags?`, `notes?`
-- Version-controlled history of all submissions
+- Fields: `url`, `added`, `title?`, `tags?`, `notes?`, `op?`
+- Lives on the orphan `links` branch
+- Processed at build time into `trove.jsonl` (deduplicated links) and `tags.jsonl` (tag list)
 
 ## Data Flow
 
@@ -62,7 +63,7 @@ GitHub Actions (cron)
     │
     ├──► Fetch title from URL
     ├──► Trigger archive.org snapshot
-    ├──► Append to trove.jsonl
+    ├──► Append to trove-log.jsonl
     ├──► Close issue
     └──► Commit + push
             │
@@ -70,7 +71,7 @@ GitHub Actions (cron)
         Netlify rebuild
             │
             ▼
-        Frontend loads updated trove.jsonl
+        Frontend loads built trove.jsonl
 ```
 
 ## Configuration

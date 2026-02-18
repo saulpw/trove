@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Deduplicate trove.jsonl by merging entries per URL in chronological order.
+"""Deduplicate trove-log.jsonl by merging entries per URL in chronological order.
 
-Treats trove.jsonl as an append-only operation log. Each entry has an optional
+Treats trove-log.jsonl as an append-only operation log. Each entry has an optional
 'op' field (default: 'add'). Merge rules per URL:
 
 - Tags: union of all add/add_tag tags, minus remove_tag tags
@@ -24,7 +24,7 @@ def dedup(entries):
     """Merge a list of operation entries into deduplicated links.
 
     Args:
-        entries: List of dicts from trove.jsonl (chronological order assumed).
+        entries: List of dicts from trove-log.jsonl (chronological order assumed).
 
     Returns:
         List of merged link dicts, one per unique URL, sorted by earliest added.

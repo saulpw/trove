@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate tags.jsonl from trove.jsonl.
+"""Generate tags.jsonl from trove-log.jsonl.
 
 Reads all link entries to collect unique tags, and reads set_tag_desc ops
 to collect latest descriptions. Outputs one JSON object per line, sorted

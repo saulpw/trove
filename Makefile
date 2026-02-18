@@ -16,14 +16,14 @@ serve:
 add:
 	python3 add_link.py ${URL} ${TAGS} $(if ${TITLE},-t "${TITLE}")
 
-# Fetch trove.jsonl from links branch
+# Fetch trove-log.jsonl from links branch
 pull-links:
-	git show links:trove.jsonl > trove.jsonl
+	git show links:trove-log.jsonl > trove-log.jsonl
 
-# Commit and push local trove.jsonl to links branch (without checkout)
+# Commit and push local trove-log.jsonl to links branch (without checkout)
 push-links:
-	@BLOB=$$(git hash-object -w trove.jsonl) && \
-	TREE=$$(printf "100644 blob %s\ttrove.jsonl\n" "$$BLOB" | git mktree) && \
+	@BLOB=$$(git hash-object -w trove-log.jsonl) && \
+	TREE=$$(printf "100644 blob %s\ttrove-log.jsonl\n" "$$BLOB" | git mktree) && \
 	PARENT=$$(git rev-parse links) && \
 	COMMIT=$$(git commit-tree "$$TREE" -p "$$PARENT" -m "$(MSG)") && \
 	git update-ref refs/heads/links "$$COMMIT" && \
@@ -36,7 +36,7 @@ build: pull-links tags.jsonl
 	npx esbuild frontend.ts --bundle --loader:.txt=text --outfile=_build/frontend.js
 	npx esbuild bookmarklet.ts --bundle --outfile=_build/bookmarklet.js
 	cp tags.jsonl index.html help.html style.css _build/
-	python3 dedup_trove.py trove.jsonl _build/trove.jsonl
+	python3 dedup_trove.py trove-log.jsonl _build/trove.jsonl
 	sed -i='' 's/BUILD_TIMESTAMP/$(shell date +%s)/' _build/index.html
 
 # Type check TypeScript (no output)
@@ -52,15 +52,15 @@ test:
 	python3 -m py_compile *.py && echo "Syntax OK"
 	python3 -m pytest test_process_issues.py test_dedup_trove.py -v
 
-# Deduplicate trove.jsonl (standalone)
+# Deduplicate trove-log.jsonl (standalone)
 dedup:
-	python3 dedup_trove.py trove.jsonl trove.jsonl
+	python3 dedup_trove.py trove-log.jsonl trove-log.jsonl
 
 # Import links from markdown files
 import:
 	python3 import_md_links.py ~/git/saul.pw/posts/links
 
-# Process GitHub issue submissions and add to trove.jsonl
+# Process GitHub issue submissions and add to trove-log.jsonl
 process-issues:
 	python3 process_issues.py
 
@@ -86,7 +86,7 @@ list-users:
 import-url:
 	python3 import_web_links.py extract ${URL} ${TAGS}
 
-# Import links from a reviewed PSV file into trove.jsonl
+# Import links from a reviewed PSV file into trove-log.jsonl
 import-psv:
 	python3 import_web_links.py import ${PSV}
 

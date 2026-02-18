@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Process GitHub issues with 'submission' label and add links to trove.jsonl."""
+"""Process GitHub issues with 'submission' label and add links to trove-log.jsonl."""
 
 import argparse
 from datetime import datetime, timezone
@@ -43,7 +43,7 @@ def close_issue(number):
 
 
 def process_issue_list(issues, trove_path=None, local=False):
-    """Process a list of issue dicts and append operations to trove.jsonl.
+    """Process a list of issue dicts and append operations to trove-log.jsonl.
 
     Args:
         issues: list of {"number": N, "body": "..."} dicts

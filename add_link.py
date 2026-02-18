@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Add a link to trove.jsonl from the command line."""
+"""Add a link to trove-log.jsonl from the command line."""
 
 import argparse
 import json
@@ -88,7 +88,7 @@ def trigger_archive(url):
 
 
 def git_commit(url, title):
-    """Commit trove.jsonl to the links branch (without checkout)."""
+    """Commit trove-log.jsonl to the links branch (without checkout)."""
     msg = f"Add link: {title or url}"
     try:
         subprocess.run(
@@ -133,7 +133,7 @@ def add_link(url, title=None, tags=None, notes=None, no_archive=False, no_commit
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Add a link to trove.jsonl")
+    parser = argparse.ArgumentParser(description="Add a link to trove-log.jsonl")
     parser.add_argument("url", help="URL to add")
     parser.add_argument("tags", nargs="*", help="Tags for the link")
     parser.add_argument("-t", "--title", help="Title for the link (auto-fetched if omitted)")

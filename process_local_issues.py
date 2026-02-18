@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Process local JSON issue files into trove.jsonl (offline, no GitHub API calls)."""
+"""Process local JSON issue files into trove-log.jsonl (offline, no GitHub API calls)."""
 
 import argparse
 import json
@@ -13,7 +13,7 @@ def main():
     parser.add_argument("--issues-dir", required=True,
                         help="Directory containing .json issue files")
     parser.add_argument("--output", required=True,
-                        help="Path for output trove.jsonl")
+                        help="Path for output trove-log.jsonl")
     args = parser.parse_args()
 
     issues_dir = Path(args.issues_dir)

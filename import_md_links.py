@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Import links from markdown files into trove.jsonl."""
+"""Import links from markdown files into trove-log.jsonl."""
 
 import re
 import sys

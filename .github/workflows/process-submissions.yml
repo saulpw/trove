@@ -24,8 +24,8 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Fetch trove.jsonl from links branch
-        run: git show links:trove.jsonl > trove.jsonl
+      - name: Fetch trove-log.jsonl from links branch
+        run: git show links:trove-log.jsonl > trove-log.jsonl
 
       - name: Process submissions
         env:
@@ -36,8 +36,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          BLOB=$(git hash-object -w trove.jsonl)
-          TREE=$(printf "100644 blob %s\ttrove.jsonl\n" "$BLOB" | git mktree)
+          BLOB=$(git hash-object -w trove-log.jsonl)
+          TREE=$(printf "100644 blob %s\ttrove-log.jsonl\n" "$BLOB" | git mktree)
           PARENT=$(git rev-parse links)
           COMMIT=$(git commit-tree "$TREE" -p "$PARENT" -m "Add links from issue submissions")
           git update-ref refs/heads/links "$COMMIT"

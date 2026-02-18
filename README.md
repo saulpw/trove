@@ -37,7 +37,7 @@ Click the bookmarklet on any page → popup opens with URL pre-filled → add ta
 ## Project Structure
 
 - `index.html` - Static frontend
-- `trove.jsonl` - Canonical link data (JSONL format)
+- `trove-log.jsonl` - Append-only operation log (JSONL format, on `links` branch)
 - `trove_utils.py` - Shared Python utilities (load/save/create entries)
 - `add_link.py` - CLI to add links locally
 - `process_issues.py` - Process GitHub issue submissions
@@ -128,4 +128,4 @@ See [ARCHITECTURE.md](ARCHITECTURE.md).
 
 I find a puzzle site, go to `trove.saul.pw/puzzles`, and submit the link.
 I'm signed in with my username/password, so the submission goes to a Netlify Function that creates a GitHub Issue.
-The next GitHub Action run processes it into `trove.jsonl` and commits, triggering a rebuild.
+The next GitHub Action run processes it into `trove-log.jsonl` and commits, triggering a rebuild.
