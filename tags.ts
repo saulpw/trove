@@ -119,6 +119,16 @@ export function initSidebarTagMenu(): void {
       menu.classList.add('open');
     }
   });
+  sidebar.addEventListener('dblclick', (e) => {
+    const tagEl = (e.target as HTMLElement).closest('.sidebar-tag[data-tag]') as HTMLElement | null;
+    if (tagEl) {
+      e.preventDefault();
+      e.stopPropagation();
+      closeSidebarMenu();
+      history.pushState(null, '', '/' + tagEl.dataset.tag!);
+      filterAndRender();
+    }
+  });
   sidebar.addEventListener('mouseenter', (e) => {
     const menu = sidebar.querySelector('.sidebar-menu') as HTMLElement & { _entered?: boolean } | null;
     if (menu && e.target === menu) menu._entered = true;
