@@ -35,7 +35,7 @@ build: pull-links tags.jsonl
 	npx esbuild bookmarklet.ts --bundle --minify --outfile=_build/bookmarklet-code.txt
 	npx esbuild frontend.ts --bundle --loader:.txt=text --outfile=_build/frontend.js
 	npx esbuild bookmarklet.ts --bundle --outfile=_build/bookmarklet.js
-	cp tags.jsonl index.html help.html style.css _build/
+	cp tags.jsonl index.html help.html submit.html style.css _build/
 	python3 dedup_trove.py trove-log.jsonl _build/trove.jsonl
 	sed -i='' 's/BUILD_TIMESTAMP/$(shell date +%s)/' _build/index.html
 

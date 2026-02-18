@@ -2,6 +2,12 @@
 
 ## 2026-02-18
 
+- Add CSP fallback for bookmarklet: when cross-origin fetch is blocked (e.g. GitHub), opens a popup tab on trove to submit same-origin, then auto-closes
+
+---
+
+## 2026-02-18
+
 - Add user tags: tags starting with a symbol + username (e.g. `@saul`, `!saul`) are per-user metadata
 - User tags sort to front of card taglist and top of sidebar
 - Frontend validation: can only add user tags matching own username

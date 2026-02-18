@@ -12,10 +12,7 @@
 
 - delete tag association
 
-- add @contributor tags
-
 - import bulk lines from web page: include link to source in notes (markdown, converted to html in js?)
-- change bookmarklet link text to "add to trove"
 
 - under tag breadcrumb: rename tag (possibly to multiple tags)
    - implementation may be better as an 'action' rather resubmitting all links
@@ -48,8 +45,6 @@
 - allow * in tag in url path as text wildcard to filter in/out?
   - so /* yields games
   - so /-* filters out anything with a tag of any kind
-
-   - separate 'personal' tag?
 
 - auto-tag [tagless] links with llm and using current list of tags
 

@@ -161,6 +161,13 @@ declare var __TROVE_PASS__: string;
       status.textContent = 'Added!';
       status.className = 'status ok';
       setTimeout(() => host.remove(), 1200);
+    } else if (result.error === 'Network error') {
+      // CSP may block cross-origin fetch — fall back to popup tab on trove origin
+      const params = new URLSearchParams({ url, title, tags, notes, u: user, p: pass });
+      window.open(origin + '/submit?' + params.toString(), '_blank');
+      status.textContent = 'Opened in new tab...';
+      status.className = 'status ok';
+      setTimeout(() => host.remove(), 1500);
     } else {
       status.textContent = result.error || 'Failed';
       status.className = 'status err';
