@@ -2,6 +2,14 @@
 
 ## 2026-02-18
 
+- Fix `push-links` to preserve existing files on links branch (was dropping netlify.toml)
+- Re-add `netlify.toml` to links branch for Netlify builds on data changes
+- GitHub Actions workflow now uses `make push-links` instead of raw git plumbing
+
+---
+
+## 2026-02-18
+
 - Add CSP fallback for bookmarklet: when cross-origin fetch is blocked (e.g. GitHub), opens a popup tab on trove to submit same-origin, then auto-closes
 
 ---

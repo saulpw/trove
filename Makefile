@@ -20,14 +20,17 @@ add:
 pull-links:
 	git show origin/links:trove-log.jsonl > trove-log.jsonl 2>/dev/null || git show links:trove-log.jsonl > trove-log.jsonl
 
-# Commit and push local trove-log.jsonl to links branch (without checkout)
+# Commit and push local trove-log.jsonl to links branch (preserves other files)
 push-links:
-	@BLOB=$$(git hash-object -w trove-log.jsonl) && \
-	TREE=$$(printf "100644 blob %s\ttrove-log.jsonl\n" "$$BLOB" | git mktree) && \
-	PARENT=$$(git rev-parse links) && \
-	COMMIT=$$(git commit-tree "$$TREE" -p "$$PARENT" -m "$(MSG)") && \
-	git update-ref refs/heads/links "$$COMMIT" && \
-	echo "Committed to links branch: $(MSG)"
+	@git worktree add /tmp/trove-links links 2>/dev/null || true; \
+	cp trove-log.jsonl /tmp/trove-links/; \
+	cd /tmp/trove-links && git add trove-log.jsonl && \
+	if git diff --cached --quiet; then \
+		echo "No changes to commit"; \
+	else \
+		git commit -m "$(MSG)" && echo "Committed to links branch: $(MSG)"; \
+	fi; \
+	cd - >/dev/null; git worktree remove /tmp/trove-links
 
 # Build for Netlify deployment
 build: pull-links tags.jsonl

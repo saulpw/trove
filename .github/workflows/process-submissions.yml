@@ -38,9 +38,5 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          BLOB=$(git hash-object -w trove-log.jsonl)
-          TREE=$(printf "100644 blob %s\ttrove-log.jsonl\n" "$BLOB" | git mktree)
-          PARENT=$(git rev-parse origin/links)
-          COMMIT=$(git commit-tree "$TREE" -p "$PARENT" -m "Add links from issue submissions")
-          git update-ref refs/heads/links "$COMMIT"
+          make push-links MSG="Add links from issue submissions"
           git push origin links
