@@ -1,4 +1,4 @@
-.PHONY: setup serve add build typecheck test dedup import process-issues process-local fill-titles add-user remove-user list-users web-extract web-import pull-links push-links
+.PHONY: setup serve add build typecheck test dedup import process-issues process-local fill-titles add-user remove-user list-users web-extract web-import pull-links push-links create-build-hook
 
 all: build
 
@@ -92,6 +92,13 @@ import-url:
 # Import links from a reviewed PSV file into trove-log.jsonl
 import-psv:
 	python3 import_web_links.py import ${PSV}
+
+# Create a Netlify build hook and save it as a GitHub Actions secret
+create-build-hook:
+	@SITE_ID=$$(netlify status --json | jq -r '.siteData.id') && \
+	HOOK_URL=$$(netlify api createSiteBuildHook --data "{\"site_id\": \"$$SITE_ID\", \"body\": {\"title\": \"links-updated\", \"branch\": \"main\"}}" | jq -r '.url') && \
+	gh secret set NETLIFY_BUILD_HOOK --body "$$HOOK_URL" && \
+	echo "Build hook created and saved as GitHub secret"
 
 clean:
 	rm -f _build/* tags.jsonl

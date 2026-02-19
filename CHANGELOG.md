@@ -2,9 +2,10 @@
 
 ## 2026-02-18
 
-- Fix `push-links` to preserve existing files on links branch (was dropping netlify.toml)
-- Re-add `netlify.toml` to links branch for Netlify builds on data changes
-- GitHub Actions workflow now uses `make push-links` instead of raw git plumbing
+- Fix `push-links` to preserve existing files on links branch (uses git worktree instead of raw plumbing)
+- Add Netlify build hook to trigger production rebuild when links branch is updated
+- Add `create-build-hook` Makefile target for one-command setup
+- GitHub Actions workflow now uses `make push-links` and triggers production rebuild via hook
 
 ---
 
