@@ -495,3 +495,4 @@
 {"op": "add", "url": "https://terminaltrove.com/gomuks/", "added": "2026-02-22T23:06:49.516588+00:00", "title": "gomuks - A terminal based Matrix client written in Go. - Terminal Trove", "tags": "chat text terminal", "submitted_by": "saul"}
 {"op": "add", "url": "https://terminaltrove.com/", "added": "2026-02-22T23:07:02.535318+00:00", "title": "Terminal Trove - The $HOME of all things in the terminal.", "tags": "terminal software", "submitted_by": "saul"}
 {"op": "add", "url": "https://xkcd.com/1205/", "added": "2026-02-22T23:21:06.055531+00:00", "title": "xkcd: Is It Worth the Time?", "tags": "xkcd comic dev wrong", "submitted_by": "saul"}
+{"op": "add", "url": "https://www.music-map.com/", "added": "2026-02-22T23:32:45.223595+00:00", "title": "Music-Map - Find Similar Music", "tags": "music rec", "submitted_by": "saul"}
