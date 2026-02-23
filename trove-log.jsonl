@@ -496,3 +496,4 @@
 {"op": "add", "url": "https://terminaltrove.com/", "added": "2026-02-22T23:07:02.535318+00:00", "title": "Terminal Trove - The $HOME of all things in the terminal.", "tags": "terminal software", "submitted_by": "saul"}
 {"op": "add", "url": "https://xkcd.com/1205/", "added": "2026-02-22T23:21:06.055531+00:00", "title": "xkcd: Is It Worth the Time?", "tags": "xkcd comic dev wrong", "submitted_by": "saul"}
 {"op": "add", "url": "https://www.music-map.com/", "added": "2026-02-22T23:32:45.223595+00:00", "title": "Music-Map - Find Similar Music", "tags": "music rec", "submitted_by": "saul"}
+{"op": "add", "url": "https://github.com/sparklost/endcord", "added": "2026-02-23T03:33:18.461711+00:00", "title": "sparklost/endcord: Feature rich Discord TUI client.", "tags": "chat tui text", "submitted_by": "saul"}
