@@ -498,3 +498,4 @@
 {"op": "add", "url": "https://www.music-map.com/", "added": "2026-02-22T23:32:45.223595+00:00", "title": "Music-Map - Find Similar Music", "tags": "music rec", "submitted_by": "saul"}
 {"op": "add", "url": "https://github.com/sparklost/endcord", "added": "2026-02-23T03:33:18.461711+00:00", "title": "sparklost/endcord: Feature rich Discord TUI client.", "tags": "chat tui text", "submitted_by": "saul"}
 {"op": "add", "url": "https://www.bernd-paysan.de/why-forth.html", "added": "2026-02-23T03:34:23.558694+00:00", "title": "Why Forth?", "tags": "forth dev lang", "submitted_by": "saul"}
+{"op": "add", "url": "https://hannahilea.com/blog/musidex/", "added": "2026-02-23T03:47:51.281309+00:00", "title": "Musidex: A physical music library for the streaming era", "tags": "music physical", "submitted_by": "saul"}
