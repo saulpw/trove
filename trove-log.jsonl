@@ -505,3 +505,4 @@
 {"op": "add", "url": "https://datacatalogue.ukdataservice.ac.uk/", "added": "2026-02-23T18:41:53.089487+00:00", "title": "UK Data Service", "tags": "dataset uk", "submitted_by": "saul"}
 {"op": "add", "url": "https://chatjimmy.ai/", "added": "2026-02-23T19:20:41.859701+00:00", "title": "chat jimmy", "tags": "ai llm asic", "submitted_by": "saul"}
 {"op": "add", "url": "https://www.theguardian.com/commentisfree/2026/feb/23/15-year-old-girl-misogyny-social-media-online-abuse", "added": "2026-02-23T20:32:11.534023+00:00", "title": "I am a 15-year-old girl. Let me show you the vile misogyny that confronts me on social media every day | Anonymous | The Guardian", "tags": "feminism society", "submitted_by": "saul"}
+{"op": "add", "url": "https://github.com/ad-si/Woxi", "added": "2026-02-24T16:16:52.433446+00:00", "title": "ad-si/Woxi: Wolfram Language / Mathematica reimplementation in Rust (Wolfram oxidized)", "tags": "math dev", "submitted_by": "saul"}
