@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2026-02-28
+
+- Fix bookmarklet dark mode: added `color-scheme: light` to panel and explicit light colors on form inputs/textarea, so the widget renders correctly on dark-mode pages
+
+---
+
 ## 2026-02-27
 
 - Persistent worktrees for orphan branches: `.links/` (links branch) and `.meta/` (new meta branch)

@@ -41,7 +41,7 @@ declare var __TROVE_PASS__: string;
     * { box-sizing: border-box; margin: 0; padding: 0; }
     .panel {
       position: fixed; top: 12px; right: 12px; z-index: 2147483647;
-      width: 340px; background: #fff; border: 1px solid #ccc; border-radius: 8px;
+      width: 340px; background: #fff; color-scheme: light; border: 1px solid #ccc; border-radius: 8px;
       box-shadow: 0 4px 24px rgba(0,0,0,0.2); font-family: system-ui, sans-serif; font-size: 14px; color: #333;
     }
     .header { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-bottom: 1px solid #eee; }
@@ -50,7 +50,7 @@ declare var __TROVE_PASS__: string;
     .close:hover { color: #333; }
     .body { padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
     label { font-size: 12px; color: #666; }
-    input, textarea { width: 100%; padding: 6px 8px; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; }
+    input, textarea { width: 100%; padding: 6px 8px; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; background: #fff; color: #333; }
     input:read-only { background: #f5f5f5; color: #666; }
     textarea { resize: vertical; min-height: 48px; }
     .tags-wrap { position: relative; }
