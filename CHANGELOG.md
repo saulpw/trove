@@ -3,6 +3,7 @@
 ## 2026-02-28
 
 - Fix bookmarklet dark mode: added `color-scheme: light` to panel and explicit light colors on form inputs/textarea, so the widget renders correctly on dark-mode pages
+- Add "Fewest tags" sort option to surface untagged/under-tagged links for triage
 
 ---
 

@@ -157,6 +157,9 @@ function sortLinks(links: Link[], sortBy: string): Link[] {
     case 'alpha':
       sorted.sort((a, b) => (a.title || a.url).toLowerCase().localeCompare((b.title || b.url).toLowerCase()));
       break;
+    case 'fewest-tags':
+      sorted.sort((a, b) => parseTags(a.tags).length - parseTags(b.tags).length);
+      break;
     case 'random':
       for (let i = sorted.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
