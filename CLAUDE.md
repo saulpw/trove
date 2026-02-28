@@ -13,19 +13,20 @@ A simple static website to share lists of links at a public mnemonic url.  e.g. 
 - `autocomplete.ts` - Shared tag autocomplete logic (used by bookmarklet)
 - `tsconfig.json` - TypeScript config (strict, noEmit — type checking only)
 - `package.json` - devDependencies: esbuild (bundler), typescript (type checker)
-- `trove-log.jsonl` - Append-only operation log in JSONL format (one JSON object per line): `{url, added, title?, tags?, notes?, op?}`. Tags are space-separated strings (e.g., `"tags": "games retro"`), not JSON arrays. **Lives on the orphan `links` branch**, not `main`. Use `make pull-links` to fetch locally, `make push-links MSG="..."` to commit back. Processed at build time into `trove.jsonl` (deduplicated links) and `tags.jsonl` (tag list with descriptions).
+- `.links/` - Persistent git worktree for the orphan `links` branch. Contains `trove-log.jsonl` (append-only operation log in JSONL format). Tags are space-separated strings (e.g., `"tags": "games retro"`), not JSON arrays. Use `make push-links MSG="..."` to commit. Processed at build time into `trove.jsonl` (deduplicated links) and `tags.jsonl` (tag list with descriptions).
+- `.meta/` - Persistent git worktree for the orphan `meta` branch. Contains `TODO.md` and project planning files that don't belong in the code branch.
 - `trove_utils.py` - Shared utilities. `load_trove()`, `save_trove()`, `create_link_entry()`
 - `add_link.py` - CLI to add links to trove-log.jsonl (auto-fetches title, triggers archive.org, commits)
 - `process_issues.py` - Processes GitHub issue submissions into trove-log.jsonl
 - `process_local_issues.py` - Offline issue processing from local JSON files (for testing)
 - `import_md_links.py` - One-time bulk import from markdown files
 - `manage_users.py` - CLI to add/remove users from Netlify `TROVE_USERS` env var
-- `Makefile` - Targets: `setup`, `serve`, `add`, `build`, `typecheck`, `test`, `import`, `process-issues`, `process-local`, `add-user`, `remove-user`, `list-users`
+- `Makefile` - Targets: `setup`, `setup-worktrees`, `serve`, `add`, `build`, `typecheck`, `test`, `import`, `process-issues`, `process-local`, `add-user`, `remove-user`, `list-users`
 - `netlify.toml` - Netlify config (SPA fallback routing)
 - `ARCHITECTURE.md` - Design: GitHub Issues submissions + GitHub Actions processor
 - `docs/auth.md` - Auth approach options and tradeoffs
-- `README.md` - Setup instructions including Google OAuth configuration
-- `TODO.md` - Feature checklist
+- `README.md` - Setup instructions (user auth, GitHub token, Netlify deployment)
+- `.meta/TODO.md` - Feature checklist (on `meta` branch)
 
 ## Design Decisions
 - All link submission (adding new links) goes through the bookmarklet. There is no inline add form on the main page.
@@ -56,6 +57,9 @@ A simple static website to share lists of links at a public mnemonic url.  e.g. 
 ## Meta Rules (cont.)
 
 - When making UI changes, always update `help.html` to reflect the new behavior.
+- **NEVER switch git branches.** Orphan branches live in persistent worktrees (`.links/`, `.meta/`). Use `git worktree add` to create, operate inside the worktree dir. Never use `git checkout --orphan` or `git rm -rf` on the working branch.
+- **`git rm` from main can cascade into worktrees** with same-named files. When removing a file from main that also exists in a worktree, verify the worktree copy is unaffected.
+- When Saul says "TODO:", add to `.meta/TODO.md` (on meta branch, not main). Ideas/deferred items go in `.meta/IDEAS.md`. Design session items go in `.meta/DESIGN.md`.
 
 ## Personality Rules
 

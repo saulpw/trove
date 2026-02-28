@@ -7,6 +7,7 @@ alphabetically by tag name.
 """
 
 import json
+from pathlib import Path
 from trove_utils import TROVE_FILE
 
 
@@ -35,7 +36,7 @@ def generate_tags(trove_path=None):
                 if t:
                     tags.add(t)
 
-    out_path = path.parent / "tags.jsonl"
+    out_path = Path(__file__).parent / "tags.jsonl"
     with open(out_path, 'w') as f:
         for tag in sorted(tags):
             obj = {"tag": tag}

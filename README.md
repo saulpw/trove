@@ -59,7 +59,7 @@ Click the bookmarklet on any page → popup opens with URL pre-filled → add ta
 
 - The existence of a Tag implies a List; Links can have multiple Tags (likely fewer than 20 per link)
 - The same tag can be on thousands of items.
-- The full set of links is always downloaded (should be less than 10MB)
+- The full set of links is always downloaded (should be less than 10MB). At ~1KB per link, 1M links = 1GB — a lifetime of links fits comfortably in git.
 - Allowlist of users (less than 100) will be able to submit links and tags initially.
 - Anyone on the internet can view.
 - Low write volume (max ~100 links/day).

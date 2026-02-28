@@ -1,12 +1,17 @@
-.PHONY: setup serve add build typecheck test dedup import process-issues process-local fill-titles add-user remove-user list-users web-extract web-import pull-links push-links create-build-hook
+.PHONY: setup setup-worktrees serve add build typecheck test dedup import process-issues process-local fill-titles add-user remove-user list-users web-extract web-import pull-links push-links create-build-hook
 
 all: build
 
 # Install dependencies
-setup:
+setup: setup-worktrees
 	npm install
 	npm install -g netlify-cli
 	pip3 install pytest yt-dlp
+
+# Create persistent worktrees for orphan branches
+setup-worktrees:
+	@test -d .links || git worktree add .links links
+	@test -d .meta || git worktree add .meta meta
 
 # Start a local server to view the site
 serve:
@@ -16,21 +21,19 @@ serve:
 add:
 	python3 add_link.py ${URL} ${TAGS} $(if ${TITLE},-t "${TITLE}")
 
-# Fetch trove-log.jsonl from links branch
+# Ensure .links worktree exists and is up to date
 pull-links:
-	git show origin/links:trove-log.jsonl > trove-log.jsonl 2>/dev/null || git show links:trove-log.jsonl > trove-log.jsonl
+	@test -d .links || git worktree add .links links
+	@cd .links && git pull --ff-only origin links 2>/dev/null || true
 
-# Commit and push local trove-log.jsonl to links branch (preserves other files)
+# Commit changes in .links worktree
 push-links:
-	@git worktree add /tmp/trove-links links 2>/dev/null || true; \
-	cp trove-log.jsonl /tmp/trove-links/; \
-	cd /tmp/trove-links && git add trove-log.jsonl && \
+	@cd .links && git add -A && \
 	if git diff --cached --quiet; then \
 		echo "No changes to commit"; \
 	else \
-		git commit -m "$(MSG)" && echo "Committed to links branch: $(MSG)"; \
-	fi; \
-	cd - >/dev/null; git worktree remove /tmp/trove-links
+		git commit -m "${MSG}" && echo "Committed to links branch: ${MSG}"; \
+	fi
 
 # Build for Netlify deployment
 build: pull-links tags.jsonl
@@ -39,7 +42,7 @@ build: pull-links tags.jsonl
 	npx esbuild frontend.ts --bundle --loader:.txt=text --outfile=_build/frontend.js
 	npx esbuild bookmarklet.ts --bundle --outfile=_build/bookmarklet.js
 	cp tags.jsonl index.html help.html submit.html style.css _build/
-	python3 dedup_trove.py trove-log.jsonl _build/trove.jsonl
+	python3 dedup_trove.py .links/trove-log.jsonl _build/trove.jsonl
 	sed -i='' 's/BUILD_TIMESTAMP/$(shell date +%s)/' _build/index.html
 
 # Type check TypeScript (no output)
@@ -57,7 +60,7 @@ test:
 
 # Deduplicate trove-log.jsonl (standalone)
 dedup:
-	python3 dedup_trove.py trove-log.jsonl trove-log.jsonl
+	python3 dedup_trove.py .links/trove-log.jsonl .links/trove-log.jsonl
 
 # Import links from markdown files
 import:

@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## 2026-02-27
+
+- Persistent worktrees for orphan branches: `.links/` (links branch) and `.meta/` (new meta branch)
+- No more branch switching during dev — worktrees are always checked out
+- Moved TODO.md from main branch to `.meta/TODO.md` on meta branch
+- `make setup-worktrees` creates both worktrees; `make setup` runs it automatically
+- `pull-links` now ensures worktree exists and pulls (no more `git show` extraction)
+- `push-links` commits directly in `.links/` (no more temp worktree dance)
+- Build reads `.links/trove-log.jsonl` directly
+- `trove_utils.py` TROVE_FILE updated to `.links/trove-log.jsonl`
+- GitHub Actions workflow updated to use `.links` worktree
+- `generate_tags.py` writes tags.jsonl to project root regardless of trove-log location
+
+---
+
 ## 2026-02-18
 
 - Fix `push-links` to preserve existing files on links branch (uses git worktree instead of raw plumbing)

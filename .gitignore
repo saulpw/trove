@@ -9,3 +9,5 @@ config.js
 node_modules/
 trove-log.jsonl
 tags.jsonl
+.links
+.meta

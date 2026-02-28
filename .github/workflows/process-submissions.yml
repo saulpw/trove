@@ -24,10 +24,10 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Fetch trove-log.jsonl from links branch
+      - name: Set up links worktree
         run: |
           git fetch origin links
-          git show origin/links:trove-log.jsonl > trove-log.jsonl
+          git worktree add .links links
 
       - name: Process submissions
         env:
@@ -36,10 +36,12 @@ jobs:
 
       - name: Commit and push to links branch
         run: |
+          cd .links
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          cd ..
           make push-links MSG="Add links from issue submissions"
-          git push origin links
+          cd .links && git push origin links
 
       - name: Trigger production rebuild
         run: curl -sS -X POST ${{ secrets.NETLIFY_BUILD_HOOK }}
