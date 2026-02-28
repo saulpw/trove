@@ -1,4 +1,4 @@
-.PHONY: setup setup-worktrees serve add build typecheck test dedup import process-issues process-local fill-titles add-user remove-user list-users web-extract web-import pull-links push-links create-build-hook
+.PHONY: setup setup-worktrees serve add build typecheck test dedup compact compact-fast import process-issues process-local fill-titles add-user remove-user list-users web-extract web-import pull-links push-links create-build-hook
 
 all: build
 
@@ -56,7 +56,7 @@ tags.jsonl: pull-links
 # Syntax check all Python files, then run tests
 test:
 	python3 -m py_compile *.py && echo "Syntax OK"
-	python3 -m pytest test_process_issues.py test_dedup_trove.py -v
+	python3 -m pytest test_process_issues.py test_dedup_trove.py test_compact_trove.py -v
 
 # Deduplicate trove-log.jsonl (standalone)
 dedup:
@@ -102,6 +102,14 @@ create-build-hook:
 	HOOK_URL=$$(netlify api createSiteBuildHook --data "{\"site_id\": \"$$SITE_ID\", \"body\": {\"title\": \"links-updated\", \"branch\": \"main\"}}" | jq -r '.url') && \
 	gh secret set NETLIFY_BUILD_HOOK --body "$$HOOK_URL" && \
 	echo "Build hook created and saved as GitHub secret"
+
+# Compact trove-log: strip tracking params, dedup, health-check dead links
+compact:
+	python3 compact_trove.py
+
+# Compact without health checks or commit (fast, local-only)
+compact-fast:
+	python3 compact_trove.py --no-health-check --no-commit
 
 clean:
 	rm -f _build/* tags.jsonl

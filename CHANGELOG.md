@@ -2,6 +2,19 @@
 
 ## 2026-02-28
 
+- Link compactor (`compact_trove.py`): post-processing step for trove-log.jsonl
+  - Phase 1: Strip tracking params (utm_*, fbclid, gclid, etc.) from all URLs
+  - Phase 2: Compact log via dedup (tracking-param URLs merge with clean URLs)
+  - Phase 3: HTTP health checks for link liveness (HEAD with GET fallback, 30-day cache in `.meta/link-check-log.jsonl`)
+  - Phase 4: Archive.org wayback fallback for dead links (adds `archive_url` field)
+  - CLI: `--no-health-check` skips phases 3+4, `--no-commit` skips git commit
+  - Makefile: `make compact` (full) and `make compact-fast` (no health check, no commit)
+  - Tests: 18 new tests covering URL stripping, compaction, health checks, and archive fallback
+
+---
+
+## 2026-02-28
+
 - Fix bookmarklet dark mode: added `color-scheme: light` to panel and explicit light colors on form inputs/textarea, so the widget renders correctly on dark-mode pages
 - Add "Fewest tags" sort option to surface untagged/under-tagged links for triage
 

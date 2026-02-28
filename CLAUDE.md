@@ -21,7 +21,9 @@ A simple static website to share lists of links at a public mnemonic url.  e.g. 
 - `process_local_issues.py` - Offline issue processing from local JSON files (for testing)
 - `import_md_links.py` - One-time bulk import from markdown files
 - `manage_users.py` - CLI to add/remove users from Netlify `TROVE_USERS` env var
-- `Makefile` - Targets: `setup`, `setup-worktrees`, `serve`, `add`, `build`, `typecheck`, `test`, `import`, `process-issues`, `process-local`, `add-user`, `remove-user`, `list-users`
+- `compact_trove.py` - Compactor: strips tracking params, deduplicates log, health-checks links, adds archive.org fallback URLs
+- `test_compact_trove.py` - Tests for compact_trove.py (strip, merge, health check, archive)
+- `Makefile` - Targets: `setup`, `setup-worktrees`, `serve`, `add`, `build`, `typecheck`, `test`, `compact`, `compact-fast`, `import`, `process-issues`, `process-local`, `add-user`, `remove-user`, `list-users`
 - `netlify.toml` - Netlify config (SPA fallback routing)
 - `ARCHITECTURE.md` - Design: GitHub Issues submissions + GitHub Actions processor
 - `docs/auth.md` - Auth approach options and tradeoffs
