@@ -546,3 +546,4 @@
 {"op": "add", "url": "https://www.capitolhillseattle.com/", "added": "2026-03-20T04:51:46.871520+00:00", "title": "CHS Capitol Hill Seattle News | Community News For All of Seattle's Capitol Hill", "tags": "news seattle", "submitted_by": "saul"}
 {"op": "add", "url": "https://www.nippon.com/en/japan-data/h01362/", "added": "2026-03-21T18:15:53.396634+00:00", "title": "A Japanese Glossary of Chopsticks Faux Pas | Nippon.com", "tags": "jp etiquette", "notes": "A Japanese Glossary of Chopsticks Faux Pas", "submitted_by": "saul"}
 {"op": "add", "url": "https://en.wikipedia.org/wiki/Albert%27s_swarm", "added": "2026-03-21T18:16:49.840564+00:00", "title": "Albert's swarm - Wikipedia", "tags": "mag population", "submitted_by": "saul"}
+{"op": "add", "url": "https://github.com/pagel-s/termcraft", "added": "2026-03-21T22:40:38.983959+00:00", "title": "pagel-s/termcraft: Terminal-first 2D sandbox survival in Rust.", "tags": "terminal games", "submitted_by": "saul"}
