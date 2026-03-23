@@ -548,3 +548,4 @@
 {"op": "add", "url": "https://en.wikipedia.org/wiki/Albert%27s_swarm", "added": "2026-03-21T18:16:49.840564+00:00", "title": "Albert's swarm - Wikipedia", "tags": "mag population", "submitted_by": "saul"}
 {"op": "add", "url": "https://github.com/pagel-s/termcraft", "added": "2026-03-21T22:40:38.983959+00:00", "title": "pagel-s/termcraft: Terminal-first 2D sandbox survival in Rust.", "tags": "terminal games", "submitted_by": "saul"}
 {"op": "add", "url": "https://www.projectnomad.us/", "added": "2026-03-23T06:29:03.190594+00:00", "title": "Project NOMAD - Offline Knowledge & AI Server", "tags": "prepper local data", "submitted_by": "saul"}
+{"op": "add", "url": "https://pagel-s.github.io/termcraft/", "added": "2026-03-23T06:51:45.925090+00:00", "title": "termcraft", "tags": "terminal games computergames", "submitted_by": "saul"}
