@@ -51,7 +51,6 @@ declare var __TROVE_PASS__: string;
     .body { padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
     label { font-size: 12px; color: #666; }
     input, textarea { width: 100%; padding: 6px 8px; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; background: #fff; color: #333; }
-    input:read-only { background: #f5f5f5; color: #666; }
     textarea { resize: vertical; min-height: 48px; }
     .tags-wrap { position: relative; }
     .suggestions {
@@ -90,7 +89,7 @@ declare var __TROVE_PASS__: string;
     <div class="header"><strong>add to trove</strong><button class="close">&times;</button></div>
     <div class="body">
       <label>URL</label>
-      <input type="text" id="tw-url" value="${pageUrl.replace(/"/g, '&quot;')}" readonly />
+      <input type="text" id="tw-url" value="${pageUrl.replace(/"/g, '&quot;')}" />
       <label>Title</label>
       <input type="text" id="tw-title" value="${pageTitle.replace(/"/g, '&quot;')}" placeholder="Page title" />
       ${authHTML}
