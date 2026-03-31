@@ -571,7 +571,6 @@
 {"op": "add", "url": "https://dbdb.io", "added": "2026-03-29T02:39:56.290535+00:00", "title": "Database of Databases", "tags": "data databases reference", "submitted_by": "saul"}
 {"op": "add", "url": "https://db-engines.com/en/ranking", "added": "2026-03-29T02:39:56.290591+00:00", "title": "Knowledge Base of Relational and NoSQL Database Management Systems", "tags": "data databases reference", "submitted_by": "saul"}
 {"op": "add", "url": "https://datadistillr.com", "added": "2026-03-29T02:39:56.290608+00:00", "title": "DataDistillr", "tags": "data", "submitted_by": "saul"}
-{"op": "add", "url": "https://bit.io", "added": "2026-03-29T02:39:56.290626+00:00", "title": "bit.io", "tags": "data", "submitted_by": "saul"}
 {"op": "add", "url": "https://brightdata.com", "added": "2026-03-29T02:39:56.290637+00:00", "title": "Bright Data - scraping, dataset marketplace", "tags": "data scraping datasets", "submitted_by": "saul"}
 {"op": "add", "url": "https://airbyte.com", "added": "2026-03-29T02:39:56.290647+00:00", "title": "Airbyte - data engineering pipelines, 100s of connectors", "tags": "data engineering pipelines", "submitted_by": "saul"}
 {"op": "add", "url": "https://ultorg.com", "added": "2026-03-29T02:39:56.290657+00:00", "title": "Ultorg - A User Interface for Relational Data", "tags": "data gui databases", "submitted_by": "saul"}
