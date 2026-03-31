@@ -562,3 +562,4 @@
 {"op": "add", "url": "https://www.beepbox.co/", "added": "2026-03-30T16:11:09.745064+00:00", "title": "BeepBox", "tags": "music synth dev", "submitted_by": "saul"}
 {"op": "add", "url": "https://www.codingfont.com/", "added": "2026-03-30T16:33:54.970583+00:00", "title": "Coding Font", "tags": "terminal dev", "notes": "Pairwise choosing of your coding font.", "submitted_by": "saul"}
 {"op": "add", "url": "https://www.youtube.com/watch?v=T4Upf_B9RLQ", "added": "2026-03-30T16:41:04.974989+00:00", "title": "A Day in the Life of an Ensh*ttificator - YouTube", "tags": "psa gov software", "submitted_by": "saul"}
+{"op": "add", "url": "https://commitmono.com/", "added": "2026-03-31T00:58:57.045242+00:00", "title": "Commit Mono. Neutral programming typeface.", "tags": "font swdev", "submitted_by": "saul"}
