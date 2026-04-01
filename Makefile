@@ -1,4 +1,4 @@
-.PHONY: setup setup-worktrees serve add build typecheck test dedup compact compact-fast import process-issues process-local fill-titles add-user remove-user list-users web-extract web-import pull-links push-links create-build-hook
+.PHONY: setup setup-worktrees serve add build typecheck test dedup compact compact-fast import process-issues process-local fill-titles add-user remove-user list-users web-extract web-import pull-links push-links create-build-hook normalize-tags autotag
 
 all: build
 
@@ -19,7 +19,7 @@ serve:
 
 # Add a link: make add URL="https://example.com" TITLE="Example" TAGS="tag1 tag2"
 add:
-	python3 add_link.py ${URL} ${TAGS} $(if ${TITLE},-t "${TITLE}")
+	python3 scripts/add_link.py ${URL} ${TAGS} $(if ${TITLE},-t "${TITLE}")
 
 # Ensure .links worktree exists and is up to date
 pull-links:
@@ -38,11 +38,11 @@ push-links:
 # Build for Netlify deployment
 build: pull-links tags.jsonl
 	mkdir -p _build
-	npx esbuild bookmarklet.ts --bundle --minify --outfile=_build/bookmarklet-code.txt
-	npx esbuild frontend.ts --bundle --loader:.txt=text --outfile=_build/frontend.js
-	npx esbuild bookmarklet.ts --bundle --outfile=_build/bookmarklet.js
-	cp tags.jsonl index.html help.html submit.html style.css _build/
-	python3 dedup_trove.py .links/trove-log.jsonl _build/trove.jsonl
+	npx esbuild src/bookmarklet.ts --bundle --minify --outfile=_build/bookmarklet-code.txt
+	npx esbuild src/frontend.ts --bundle --loader:.txt=text --outfile=_build/frontend.js
+	npx esbuild src/bookmarklet.ts --bundle --outfile=_build/bookmarklet.js
+	cp src/index.html src/help.html src/submit.html src/style.css tags.jsonl _build/
+	python3 scripts/dedup_trove.py .links/trove-log.jsonl _build/trove.jsonl
 	sed -i='' 's/BUILD_TIMESTAMP/$(shell date +%s)/' _build/index.html
 
 # Type check TypeScript (no output)
@@ -51,50 +51,50 @@ typecheck:
 
 # Build tags file
 tags.jsonl: pull-links
-	python3 generate_tags.py
+	python3 scripts/generate_tags.py > tags.jsonl
 
 # Syntax check all Python files, then run tests
 test:
-	python3 -m py_compile *.py && echo "Syntax OK"
-	python3 -m pytest test_process_issues.py test_dedup_trove.py test_compact_trove.py -v
+	python3 -m py_compile scripts/*.py && echo "Syntax OK"
+	python3 -m pytest tests/ -v
 
 # Deduplicate trove-log.jsonl (standalone)
 dedup:
-	python3 dedup_trove.py .links/trove-log.jsonl .links/trove-log.jsonl
+	python3 scripts/dedup_trove.py .links/trove-log.jsonl .links/trove-log.jsonl
 
 # Import links from markdown files
 import:
-	python3 import_md_links.py ~/git/saul.pw/posts/links
+	python3 scripts/import_md_links.py ~/git/saul.pw/posts/links
 
 # Process GitHub issue submissions and add to trove-log.jsonl
 process-issues:
-	python3 process_issues.py
+	python3 scripts/process_issues.py
 
 # Process local JSON issue files (offline, for testing)
 process-local:
-	python3 process_local_issues.py --issues-dir ${ISSUES_DIR} --output ${OUTPUT}
+	python3 scripts/process_local_issues.py --issues-dir ${ISSUES_DIR} --output ${OUTPUT}
 
 # Fill in missing titles for existing links
 fill-titles:
-	python3 process_issues.py --fill-titles
+	python3 scripts/process_issues.py --fill-titles
 
 # User management: manage TROVE_USERS env var on Netlify
 add-user:
-	python3 manage_users.py add ${NAME} ${PASS}
+	python3 scripts/manage_users.py add ${NAME} ${PASS}
 
 remove-user:
-	python3 manage_users.py remove ${NAME}
+	python3 scripts/manage_users.py remove ${NAME}
 
 list-users:
-	python3 manage_users.py list
+	python3 scripts/manage_users.py list
 
 # Extract links from a webpage into a reviewable PSV file
 import-url:
-	python3 import_web_links.py extract ${URL} ${TAGS}
+	python3 scripts/import_web_links.py extract ${URL} ${TAGS}
 
 # Import links from a reviewed PSV file into trove-log.jsonl
 import-psv:
-	python3 import_web_links.py import ${PSV}
+	python3 scripts/import_web_links.py import ${PSV}
 
 # Create a Netlify build hook and save it as a GitHub Actions secret
 create-build-hook:
@@ -103,13 +103,21 @@ create-build-hook:
 	gh secret set NETLIFY_BUILD_HOOK --body "$$HOOK_URL" && \
 	echo "Build hook created and saved as GitHub secret"
 
+# Normalize tags according to TAGS.md conventions
+normalize-tags:
+	python3 scripts/normalize_tags.py
+
+# Auto-tag untagged links using AI
+autotag:
+	python3 scripts/autotag.py --count ${COUNT}
+
 # Compact trove-log: strip tracking params, dedup, health-check dead links
 compact:
-	python3 compact_trove.py
+	python3 scripts/compact_trove.py
 
 # Compact without health checks or commit (fast, local-only)
 compact-fast:
-	python3 compact_trove.py --no-health-check --no-commit
+	python3 scripts/compact_trove.py --no-health-check --no-commit
 
 clean:
 	rm -f _build/* tags.jsonl

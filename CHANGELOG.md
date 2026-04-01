@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## 2026-03-31
+
+- Reorganize project directory structure
+  - `src/` — TypeScript, HTML, CSS (frontend source)
+  - `scripts/` — Python CLI tools and utilities
+  - `tests/` — Python tests and test fixtures (with conftest.py for import paths)
+- Delete dead `config.js` (gitignored, no references in code)
+- `generate_tags.py` writes to stdout; Makefile redirects to `tags.jsonl`
+- `trove_utils.py` TROVE_FILE uses cwd-relative path instead of `__file__` gymnastics
+- Updated: Makefile, tsconfig.json, GitHub Actions workflow, CLAUDE.md, ARCHITECTURE.md, .gitignore
+
+---
+
 ## 2026-02-28
 
 - Link compactor (`compact_trove.py`): post-processing step for trove-log.jsonl

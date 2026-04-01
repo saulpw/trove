@@ -55,6 +55,10 @@ Click the bookmarklet on any page → popup opens with URL pre-filled → add ta
 - Browser plugin to submit current page with selected text as pullout
 - Long-term link archival via archive.org
 
+## Tags
+
+See [TAGS.md](TAGS.md) for the tag strategy and full tag vocabulary.
+
 ## Constraints
 
 - The existence of a Tag implies a List; Links can have multiple Tags (likely fewer than 20 per link)

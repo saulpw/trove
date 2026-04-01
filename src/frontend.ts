@@ -1,4 +1,4 @@
-import bookmarkletCode from './_build/bookmarklet-code.txt';
+import bookmarkletCode from '../_build/bookmarklet-code.txt';
 import { getCredentials, clearCredentials, isSignedIn, showSignIn, handleSignIn, togglePasswordVisibility, initSignInForm } from './auth';
 import { renderTag, renderTagSidebar, initTagMenu, initSidebarTagMenu, handleAddTagClick, isUserTag, userTagUsername } from './tags';
 import { initAutocomplete } from './autocomplete';

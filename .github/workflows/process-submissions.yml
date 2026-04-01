@@ -32,7 +32,7 @@ jobs:
       - name: Process submissions
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: python process_issues.py
+        run: python scripts/process_issues.py
 
       - name: Commit and push to links branch
         run: |

@@ -78,7 +78,6 @@ GitHub Actions (cron)
 
 ### Frontend (Google OAuth)
 - **Production:** Netlify snippet injection sets `window.GOOGLE_CLIENT_ID`
-- **Local dev:** `config.js` sets `window.GOOGLE_CLIENT_ID`
 
 ### Netlify Function
 - `GITHUB_TOKEN`: Personal access token with `repo` scope

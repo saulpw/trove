@@ -8,5 +8,5 @@
     "skipLibCheck": true,
     "lib": ["ES2020", "DOM", "DOM.Iterable"]
   },
-  "include": ["*.ts"]
+  "include": ["src/**/*.ts"]
 }

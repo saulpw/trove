@@ -3,38 +3,54 @@
 A simple static website to share lists of links at a public mnemonic url.  e.g. trove.saul.pw/games is a list of games
 
 ## Project Structure
-- `index.html` - Static frontend HTML structure
-- `style.css` - Frontend CSS styles
-- `frontend.ts` - Frontend TypeScript (link loading, filtering, sorting, orchestration)
-- `auth.ts` - Auth primitives (credentials, sign-in UI, password visibility)
-- `tags.ts` - Tag sidebar, tag menus, and tag editing operations
-- `addlink.ts` - Shared link submission logic (used by bookmarklet)
-- `bookmarklet.ts` - Bookmarklet widget TypeScript (IIFE injected on external pages)
-- `autocomplete.ts` - Shared tag autocomplete logic (used by bookmarklet)
-- `tsconfig.json` - TypeScript config (strict, noEmit — type checking only)
-- `package.json` - devDependencies: esbuild (bundler), typescript (type checker)
+- `src/` - Frontend source files (HTML, CSS, TypeScript)
+  - `index.html` - Static frontend HTML structure
+  - `help.html` - Help page
+  - `submit.html` - Submit page
+  - `style.css` - Frontend CSS styles
+  - `frontend.ts` - Frontend TypeScript (link loading, filtering, sorting, orchestration)
+  - `auth.ts` - Auth primitives (credentials, sign-in UI, password visibility)
+  - `tags.ts` - Tag sidebar, tag menus, and tag editing operations
+  - `addlink.ts` - Shared link submission logic (used by bookmarklet)
+  - `bookmarklet.ts` - Bookmarklet widget TypeScript (IIFE injected on external pages)
+  - `autocomplete.ts` - Shared tag autocomplete logic (used by bookmarklet)
+  - `text.d.ts` - TypeScript declaration for .txt imports (esbuild text loader)
+- `scripts/` - Python CLI tools and utilities
+  - `trove_utils.py` - Shared utilities. `load_trove()`, `save_trove()`, `create_link_entry()`
+  - `add_link.py` - CLI to add links to trove-log.jsonl (auto-fetches title, triggers archive.org, commits)
+  - `process_issues.py` - Processes GitHub issue submissions into trove-log.jsonl
+  - `process_local_issues.py` - Offline issue processing from local JSON files (for testing)
+  - `import_md_links.py` - One-time bulk import from markdown files
+  - `import_web_links.py` - Extract/import links from web pages
+  - `manage_users.py` - CLI to add/remove users from Netlify `TROVE_USERS` env var
+  - `compact_trove.py` - Compactor: strips tracking params, deduplicates log, health-checks links, adds archive.org fallback URLs
+  - `dedup_trove.py` - Deduplicate trove-log.jsonl
+  - `generate_tags.py` - Build tags.jsonl from trove-log.jsonl
+  - `normalize_tags.py` - Normalize tags according to TAGS.md conventions
+  - `autotag.py` - Auto-tag untagged links using AI
+- `tests/` - Python tests and test fixtures
+  - `test_compact_trove.py` - Tests for compact_trove.py (strip, merge, health check, archive)
+  - `test_dedup_trove.py` - Tests for dedup_trove.py
+  - `test_process_issues.py` - Tests for process_issues.py
+  - `test_issues/` - Test fixture data
 - `.links/` - Persistent git worktree for the orphan `links` branch. Contains `trove-log.jsonl` (append-only operation log in JSONL format). Tags are space-separated strings (e.g., `"tags": "games retro"`), not JSON arrays. Use `make push-links MSG="..."` to commit. Processed at build time into `trove.jsonl` (deduplicated links) and `tags.jsonl` (tag list with descriptions).
 - `.meta/` - Persistent git worktree for the orphan `meta` branch. Contains `TODO.md` and project planning files that don't belong in the code branch.
-- `trove_utils.py` - Shared utilities. `load_trove()`, `save_trove()`, `create_link_entry()`
-- `add_link.py` - CLI to add links to trove-log.jsonl (auto-fetches title, triggers archive.org, commits)
-- `process_issues.py` - Processes GitHub issue submissions into trove-log.jsonl
-- `process_local_issues.py` - Offline issue processing from local JSON files (for testing)
-- `import_md_links.py` - One-time bulk import from markdown files
-- `manage_users.py` - CLI to add/remove users from Netlify `TROVE_USERS` env var
-- `compact_trove.py` - Compactor: strips tracking params, deduplicates log, health-checks links, adds archive.org fallback URLs
-- `test_compact_trove.py` - Tests for compact_trove.py (strip, merge, health check, archive)
 - `Makefile` - Targets: `setup`, `setup-worktrees`, `serve`, `add`, `build`, `typecheck`, `test`, `compact`, `compact-fast`, `import`, `process-issues`, `process-local`, `add-user`, `remove-user`, `list-users`
+- `tsconfig.json` - TypeScript config (strict, noEmit — type checking only)
+- `package.json` - devDependencies: esbuild (bundler), typescript (type checker)
 - `netlify.toml` - Netlify config (SPA fallback routing)
 - `ARCHITECTURE.md` - Design: GitHub Issues submissions + GitHub Actions processor
 - `docs/auth.md` - Auth approach options and tradeoffs
 - `README.md` - Setup instructions (user auth, GitHub token, Netlify deployment)
+- `TAGS.md` - Tag strategy and full tag vocabulary. Consult when tagging links or writing tag-related code.
 - `.meta/TODO.md` - Feature checklist (on `meta` branch)
 
 ## Design Decisions
 - All link submission (adding new links) goes through the bookmarklet. There is no inline add form on the main page.
-- CLI interface (`add_link.py`) uses positional arguments for tags (not `--tags` flag): `python3 add_link.py URL tag1 tag2`
+- CLI interface (`scripts/add_link.py`) uses positional arguments for tags (not `--tags` flag): `python3 scripts/add_link.py URL tag1 tag2`
 - Use space-separated strings (not lists) for multi-value fields like tags and URLs in Python function interfaces. This matches the trove-log.jsonl storage format and keeps a consistent pattern across the codebase.
 - Use `${FOO}` variable syntax in Makefiles (not `$(FOO)`), because it is directly compatible with shell env var syntax for easy copy-paste.
+- **Tag strategy is in TAGS.md.** Short, atomic, lowercase, no hyphens. Singular = specific instance (`game`), plural = category (`games`). Consult TAGS.md for the full vocabulary before suggesting or applying tags.
 
 ## Meta Rules
 - **NEVER implement code changes in response to a question.** Questions get answers. Wait for explicit confirmation before touching any files.
@@ -53,12 +69,12 @@ A simple static website to share lists of links at a public mnemonic url.  e.g. 
 - When summarizing completed work, append to CHANGELOG.md with ISO date heading. Use --- between each set of changes. Edit CHANGELOG.md BEFORE committing and stage it with the code changes.
 - When writing tests, ask the human to verify test expectations rather than guessing values. Show them the test scenario and ask if the expected behavior is correct.
 - Document all setup steps (API keys, external services, environment variables) in README.md in a dedicated section.
-- Bump version in `index.html` footer (`<div id="version">vX.X</div>`) on major code changes (new features, significant fixes). Always bump minor version until major is >0.
+- Bump version in `src/index.html` footer (`<div id="version">vX.X</div>`) on major code changes (new features, significant fixes). Always bump minor version until major is >0.
 - When the user swears at you, they're frustrated about a deeper issue. Identify the root cause and create a META RULE to prevent similar mistakes, not a narrow fix for the specific case.
 
 ## Meta Rules (cont.)
 
-- When making UI changes, always update `help.html` to reflect the new behavior.
+- When making UI changes, always update `src/help.html` to reflect the new behavior.
 - **NEVER switch git branches.** Orphan branches live in persistent worktrees (`.links/`, `.meta/`). Use `git worktree add` to create, operate inside the worktree dir. Never use `git checkout --orphan` or `git rm -rf` on the working branch.
 - **`git rm` from main can cascade into worktrees** with same-named files. When removing a file from main that also exists in a worktree, verify the worktree copy is unaffected.
 - When Saul says "TODO:", add to `.meta/TODO.md` (on meta branch, not main). Ideas/deferred items go in `.meta/IDEAS.md`. Design session items go in `.meta/DESIGN.md`.

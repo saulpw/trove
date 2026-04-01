@@ -3,7 +3,6 @@ __pycache__
 _build/
 tags.json
 client_secret_*.json
-config.js
 .env
 .envrc
 node_modules/
