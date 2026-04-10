@@ -603,3 +603,4 @@
 {"op": "add", "url": "http://viznut.fi/unscii/", "added": "2026-04-07T23:49:58.339907+00:00", "title": "Unscii - a bitmapped Unicode font for blocky graphics", "tags": "textart retro unicode", "submitted_by": "saul"}
 {"op": "add", "url": "https://not-an-llm.bearblog.dev/meat-based-llm-proxies/", "added": "2026-04-08T02:30:37.685781+00:00", "title": "Meat-based LLM proxies | Not-an-LLM", "tags": "ai essay", "submitted_by": "saul"}
 {"op": "add", "url": "https://github.com/onesuper/tui-use", "added": "2026-04-08T17:26:10.325886+00:00", "title": "onesuper/tui-use: tui-use gives agents access to the parts of the terminal that bash can't reach \u2014 every REPL, installer, and TUI app built for humans.", "tags": "ai tui terminal", "submitted_by": "saul"}
+{"op": "add", "url": "https://charcuterie.elastiq.ch/#1E71", "added": "2026-04-10T01:36:42.836646+00:00", "title": "Charcuterie \u2014 A Visual Unicode Explorer", "tags": "unicode textart", "submitted_by": "saul"}
