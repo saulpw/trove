@@ -1,4 +1,8 @@
-.PHONY: setup setup-worktrees serve add build typecheck test dedup compact compact-fast import process-issues process-local fill-titles add-user remove-user list-users web-extract web-import pull-links push-links create-build-hook normalize-tags autotag
+BUILDDIR := _build
+
+.PHONY: setup setup-worktrees serve add build typecheck test dedup compact compact-fast import process-issues process-local fill-titles add-user remove-user list-users web-extract web-import pull-links push-links create-build-hook normalize-tags autotag rewrite-amazon
+
+COUNT ?= 1
 
 all: build
 
@@ -36,22 +40,20 @@ push-links:
 	fi
 
 # Build for Netlify deployment
-build: pull-links tags.jsonl
-	mkdir -p _build
-	npx esbuild src/bookmarklet.ts --bundle --minify --outfile=_build/bookmarklet-code.txt
-	npx esbuild src/frontend.ts --bundle --loader:.txt=text --outfile=_build/frontend.js
-	npx esbuild src/bookmarklet.ts --bundle --outfile=_build/bookmarklet.js
-	cp src/index.html src/help.html src/submit.html src/style.css tags.jsonl _build/
-	python3 scripts/dedup_trove.py .links/trove-log.jsonl _build/trove.jsonl
-	sed -i='' 's/BUILD_TIMESTAMP/$(shell date +%s)/' _build/index.html
+build: pull-links
+	mkdir -p ${BUILDDIR}
+	npx esbuild src/bookmarklet.ts --bundle --minify --outfile=${BUILDDIR}/bookmarklet-code.txt
+	npx esbuild src/frontend.ts --bundle --loader:.txt=text --outfile=${BUILDDIR}/frontend.js
+	npx esbuild src/bookmarklet.ts --bundle --outfile=${BUILDDIR}/bookmarklet.js
+	cp src/index.html src/help.html src/submit.html src/style.css ${BUILDDIR}/
+	python3 scripts/generate_tags.py > ${BUILDDIR}/tags.jsonl
+	python3 scripts/dedup_trove.py .links/trove-log.jsonl ${BUILDDIR}/trove.jsonl
+	sed -i='' 's/BUILD_TIMESTAMP/$(shell date +%s)/' ${BUILDDIR}/index.html
 
 # Type check TypeScript (no output)
 typecheck:
 	npx tsc --noEmit
 
-# Build tags file
-tags.jsonl: pull-links
-	python3 scripts/generate_tags.py > tags.jsonl
 
 # Syntax check all Python files, then run tests
 test:
@@ -108,8 +110,12 @@ normalize-tags:
 	python3 scripts/normalize_tags.py
 
 # Auto-tag untagged links using AI
-autotag:
+autotag: build
 	python3 scripts/autotag.py --count ${COUNT}
+
+# Rewrite Amazon book URLs to OpenLibrary (dry run; use APPLY=--apply to write)
+rewrite-amazon:
+	python3 scripts/rewrite_amazon.py ${APPLY}
 
 # Compact trove-log: strip tracking params, dedup, health-check dead links
 compact:
@@ -120,4 +126,4 @@ compact-fast:
 	python3 scripts/compact_trove.py --no-health-check --no-commit
 
 clean:
-	rm -f _build/* tags.jsonl
+	rm -f ${BUILDDIR}/*

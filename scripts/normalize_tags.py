@@ -7,9 +7,8 @@ Run with --dry-run to preview changes without writing.
 
 import json
 import sys
-from pathlib import Path
 
-TROVE_FILE = Path(__file__).parent / ".links" / "trove-log.jsonl"
+from trove_utils import TROVE_FILE
 
 # old tag -> new tag(s), space-separated for splits
 RENAMES = {

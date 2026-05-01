@@ -17,7 +17,7 @@ from pathlib import Path
 from dedup_trove import dedup
 from trove_utils import load_trove, save_trove
 
-LINK_CHECK_LOG = Path(__file__).parent / ".meta" / "link-check-log.jsonl"
+LINK_CHECK_LOG = Path(".meta/link-check-log.jsonl")
 
 TRACKING_PARAMS = {
     "utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content",
@@ -157,6 +157,10 @@ def main():
                         help="Skip git commit")
     args = parser.parse_args()
 
+    if not Path(".meta").is_dir():
+        print("Error: .meta/ worktree not found. Run 'make setup-worktrees' first.")
+        raise SystemExit(1)
+
     # Phase 1+2: Strip tracking params and compact
     entries = load_trove()
     original_count = len(entries)
@@ -178,7 +182,7 @@ def main():
         try:
             subprocess.run(
                 ["make", "push-links", "MSG=compact trove-log"],
-                check=True, cwd=Path(__file__).parent,
+                check=True,
             )
         except subprocess.CalledProcessError as e:
             print(f"Warning: push-links failed: {e}")
