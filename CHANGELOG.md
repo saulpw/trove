@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2026-05-22
+
+- `manage_users.py`: pass `--force` to `netlify env:set` to skip overwrite prompt; print redeploy hint after add/remove
+
+---
+
 ## 2026-03-31
 
 - Reorganize project directory structure

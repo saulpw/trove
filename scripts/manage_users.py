@@ -32,9 +32,10 @@ def set_users(users):
     """Write users dict back to Netlify TROVE_USERS env var."""
     value = ",".join(f"{u}:{p}" for u, p in users.items())
     subprocess.run(
-        ["netlify", "env:set", "TROVE_USERS", value],
+        ["netlify", "env:set", "TROVE_USERS", value, "--force"],
         check=True
     )
+    print("Run `netlify deploy --prod --build` to activate (or push to main).")
 
 
 def main():
