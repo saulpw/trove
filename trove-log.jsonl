@@ -651,3 +651,4 @@
 {"op": "add", "url": "https://objective.st/", "added": "2026-05-25T02:02:00.355285+00:00", "title": "Objective-Smalltalk", "tags": "lang software", "notes": "Elegantly compose modern software by going beyond algorithms and data structures.", "submitted_by": "saul"}
 {"op": "add", "url": "https://danhaylett.substack.com/p/what-you-will-lose-when-you-retire", "added": "2026-05-28T22:00:34.531698+00:00", "title": "What You Will Lose When You Retire - by Dan Haylett", "tags": "essay society", "submitted_by": "saul"}
 {"op": "add", "url": "https://dles.gg/blog/dles-gg-manifesto", "added": "2026-05-29T20:51:43.315792+00:00", "title": "Daily Logic Exercises", "tags": "games puzzles", "submitted_by": "saul"}
+{"op": "add", "url": "https://movq.de/blog/postings/2026-05-29/0/POSTING-en.html", "added": "2026-06-01T16:22:10.499956+00:00", "title": "movwin: My (unpublished) TUI framework", "tags": "tui", "submitted_by": "saul"}
