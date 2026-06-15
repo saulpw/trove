@@ -665,3 +665,4 @@
 {"op": "add", "url": "https://agency-lang.com/", "added": "2026-06-13T05:01:15.877489+00:00", "title": "Agency Language", "tags": "software lang ai", "submitted_by": "saul"}
 {"op": "add", "url": "https://store.steampowered.com/app/2527160/Desktop_Explorer/", "added": "2026-06-14T03:19:43.279600+00:00", "title": "Desktop Explorer on Steam", "tags": "game computers", "submitted_by": "saul"}
 {"op": "add", "url": "https://bitsy.org/", "added": "2026-06-15T01:24:34.572537+00:00", "title": "bitsy", "tags": "gamedev", "submitted_by": "saul"}
+{"op": "add", "url": "https://prahladyeri.github.io/guides/applying-brevity-and-language-efficiency-to-prompt-engineering.html", "added": "2026-06-15T15:30:43.415754+00:00", "title": "Applying Brevity and Language Efficiency in Prompt Engineering", "tags": "ai optimization", "submitted_by": "saul"}
