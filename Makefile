@@ -1,6 +1,6 @@
 BUILDDIR := _build
 
-.PHONY: setup setup-worktrees serve add build typecheck test dedup compact compact-fast import process-issues process-local fill-titles add-user remove-user list-users web-extract web-import pull-links push-links create-build-hook normalize-tags autotag rewrite-amazon
+.PHONY: setup setup-worktrees serve add build typecheck test test-csp dedup compact compact-fast import process-issues process-local fill-titles add-user remove-user list-users web-extract web-import pull-links push-links create-build-hook normalize-tags autotag rewrite-amazon
 
 COUNT ?= 1
 
@@ -59,6 +59,11 @@ typecheck:
 test:
 	python3 -m py_compile scripts/*.py && echo "Syntax OK"
 	python3 -m pytest tests/ -v
+
+# Headless check: bookmarklet new-tab fallback escapes archive.org wombat.js (needs network)
+PLAYWRIGHT_PY ?= ${HOME}/.venvs/claude/bin/python
+test-csp:
+	${PLAYWRIGHT_PY} tests/check_bookmarklet_csp.py
 
 # Deduplicate trove-log.jsonl (standalone)
 dedup:

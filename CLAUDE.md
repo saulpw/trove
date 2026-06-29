@@ -78,6 +78,7 @@ A simple static website to share lists of links at a public mnemonic url.  e.g. 
 - **NEVER switch git branches.** Orphan branches live in persistent worktrees (`.links/`, `.meta/`). Use `git worktree add` to create, operate inside the worktree dir. Never use `git checkout --orphan` or `git rm -rf` on the working branch.
 - **`git rm` from main can cascade into worktrees** with same-named files. When removing a file from main that also exists in a worktree, verify the worktree copy is unaffected.
 - When Saul says "TODO:", add to `.meta/TODO.md` (on meta branch, not main). Ideas/deferred items go in `.meta/IDEAS.md`. Design session items go in `.meta/DESIGN.md`.
+- When you install a tool or system dependency in the cbox that could be useful for trove work in a future session (e.g. Chromium libs for `make test-csp`), add a guarded, idempotent line to `.meta/cbox-init.sh` so it persists across rebuilds (cbox upper-layer installs are lost otherwise).
 
 ## Personality Rules
 

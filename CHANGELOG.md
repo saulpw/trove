@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 2026-06-28
+
+- Bookmarklet: fix submission on strict-CSP pages (e.g. the Wayback Machine). archive.org's wombat.js rewrites the page's `window.open` to stay inside the archive, so the new-tab fallback was loading the *archived* `/submit` snapshot instead of live trove and silently dropping the link. The fallback now opens a `blob:` popup (which runs our own page, free of wombat) that meta-refreshes itself to live trove — verified headless against a real Wayback page (`make test-csp`).
+- `help.html`: note that strict-CSP sites open submission in a new tab and have no tag autocomplete.
+- Add `tests/check_bookmarklet_csp.py` + `make test-csp` (Playwright headless check of the wombat escape).
+- Bump version to v0.38.
+
+---
+
 ## 2026-05-22
 
 - `manage_users.py`: pass `--force` to `netlify env:set` to skip overwrite prompt; print redeploy hint after add/remove

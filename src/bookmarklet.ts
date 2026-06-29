@@ -161,9 +161,15 @@ declare var __TROVE_PASS__: string;
       status.className = 'status ok';
       setTimeout(() => host.remove(), 1200);
     } else if (result.error === 'Network error') {
-      // CSP may block cross-origin fetch — fall back to popup tab on trove origin
+      // CSP blocks the cross-origin fetch — open trove /submit in a new tab instead
       const params = new URLSearchParams({ url, title, tags, notes, u: user, p: pass });
-      window.open(origin + '/submit?' + params.toString(), '_blank');
+      const submitUrl = origin + '/submit?' + params.toString();
+      // wombat-escape: archive.org rewrites window.open(url); blob popup meta-refreshes itself to live trove
+      const esc = submitUrl.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+      const blobUrl = URL.createObjectURL(new Blob(
+        [`<!doctype html><meta charset=utf-8><meta http-equiv=refresh content="0;url=${esc}">`],
+        { type: 'text/html' }));
+      window.open(blobUrl, '_blank');
       status.textContent = 'Opened in new tab...';
       status.className = 'status ok';
       setTimeout(() => host.remove(), 1500);
