@@ -681,3 +681,4 @@
 {"op": "add", "url": "https://www.openra.net/", "added": "2026-06-27T21:27:24.722123+00:00", "title": "OpenRA - Classic strategy games rebuilt for the modern era", "tags": "game retro oss", "submitted_by": "saul"}
 {"op": "add", "url": "https://dam.stanford.edu/memory-prices.html", "added": "2026-06-28T20:00:51.584570+00:00", "title": "Memory Prices | DAM", "tags": "mag computer", "submitted_by": "saul"}
 {"op": "add", "url": "https://web.archive.org/web/20240325000853/https://sedac.ciesin.columbia.edu/data/set/urbanspatial-hist-urban-pop-3700bc-ad2000", "added": "2026-07-01T18:30:53.027172+00:00", "title": "Historical Urban Population, v1: Urban Spatial Data | SEDAC", "tags": "mag population", "submitted_by": "saul"}
+{"op": "add", "url": "https://datasetsearch.research.google.com/", "added": "2026-07-01T18:33:27.293466+00:00", "title": "Google Dataset Search", "tags": "datasets", "submitted_by": "saul"}
