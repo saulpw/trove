@@ -685,3 +685,4 @@
 {"op": "add", "url": "https://pudo.org/", "added": "2026-07-01T18:34:48.786127+00:00", "title": "Friedrich Lindenberg", "tags": "person data oss journalism", "submitted_by": "saul"}
 {"op": "add", "url": "https://dataset.readthedocs.io/en/latest/", "added": "2026-07-01T18:35:42.920540+00:00", "title": "dataset 2.0.0 documentation", "tags": "databases", "submitted_by": "saul"}
 {"op": "add", "url": "https://dataverse.harvard.edu/", "added": "2026-07-01T18:35:59.102329+00:00", "title": "Harvard Dataverse", "tags": "datasets", "submitted_by": "saul"}
+{"op": "add", "url": "https://cookthedata.org/p/public-datasets/", "added": "2026-07-01T19:07:55.936870+00:00", "title": "Publicly available datasets", "tags": "datasets", "submitted_by": "saul"}
