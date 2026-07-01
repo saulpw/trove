@@ -683,3 +683,4 @@
 {"op": "add", "url": "https://web.archive.org/web/20240325000853/https://sedac.ciesin.columbia.edu/data/set/urbanspatial-hist-urban-pop-3700bc-ad2000", "added": "2026-07-01T18:30:53.027172+00:00", "title": "Historical Urban Population, v1: Urban Spatial Data | SEDAC", "tags": "mag population", "submitted_by": "saul"}
 {"op": "add", "url": "https://datasetsearch.research.google.com/", "added": "2026-07-01T18:33:27.293466+00:00", "title": "Google Dataset Search", "tags": "datasets", "submitted_by": "saul"}
 {"op": "add", "url": "https://pudo.org/", "added": "2026-07-01T18:34:48.786127+00:00", "title": "Friedrich Lindenberg", "tags": "person data oss journalism", "submitted_by": "saul"}
+{"op": "add", "url": "https://dataset.readthedocs.io/en/latest/", "added": "2026-07-01T18:35:42.920540+00:00", "title": "dataset 2.0.0 documentation", "tags": "databases", "submitted_by": "saul"}
