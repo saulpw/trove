@@ -688,3 +688,4 @@
 {"op": "add", "url": "https://cookthedata.org/p/public-datasets/", "added": "2026-07-01T19:07:55.936870+00:00", "title": "Publicly available datasets", "tags": "datasets", "submitted_by": "saul"}
 {"op": "add", "url": "https://project-awesome.org/r/awesome-public-datasets", "added": "2026-07-01T19:08:17.906019+00:00", "title": "Awesome Public Datasets \u2014 Project Awesome", "tags": "datasets", "submitted_by": "saul"}
 {"op": "add", "url": "https://github.com/awesomedata/awesome-public-datasets", "added": "2026-07-01T19:08:19.335247+00:00", "title": "awesomedata/awesome-public-datasets: A topic-centric list of HQ open datasets.", "tags": "datasets", "submitted_by": "saul"}
+{"op": "add", "url": "https://www.weaverobotics.com/isaac-1", "added": "2026-07-01T22:05:42.962591+00:00", "title": "Isaac 1 \u2014 Weave Robotics", "tags": "robot", "submitted_by": "saul"}
