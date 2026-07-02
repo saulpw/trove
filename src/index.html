@@ -17,13 +17,13 @@
     </div>
   </header>
 
-  <div id="signin-overlay" style="display:none;">
-    <div id="signin-panel">
-      <div class="signin-header">
+  <div id="signin-overlay" class="modal-overlay" style="display:none;">
+    <div class="modal-panel">
+      <div class="modal-header">
         <strong>Sign in</strong>
-        <button class="signin-close" onclick="showSignIn(false)">&times;</button>
+        <button class="modal-close" onclick="showSignIn(false)">&times;</button>
       </div>
-      <div class="signin-body">
+      <div class="modal-body">
         <label for="auth-username">Username</label>
         <input type="text" id="auth-username" placeholder="Username" />
         <label for="auth-password">Password</label>
@@ -43,13 +43,13 @@
     </div>
   </div>
 
-  <div id="edit-tag-overlay" style="display:none;">
-    <div id="edit-tag-panel">
-      <div class="signin-header">
+  <div id="edit-tag-overlay" class="modal-overlay" style="display:none;">
+    <div class="modal-panel">
+      <div class="modal-header">
         <strong>Edit tag</strong>
-        <button class="signin-close" id="edit-tag-close">&times;</button>
+        <button class="modal-close" id="edit-tag-close">&times;</button>
       </div>
-      <div class="signin-body">
+      <div class="modal-body">
         <label for="edit-tag-name">Tag name</label>
         <input type="text" id="edit-tag-name" />
         <label for="edit-tag-desc">Description</label>
@@ -93,7 +93,7 @@
 
   <footer>
     <div>a <a href="https://saul.pw">saul.pw</a> project | <a href="/privacy">privacy policy</a></div>
-    <div id="version">v0.38</div>
+    <div id="version">v0.39</div>
   </footer>
 
   <!-- Main frontend code -->

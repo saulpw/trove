@@ -45,10 +45,10 @@ build: pull-links
 	npx esbuild src/bookmarklet.ts --bundle --minify --outfile=${BUILDDIR}/bookmarklet-code.txt
 	npx esbuild src/frontend.ts --bundle --loader:.txt=text --outfile=${BUILDDIR}/frontend.js
 	npx esbuild src/bookmarklet.ts --bundle --outfile=${BUILDDIR}/bookmarklet.js
-	cp src/index.html src/help.html src/submit.html src/style.css ${BUILDDIR}/
+	cp src/help.html src/submit.html src/privacy.html src/style.css ${BUILDDIR}/
+	sed 's/BUILD_TIMESTAMP/$(shell date +%s)/' src/index.html > ${BUILDDIR}/index.html
 	python3 scripts/generate_tags.py > ${BUILDDIR}/tags.jsonl
 	python3 scripts/dedup_trove.py .links/trove-log.jsonl ${BUILDDIR}/trove.jsonl
-	sed -i='' 's/BUILD_TIMESTAMP/$(shell date +%s)/' ${BUILDDIR}/index.html
 
 # Type check TypeScript (no output)
 typecheck:

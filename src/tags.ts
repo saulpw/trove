@@ -1,7 +1,7 @@
 // Tag sidebar, tag menus, and tag editing operations
 
 import { isSignedIn, getCredentials } from './auth';
-import { getCurrentPageTags, currentPath, parseTags, submitToBackend, filterAndRender, getRatings, getTagDescriptions, getAllTagNames } from './frontend';
+import { getCurrentPageTags, currentPath, parseTags, submitToBackend, navigateTo, getRatings, getTagDescriptions, getAllTagNames, esc } from './frontend';
 import { initAutocomplete } from './autocomplete';
 
 // A user tag starts with a non-alphanumeric char followed by a username
@@ -17,15 +17,16 @@ export function userTagUsername(tag: string): string {
 
 function renderTagMenu(tag: string, opts?: { sidebar?: boolean }): string {
   const path = currentPath();
-  const pathDisplay = path.slice(1);
-  const editOpt = opts?.sidebar && isSignedIn() ? `<span class="edit-tag-trigger" data-tag="${tag}">✎ edit</span>` : '';
-  const addLabel = pathDisplay ? `${pathDisplay} ∩ ${tag}` : tag;
-  const excludeLabel = pathDisplay ? `${pathDisplay} ∩ ~${tag}` : `~${tag}`;
-  return `<span data-href="${path}/${tag}">${addLabel}</span><span data-href="${path}/-${tag}">${excludeLabel}</span>${editOpt}`;
+  const pathDisplay = esc(path.slice(1));
+  const t = esc(tag);
+  const editOpt = opts?.sidebar && isSignedIn() ? `<span class="edit-tag-trigger" data-tag="${t}">✎ edit</span>` : '';
+  const addLabel = pathDisplay ? `${pathDisplay} ∩ ${t}` : t;
+  const excludeLabel = pathDisplay ? `${pathDisplay} ∩ -${t}` : `-${t}`;
+  return `<span data-href="${esc(path)}/${t}">${addLabel}</span><span data-href="${esc(path)}/-${t}">${excludeLabel}</span>${editOpt}`;
 }
 
 export function renderTag(t: string): string {
-  return `<span class="tag-wrap"><span class="tag" data-tag="${t}">${t}</span><span class="tag-menu">${renderTagMenu(t)}</span></span>`;
+  return `<span class="tag-wrap"><span class="tag" data-tag="${esc(t)}">${esc(t)}</span><span class="tag-menu">${renderTagMenu(t)}</span></span>`;
 }
 
 export function renderTagSidebar(links: Array<{ url: string; tags?: string }>, pageTags: string[]): void {
@@ -62,8 +63,8 @@ export function renderTagSidebar(links: Array<{ url: string; tags?: string }>, p
   const descs = getTagDescriptions();
   sidebar.innerHTML = pseudoTags + sorted.map(([tag, count]) => {
     const desc = descs[tag];
-    const titleAttr = desc ? ` title="${desc.replace(/"/g, '&quot;')}"` : '';
-    return `<span class="sidebar-tag" data-tag="${tag}"${titleAttr}><span class="tag">${tag}</span> <span class="sidebar-count">(${count})</span></span>`;
+    const titleAttr = desc ? ` title="${esc(desc)}"` : '';
+    return `<span class="sidebar-tag" data-tag="${esc(tag)}"${titleAttr}><span class="tag">${esc(tag)}</span> <span class="sidebar-count">(${count})</span></span>`;
   }).join('') + `<div class="sidebar-menu"></div>`;
 }
 
@@ -89,8 +90,7 @@ export function initSidebarTagMenu(): void {
       e.preventDefault();
       e.stopPropagation();
       closeSidebarMenu();
-      history.pushState(null, '', menuItem.dataset.href!);
-      filterAndRender();
+      navigateTo(menuItem.dataset.href!);
       return;
     }
     const tagEl = (e.target as HTMLElement).closest('.sidebar-tag[data-tag]') as HTMLElement | null;
@@ -99,8 +99,7 @@ export function initSidebarTagMenu(): void {
       e.stopPropagation();
       // Pseudo-tags navigate directly
       if (tagEl.classList.contains('sidebar-pseudo')) {
-        history.pushState(null, '', '/' + tagEl.dataset.tag!);
-        filterAndRender();
+        navigateTo('/' + tagEl.dataset.tag!);
         return;
       }
       const menu = sidebar.querySelector('.sidebar-menu') as HTMLElement & { _tag?: string; _entered?: boolean };
@@ -125,8 +124,7 @@ export function initSidebarTagMenu(): void {
       e.preventDefault();
       e.stopPropagation();
       closeSidebarMenu();
-      history.pushState(null, '', '/' + tagEl.dataset.tag!);
-      filterAndRender();
+      navigateTo('/' + tagEl.dataset.tag!);
     }
   });
   sidebar.addEventListener('mouseenter', (e) => {
@@ -142,12 +140,6 @@ export function initSidebarTagMenu(): void {
   });
 }
 
-// Navigate to a tag without full page reload
-function navigateToTag(tag: string): void {
-  history.pushState(null, '', '/' + tag);
-  filterAndRender();
-}
-
 export function initTagMenu(): void {
   document.getElementById('links')!.addEventListener('click', (e) => {
     const menuItem = (e.target as HTMLElement).closest('.tag-menu [data-href]') as HTMLElement | null;
@@ -155,12 +147,11 @@ export function initTagMenu(): void {
     if (menuItem) {
       e.preventDefault();
       e.stopPropagation();
-      history.pushState(null, '', menuItem.dataset.href!);
-      filterAndRender();
+      navigateTo(menuItem.dataset.href!);
     } else if (tag) {
       e.preventDefault();
       e.stopPropagation();
-      navigateToTag(tag.dataset.tag!);
+      navigateTo('/' + tag.dataset.tag!);
     }
   });
 }
@@ -226,8 +217,9 @@ async function submitTagsForLink(url: string, tags: string, linkEl: HTMLElement,
   const tagsEl = linkEl.querySelector('.tags')!;
   const creds = getCredentials();
   const currentUser = creds?.username || '';
+  const existingTags = (linkEl.dataset.tags || '').split(' ').filter(t => t);
   const newTags = tags.split(' ').filter(t => {
-    if (!t || pageTags.includes(t)) return false;
+    if (!t || pageTags.includes(t) || existingTags.includes(t)) return false;
     if (isUserTag(t) && userTagUsername(t) !== currentUser) return false;
     return true;
   });
@@ -235,58 +227,12 @@ async function submitTagsForLink(url: string, tags: string, linkEl: HTMLElement,
   newTags.forEach(t => {
     tagsEl.insertAdjacentHTML('beforeend', renderTag(t) + ' ');
   });
+  linkEl.dataset.tags = existingTags.concat(newTags).join(' ');
 
   restoreAddButton(input, btn);
-  submitToBackend({ action: 'add_tag', url, tags });
-}
-
-function showRenameInput(hideEl: HTMLElement, tagName: string, onConfirm: (newTags: string[]) => void): void {
-  const input = document.createElement('input');
-  input.type = 'text';
-  input.className = 'rename-tag-input';
-  input.value = tagName;
-
-  const cancel = () => { input.remove(); hideEl.style.display = ''; };
-
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      e.stopPropagation();
-      const newTagStr = input.value.trim();
-      if (newTagStr && newTagStr !== tagName) {
-        onConfirm(newTagStr.split(/\s+/).filter(t => t));
-        cancel();
-      } else { cancel(); }
-    } else if (e.key === 'Escape') { e.stopPropagation(); cancel(); }
-  });
-
-  input.addEventListener('blur', () => { setTimeout(() => { if (document.body.contains(input)) cancel(); }, 100); });
-
-  hideEl.style.display = 'none';
-  hideEl.parentNode!.insertBefore(input, hideEl);
-  input.focus();
-  input.select();
-}
-
-function handleRemoveTag(tagName: string, linkEl: HTMLElement): void {
-  const tagWrap = linkEl.querySelector(`.tag-wrap .tag[data-tag="${tagName}"]`)?.closest('.tag-wrap') as HTMLElement | null;
-  if (tagWrap) tagWrap.remove();
-  const oldTags = (linkEl.dataset.tags || '').split(' ').filter(t => t);
-  linkEl.dataset.tags = oldTags.filter(t => t !== tagName).join(' ');
-  submitToBackend({ action: 'remove_tag', url: linkEl.dataset.url!, tags: tagName });
-}
-
-function handleRenameTagClick(tagName: string, linkEl: HTMLElement): void {
-  const tagWrap = linkEl.querySelector(`.tag-wrap .tag[data-tag="${tagName}"]`)!.closest('.tag-wrap') as HTMLElement;
-  showRenameInput(tagWrap, tagName, (newTags) => {
-    newTags.forEach(t => {
-      tagWrap.insertAdjacentHTML('beforebegin', renderTag(t) + ' ');
-    });
-    tagWrap.remove();
-    const oldTags = (linkEl.dataset.tags || '').split(' ').filter(t => t);
-    linkEl.dataset.tags = oldTags.filter(t => t !== tagName).concat(newTags).join(' ');
-    submitToBackend({ action: 'rename_tag', remove_tag: tagName, add_tags: newTags.join(' '), urls: linkEl.dataset.url! });
-  });
+  if (newTags.length > 0) {
+    submitToBackend({ action: 'add_tag', url, tags: newTags.join(' ') });
+  }
 }
 
 function renameTagGlobally(tagName: string, newTags: string[]): void {

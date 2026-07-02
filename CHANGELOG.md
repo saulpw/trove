@@ -1,5 +1,27 @@
 # CHANGELOG
 
+## 2026-07-01
+
+Consistency/UI fix round (10 issues from a full-repo review, tracked in `.meta/todo/`, now in `.meta/done/`):
+
+- Hidden-links toggle: `filterAndRender()` reset `showingHidden` on every call, so the "N hidden" / "show visible" links were no-ops everywhere. Hidden-view state now resets only on navigation (new `navigateTo()` helper, used by all tag menus / sidebar / breadcrumbs / popstate — replaces six inline `pushState`+`filterAndRender` pairs).
+- `/_peeves`: removed the `showingHidden = true` side effect from `getPageConfig()`; `_favs`/`_peeves` no longer split visible/hidden (new `splitHidden` page flag), so no dead toggle link.
+- Empty results: link count now updates (was stale from the previous page); time-period dropdown stays visible so an over-narrow "Last day" filter can be undone.
+- Homepage truncation: changing sort (or logging in/out) re-rendered all links; truncation + count now live in `applySort()`, shared by all render paths.
+- Add-tag (+) input submitted the raw tag string while displaying a filtered subset; now submits only the filtered tags and updates `data-tags` (skips backend call when nothing survives).
+- Tag exclusion notation unified on the URL syntax: menus show `-tag` (was `~tag`); help updated.
+- New `esc()` helper; all card/tag/sidebar HTML interpolation now escapes `& < > "` (was piecemeal quote-escaping in a few attributes only).
+- Edit panel: Enter saves, Escape cancels (matching the other inline inputs); open autocomplete dropdown keeps priority.
+- Added `/privacy` page + Netlify redirect (footer previously linked to a nonexistent page that rendered as an empty tag view).
+- help.html: rating widget description matched an old layout (now: left column, ❤️ top / ♠️ bottom); edit/delete icon placement corrected; "fewest tags" sort documented.
+- Dead code: removed unused `handleRemoveTag`/`handleRenameTagClick`/`showRenameInput`, vestigial `#foo/bar` hash routing, empty/unused CSS rules (`#links {}`, `header nav`), unused `onAuthSuccess` param.
+- Modal CSS: `#signin-*` and `#edit-tag-*` duplicate blocks merged into shared `.modal-overlay`/`.modal-panel`/`.modal-header`/`.modal-body` classes.
+- Layout constants (`--sidebar-width`, `--content-gap`, `--main-max-width`) now CSS vars; the `#auth-container` margin calc derives from them instead of repeating magic numbers.
+- Makefile: `sed -i=''` left a stray `_build/index.html=` backup; index.html now built via `sed ... > dest` (portable, no backup).
+- Bump version to v0.39.
+
+---
+
 ## 2026-06-28
 
 - Bookmarklet: fix submission on strict-CSP pages (e.g. the Wayback Machine). archive.org's wombat.js rewrites the page's `window.open` to stay inside the archive, so the new-tab fallback was loading the *archived* `/submit` snapshot instead of live trove and silently dropping the link. The fallback now opens a `blob:` popup (which runs our own page, free of wombat) that meta-refreshes itself to live trove — verified headless against a real Wayback page (`make test-csp`).

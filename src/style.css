@@ -23,6 +23,11 @@
   --text-base: 0.85em;
   --text-md: 0.9em;
   --text-lg: 1.1em;
+
+  /* Layout */
+  --sidebar-width: 200px;
+  --content-gap: 2rem;
+  --main-max-width: 800px;
 }
 
 body { font-family: system-ui, sans-serif; max-width: 1100px; margin: 2rem auto; padding: 0 1rem; }
@@ -30,39 +35,42 @@ header { display: flex; justify-content: space-between; align-items: center; mar
 header h1 { margin: 0; }
 header h1 a { color: inherit; text-decoration: none; }
 header h1 a:hover { text-decoration: underline; }
-header nav { flex: 1; margin-left: 1.5rem; }
-header nav a { color: var(--color-link); text-decoration: none; font-size: var(--text-md); }
-header nav a:hover { text-decoration: underline; }
 .breadcrumb-sep { color: var(--color-text-light); font-weight: normal; margin: 0 0.1em; }
-#auth-container { font-size: var(--text-md); display: flex; align-items: center; gap: 0.5rem; margin-right: max(0px, calc(100% - 200px - 2rem - 800px)); }
+#auth-container { font-size: var(--text-md); display: flex; align-items: center; gap: 0.5rem; margin-right: max(0px, calc(100% - var(--sidebar-width) - var(--content-gap) - var(--main-max-width))); }
 #auth-container a { color: var(--color-link); text-decoration: none; cursor: pointer; }
 #auth-container a:hover { text-decoration: underline; }
-#signin-overlay {
+
+/* Modal dialogs (sign-in, edit tag) */
+.modal-overlay {
   position: fixed; top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0,0,0,0.15); z-index: 1000;
   display: flex; align-items: flex-start; justify-content: center; padding-top: 80px;
 }
-#signin-panel {
+.modal-panel {
   width: 340px; background: var(--color-bg); border: 1px solid var(--color-border-input);
   border-radius: 8px; box-shadow: 0 4px 24px rgba(0,0,0,0.2);
   font-family: system-ui, sans-serif; font-size: 14px; color: var(--color-text);
 }
-.signin-header {
+.modal-header {
   display: flex; justify-content: space-between; align-items: center;
   padding: 10px 14px; border-bottom: 1px solid var(--color-border-light);
 }
-.signin-header strong { font-size: 15px; }
-.signin-close { cursor: pointer; font-size: 20px; color: var(--color-text-light); line-height: 1; background: none; border: none; }
-.signin-close:hover { color: var(--color-text); }
-.signin-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
-.signin-body label { font-size: 12px; color: var(--color-text-muted); }
-.signin-body input { width: 100%; padding: 6px 8px; font-size: 14px; border: 1px solid var(--color-border-input); border-radius: 4px; box-sizing: border-box; }
-.signin-body .password-wrap { position: relative; }
-.signin-body .password-wrap input { padding-right: 2rem; }
+.modal-header strong { font-size: 15px; }
+.modal-close { cursor: pointer; font-size: 20px; color: var(--color-text-light); line-height: 1; background: none; border: none; }
+.modal-close:hover { color: var(--color-text); }
+.modal-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.modal-body label { font-size: 12px; color: var(--color-text-muted); }
+.modal-body input { width: 100%; padding: 6px 8px; font-size: 14px; border: 1px solid var(--color-border-input); border-radius: 4px; box-sizing: border-box; }
+.modal-body textarea {
+  width: 100%; padding: 6px 8px; font-size: 14px; border: 1px solid var(--color-border-input);
+  border-radius: 4px; font-family: inherit; resize: vertical; min-height: 48px; box-sizing: border-box;
+}
+.modal-body button { padding: 8px; font-size: 14px; cursor: pointer; border: 1px solid var(--color-border-input); border-radius: 4px; background: var(--color-bg-btn); width: 100%; }
+.modal-body button:hover { background: var(--color-bg-btn-hover); }
+.modal-body .password-wrap { position: relative; }
+.modal-body .password-wrap input { padding-right: 2rem; }
 .password-toggle { position: absolute; right: 0.4rem; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--color-text-light); line-height: 0; }
 .password-toggle:hover { color: var(--color-text); }
-.signin-body button { padding: 8px; font-size: 14px; cursor: pointer; border: 1px solid var(--color-border-input); border-radius: 4px; background: var(--color-bg-btn); width: 100%; }
-.signin-body button:hover { background: var(--color-bg-btn-hover); }
 #auth-status { font-size: 13px; text-align: center; min-height: 1.2em; }
 #auth-status.status-error { color: var(--color-error); }
 #links { list-style: none; padding: 0; }
@@ -150,19 +158,18 @@ footer a { color: var(--color-text-muted); }
 }
 .add-tag-btn:hover { color: var(--color-link); border-color: var(--color-link); }
 
-.add-tag-input, .rename-tag-input {
+.add-tag-input {
   font-size: var(--text-base); padding: 0.1rem 0.4rem;
   border: 1px solid var(--color-link); border-radius: 4px;
   width: 8rem;
+  margin-left: 0.5rem;
 }
-.add-tag-input { margin-left: 0.5rem; }
 
 /* Content wrapper and tag sidebar */
-#content-wrapper { display: flex; gap: 2rem; }
-#main-content { flex: 1; min-width: 0; max-width: 800px; }
-#links { }
+#content-wrapper { display: flex; gap: var(--content-gap); }
+#main-content { flex: 1; min-width: 0; max-width: var(--main-max-width); }
 #tag-sidebar {
-  width: 200px; flex-shrink: 0; font-size: var(--text-sm);
+  width: var(--sidebar-width); flex-shrink: 0; font-size: var(--text-sm);
   padding-top: 0.75rem; position: relative;
 }
 #tag-sidebar .sidebar-tag { display: block; margin-bottom: 0.3rem; cursor: pointer; }
@@ -202,29 +209,9 @@ footer a { color: var(--color-text-muted); }
 .help-page li { margin: 0.3rem 0; }
 .help-page code { background: var(--color-border-light); padding: 0.15rem 0.4rem; border-radius: 3px; font-size: var(--text-md); }
 .tag-example { color: var(--color-text-muted); }
-header nav a + a { margin-left: 1rem; }
 
-/* Edit tag dialog */
-#edit-tag-overlay {
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.15); z-index: 1000;
-  display: flex; align-items: flex-start; justify-content: center; padding-top: 80px;
-}
-#edit-tag-panel {
-  width: 340px; background: var(--color-bg); border: 1px solid var(--color-border-input);
-  border-radius: 8px; box-shadow: 0 4px 24px rgba(0,0,0,0.2);
-  font-family: system-ui, sans-serif; font-size: 14px; color: var(--color-text);
-}
-#edit-tag-panel textarea {
-  width: 100%; padding: 6px 8px; font-size: 14px; border: 1px solid var(--color-border-input);
-  border-radius: 4px; font-family: inherit; resize: vertical; min-height: 48px; box-sizing: border-box;
-}
 .edit-tag-buttons { display: flex; gap: 8px; }
-.edit-tag-buttons button {
-  flex: 1; padding: 8px; font-size: 14px; cursor: pointer;
-  border: 1px solid var(--color-border-input); border-radius: 4px; background: var(--color-bg-btn);
-}
-.edit-tag-buttons button:hover { background: var(--color-bg-btn-hover); }
+.edit-tag-buttons button { flex: 1; }
 
 /* Tag autocomplete dropdown */
 .tag-autocomplete-dropdown {

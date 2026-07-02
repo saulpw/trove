@@ -21,15 +21,12 @@ interface PageConfig {
   pageTags: string[];
   tagFilters: string[];
   truncate: boolean;
+  splitHidden: boolean;
 }
 
-// Parse path or hash to get tag filters: /foo/bar or #foo/bar → ['foo', 'bar']
+// Parse path to get tag filters: /foo/bar → ['foo', 'bar']
 // Tags starting with '-' are exclusions: /foo/-bar → include 'foo', exclude 'bar'
 function getTagFilters(): string[] {
-  const hash = window.location.hash.replace(/^#\/?/, '');
-  if (hash) {
-    return hash.split('/').filter(s => s.length > 0);
-  }
   return window.location.pathname
     .split('/')
     .filter(segment => segment.length > 0 && segment !== 'index.html');
@@ -68,6 +65,9 @@ function filterLinksByTime(links: Link[], period: string): Link[] {
 
 // Parse tags from space-separated string to array
 export const parseTags = (tags: string | undefined): string[] => tags ? tags.split(' ').filter(t => t) : [];
+
+export const esc = (s: string): string =>
+  s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 // Ratings stored in localStorage: { url: number }
 const RATINGS_KEY = 'trove_ratings';
@@ -184,22 +184,21 @@ function renderLinks(links: Link[]): void {
     const tags = [...userTags, ...regularTags];
     let domain = link.url;
     try { domain = new URL(link.url).hostname.replace(/^www\./, ''); } catch {}
-    const escapedUrl = link.url.replace(/'/g, "\\'");
+    const escapedUrl = esc(link.url.replace(/\\/g, '\\\\').replace(/'/g, "\\'"));
     const rating = ratings[link.url] || 0;
     const ratingClass = rating > 0 ? 'positive' : rating < 0 ? 'negative' : 'zero';
     const imgSrc = link.thumbnail || (/\.(jpe?g|png|gif|webp)(\?.*)?$/i.test(link.url) ? link.url : '');
-    const imgAlt = (link.title || '').replace(/"/g, '&quot;');
     const metaParts = [domain];
     if (link.added) metaParts.push(formatDate(link.added));
     if (link.duration) metaParts.push(formatDuration(link.duration));
     if (link.channel) metaParts.push(link.channel);
     return `
-    <a class="link-anchor" href="${link.url}" target="_blank" rel="noopener" draggable="false">
+    <a class="link-anchor" href="${esc(link.url)}" target="_blank" rel="noopener" draggable="false">
       <div class="link"
-           data-url="${link.url}"
-           data-added="${link.added || ''}"
-           ${link.title ? `data-title="${link.title.replace(/"/g, '&quot;')}"` : ''}
-           ${tags.length ? `data-tags="${tags.join(' ')}"` : ''}>
+           data-url="${esc(link.url)}"
+           data-added="${esc(link.added || '')}"
+           ${link.title ? `data-title="${esc(link.title)}"` : ''}
+           ${tags.length ? `data-tags="${esc(tags.join(' '))}"` : ''}>
         <div class="card-body">
           <div class="card-rating">
             <span class="rate-up" onclick="handleRateUp(event, '${escapedUrl}', this)" title="Love">❤️</span>
@@ -208,13 +207,13 @@ function renderLinks(links: Link[]): void {
           </div>
           <div class="card-left">
             <div class="title-row">
-              <span class="title">${link.title || link.url}</span>
+              <span class="title">${esc(link.title || link.url)}</span>
             </div>
-            <span class="meta-line">${metaParts.join(' · ')}</span>
-            ${link.notes ? `<div class="notes">${link.notes}</div>` : ''}
+            <span class="meta-line">${esc(metaParts.join(' · '))}</span>
+            ${link.notes ? `<div class="notes">${esc(link.notes)}</div>` : ''}
             <div class="card-bottom"><span class="tags">${tags.map(t => renderTag(t)).join(' ')}</span><button class="add-tag-btn" onclick="handleAddTagClick(event, this)">+</button></div>
           </div>
-          ${imgSrc ? `<div class="card-thumb"><img src="${imgSrc}" alt="${imgAlt}" loading="lazy"></div>` : ''}
+          ${imgSrc ? `<div class="card-thumb"><img src="${esc(imgSrc)}" alt="${esc(link.title || '')}" loading="lazy"></div>` : ''}
           ${isSignedIn() ? `<div class="card-actions"><span class="card-edit-btn" onclick="handleEditCardClick(event, this)">✏️</span><span class="card-delete-btn" onclick="handleDeleteClick(event, '${escapedUrl}', this)">🗑️</span></div>` : ''}
         </div>
       </div>
@@ -222,10 +221,12 @@ function renderLinks(links: Link[]): void {
   }).join('');
 }
 
+// Render currentLinks with the selected sort, truncation, and count
 function applySort(): void {
   const sortBy = (document.getElementById('sort-select') as HTMLSelectElement).value;
   const sorted = sortLinks(currentLinks, sortBy);
-  renderLinks(sorted);
+  renderLinks(currentTruncate ? sorted.slice(0, 100) : sorted);
+  updateLinkCountDisplay();
 }
 
 // Resolve page config from current route: title, heading, filter, pageTags
@@ -243,12 +244,12 @@ function getPageConfig(): PageConfig {
       pageTags: [],
       tagFilters,
       truncate: false,
+      splitHidden: false,
     };
   }
 
   if (includeTags.includes('_peeves')) {
     const ratings = getRatings();
-    showingHidden = true;
     return {
       title: '_peeves - trove',
       heading: '<a href="/" data-nav>trove</a> <span class="breadcrumb-sep">/</span> _peeves',
@@ -256,6 +257,7 @@ function getPageConfig(): PageConfig {
       pageTags: [],
       tagFilters,
       truncate: false,
+      splitHidden: false,
     };
   }
 
@@ -278,6 +280,7 @@ function getPageConfig(): PageConfig {
       pageTags: tagFilters,
       tagFilters,
       truncate: false,
+      splitHidden: true,
     };
   }
 
@@ -288,12 +291,12 @@ function getPageConfig(): PageConfig {
     pageTags: tagFilters,
     tagFilters,
     truncate: true,
+    splitHidden: true,
   };
 }
 
 // Filter allLinks by current URL and render
 export function filterAndRender(): void {
-  showingHidden = false;
   const container = document.getElementById('links')!;
   const sortControls = document.getElementById('sort-controls')!;
   const timeFilterControls = document.getElementById('time-filter-controls')!;
@@ -325,36 +328,31 @@ export function filterAndRender(): void {
   const ratings = getRatings();
   const tagMatchedLinks = searchedLinks.filter(page.filter);
 
-  currentHiddenCount = tagMatchedLinks.filter(link => (ratings[link.url] || 0) < 0).length;
-  const visibleLinks = tagMatchedLinks.filter(link => (ratings[link.url] || 0) >= 0);
-  const hiddenLinksList = tagMatchedLinks.filter(link => (ratings[link.url] || 0) < 0);
-  const links = showingHidden ? hiddenLinksList : visibleLinks;
-
-  if (links.length === 0) {
-    sortControls.style.display = 'none';
-    timeFilterControls.style.display = 'none';
-    renderTagSidebar([], []);
-    if (showingHidden) {
-      container.innerHTML = '<div class="empty">No hidden links. <a href="#" onclick="toggleShowHidden(); return false;">Show all</a></div>';
-    } else {
-      const hiddenText = currentHiddenCount > 0
-        ? ` (<a href="#" onclick="toggleShowHidden(); return false;">${currentHiddenCount} hidden</a>)`
-        : '';
-      container.innerHTML = `<div class="empty">No links found.${hiddenText}</div>`;
-    }
-    return;
+  let links: Link[];
+  if (page.splitHidden) {
+    const hiddenLinksList = tagMatchedLinks.filter(link => (ratings[link.url] || 0) < 0);
+    currentHiddenCount = hiddenLinksList.length;
+    links = showingHidden ? hiddenLinksList : tagMatchedLinks.filter(link => (ratings[link.url] || 0) >= 0);
+  } else {
+    // _favs/_peeves already filter by rating; no visible/hidden split
+    currentHiddenCount = 0;
+    links = tagMatchedLinks;
   }
 
-  // Show sort controls, link count, and render sorted links
-  sortControls.style.display = 'block';
   currentLinks = links;
   currentPageTags = page.pageTags;
   currentTruncate = page.truncate;
-  updateLinkCountDisplay();
-  const sortBy = (document.getElementById('sort-select') as HTMLSelectElement).value;
-  const sorted = sortLinks(links, sortBy);
-  const displayLinks = page.truncate ? sorted.slice(0, 100) : sorted;
-  renderLinks(displayLinks);
+
+  if (links.length === 0) {
+    sortControls.style.display = 'none';
+    renderTagSidebar([], []);
+    updateLinkCountDisplay();
+    container.innerHTML = `<div class="empty">${showingHidden ? 'No hidden links.' : 'No links found.'}</div>`;
+    return;
+  }
+
+  sortControls.style.display = 'block';
+  applySort();
   renderTagSidebar(links, page.pageTags);
 }
 
@@ -438,17 +436,16 @@ function handleEditCardClick(event: Event, btn: HTMLElement): void {
   // Replace title with input
   const titleRow = linkEl.querySelector('.title-row') as HTMLElement;
   const titleRowHTML = titleRow.innerHTML;
-  titleRow.innerHTML = `<input class="edit-title-input" value="${oldTitle.replace(/"/g, '&quot;')}">`;
+  titleRow.innerHTML = `<input class="edit-title-input" value="${esc(oldTitle)}">`;
   const titleInput = titleRow.querySelector('.edit-title-input') as HTMLInputElement;
 
   // Replace tags + add-btn with tags input
   const cardBottom = linkEl.querySelector('.card-bottom') as HTMLElement;
   const cardBottomHTML = cardBottom.innerHTML;
   cardBottom.style.position = 'relative';
-  cardBottom.innerHTML = `<input class="edit-tags-input" value="${oldTags.replace(/"/g, '&quot;')}" placeholder="space-separated tags"><div class="tag-autocomplete-dropdown"></div>`;
+  cardBottom.innerHTML = `<input class="edit-tags-input" value="${esc(oldTags)}" placeholder="space-separated tags"><div class="tag-autocomplete-dropdown"></div>`;
   const tagsInput = cardBottom.querySelector('.edit-tags-input') as HTMLInputElement;
   const tagsDropdown = cardBottom.querySelector('.tag-autocomplete-dropdown') as HTMLElement;
-  initAutocomplete(tagsInput, tagsDropdown, () => getAllTagNames());
 
   // Add stacked action buttons between card-left and thumbnail
   const cardLeft = linkEl.querySelector('.card-left') as HTMLElement;
@@ -505,6 +502,16 @@ function handleEditCardClick(event: Event, btn: HTMLElement): void {
   actionsCol.querySelector('.edit-save-btn')!.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); save(); });
   actionsCol.querySelector('.vote-delete-btn')!.addEventListener('click', (e) => { handleDeleteClick(e, url, actionsCol); });
 
+  // editKeys before initAutocomplete: open dropdown owns Enter/Escape
+  const editKeys = (e: KeyboardEvent) => {
+    if (tagsDropdown.classList.contains('open')) return;
+    if (e.key === 'Enter') { e.preventDefault(); save(); }
+    else if (e.key === 'Escape') { e.preventDefault(); cancel(); }
+  };
+  titleInput.addEventListener('keydown', editKeys);
+  tagsInput.addEventListener('keydown', editKeys);
+  initAutocomplete(tagsInput, tagsDropdown, () => getAllTagNames());
+
   titleInput.focus();
 }
 
@@ -552,7 +559,7 @@ function signOut(): void {
   }
 }
 
-function onAuthSuccess(username: string): void {
+function onAuthSuccess(): void {
   document.getElementById('auth-signout')!.style.display = '';
   document.getElementById('auth-btn')!.style.display = 'none';
   updateBookmarkletHref();
@@ -562,15 +569,16 @@ function onAuthSuccess(username: string): void {
   }
 }
 
+// Navigate to a path without a page reload; hidden view resets on navigation
+export function navigateTo(path: string): void {
+  showingHidden = false;
+  history.pushState(null, '', path);
+  filterAndRender();
+}
+
 // Handle browser back/forward navigation
 window.addEventListener('popstate', () => {
-  if (allLinks.length > 0) {
-    filterAndRender();
-  }
-});
-
-// Handle hash changes for #/tags route
-window.addEventListener('hashchange', () => {
+  showingHidden = false;
   if (allLinks.length > 0) {
     filterAndRender();
   }
@@ -589,9 +597,8 @@ function updateBookmarkletHref(): void {
 
 // Check for existing credentials on page load
 function initAuth(): void {
-  const creds = getCredentials();
-  if (creds) {
-    onAuthSuccess(creds.username);
+  if (isSignedIn()) {
+    onAuthSuccess();
   }
 }
 
@@ -601,8 +608,7 @@ function initBreadcrumbNav(): void {
     const link = (e.target as HTMLElement).closest('a[data-nav]') as HTMLAnchorElement | null;
     if (link) {
       e.preventDefault();
-      history.pushState(null, '', link.getAttribute('href')!);
-      filterAndRender();
+      navigateTo(link.getAttribute('href')!);
     }
   });
 }

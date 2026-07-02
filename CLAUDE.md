@@ -7,6 +7,7 @@ A simple static website to share lists of links at a public mnemonic url.  e.g. 
   - `index.html` - Static frontend HTML structure
   - `help.html` - Help page
   - `submit.html` - Submit page
+  - `privacy.html` - Privacy policy page
   - `style.css` - Frontend CSS styles
   - `frontend.ts` - Frontend TypeScript (link loading, filtering, sorting, orchestration)
   - `auth.ts` - Auth primitives (credentials, sign-in UI, password visibility)

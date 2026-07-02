@@ -9,8 +9,6 @@
 <body>
   <header>
     <h1><a href="/">trove</a> <span class="breadcrumb-sep">/</span> help</h1>
-    <nav>
-    </nav>
   </header>
 
   <div class="help-page">
@@ -54,7 +52,7 @@
       <p>Hover over any tag on a link card to see a popup menu with two options:</p>
       <ul>
         <li><strong>tag</strong> &mdash; add this tag to the current filter (narrow results)</li>
-        <li><strong>~tag</strong> &mdash; exclude this tag from the current view</li>
+        <li><strong>-tag</strong> &mdash; exclude this tag from the current view (same <code>-</code> as in URLs)</li>
       </ul>
       <p>When signed in, the sidebar tag menu includes a <strong>&#x270E; edit</strong> option. This opens a dialog where you can rename the tag and add or change its description. Descriptions appear as tooltips when hovering over sidebar tags.</p>
 
@@ -66,19 +64,19 @@
 
       <h3 id="help-sorting">Sorting &amp; filtering</h3>
       <ul>
-        <li><strong>Sort</strong> &mdash; newest first (default), oldest first, alphabetical, or random</li>
+        <li><strong>Sort</strong> &mdash; newest first (default), oldest first, alphabetical, fewest tags (find under-tagged links), or random</li>
         <li><strong>Time period</strong> &mdash; filter links by when they were added (last day, week, month, year, or all time)</li>
       </ul>
 
       <h3 id="help-rating">Rating links</h3>
-      <p>Each link card has a rating widget in the lower-right corner: ♠️ [number] ❤️</p>
+      <p>Each link card has a rating column on its left edge, with ❤️ on top, the current rating in the middle, and ♠️ on the bottom.</p>
       <ul>
         <li><strong>❤️</strong> &mdash; click to bump the rating up by 1</li>
         <li><strong>♠️</strong> &mdash; click to bump the rating down by 1</li>
       </ul>
       <p>Links with a negative rating are hidden by default. The "N hidden" link in the link count lets you toggle their visibility. Ratings are stored locally in the browser.</p>
       <p>Use the pseudo-tags <code>_favs</code> and <code>_peeves</code> in the tag sidebar to view positively or negatively rated links.</p>
-      <p>When signed in, a ✏️ icon appears in the upper-right corner of each card on hover. Click it to open an inline edit panel where you can change the title and edit tags (space-separated). A 🗑️ icon in the lower-right corner lets you delete a link. Changes are submitted to the backend and visible to all users.</p>
+      <p>When signed in, hovering over a card reveals ✏️ and 🗑️ icons on its right edge. Click ✏️ to open an inline edit panel where you can change the title and edit tags (space-separated); Enter saves, Escape cancels. Click 🗑️ to delete a link. Changes are submitted to the backend and visible to all users.</p>
 
       <h3 id="help-usertags">User tags</h3>
       <p>Tags that start with a symbol followed by a username (e.g. <code>@saul</code>, <code>!saul</code>, <code>+saul</code>) are <strong>user tags</strong>. They represent per-user metadata on a link.</p>
