@@ -15,18 +15,24 @@ export function userTagUsername(tag: string): string {
   return tag.replace(/^[^a-zA-Z0-9]+/, '');
 }
 
+// Menu labels are the resulting filter paths, same syntax as the URL
 function renderTagMenu(tag: string, opts?: { sidebar?: boolean }): string {
   const path = currentPath();
   const pathDisplay = esc(path.slice(1));
   const t = esc(tag);
   const editOpt = opts?.sidebar && isSignedIn() ? `<span class="edit-tag-trigger" data-tag="${t}">✎ edit</span>` : '';
-  const addLabel = pathDisplay ? `${pathDisplay} ∩ ${t}` : t;
-  const excludeLabel = pathDisplay ? `${pathDisplay} ∩ -${t}` : `-${t}`;
+  const addLabel = pathDisplay ? `${pathDisplay}/${t}` : t;
+  const excludeLabel = pathDisplay ? `${pathDisplay}/-${t}` : `-${t}`;
   return `<span data-href="${esc(path)}/${t}">${addLabel}</span><span data-href="${esc(path)}/-${t}">${excludeLabel}</span>${editOpt}`;
 }
 
 export function renderTag(t: string): string {
-  return `<span class="tag-wrap"><span class="tag" data-tag="${esc(t)}">${esc(t)}</span><span class="tag-menu">${renderTagMenu(t)}</span></span>`;
+  const cls = isUserTag(t) ? 'tag tag-user' : 'tag';
+  // Tags already in the active filter get no menu (both options are degenerate)
+  if (getCurrentPageTags().includes(t)) {
+    return `<span class="tag-wrap"><span class="${cls}" data-tag="${esc(t)}">${esc(t)}</span></span>`;
+  }
+  return `<span class="tag-wrap"><span class="${cls}" data-tag="${esc(t)}">${esc(t)}</span><span class="tag-menu">${renderTagMenu(t)}</span></span>`;
 }
 
 export function renderTagSidebar(links: Array<{ url: string; tags?: string }>, pageTags: string[]): void {
@@ -213,13 +219,12 @@ function restoreAddButton(input: HTMLInputElement, btn: HTMLElement): void {
 }
 
 async function submitTagsForLink(url: string, tags: string, linkEl: HTMLElement, input: HTMLInputElement, btn: HTMLElement): Promise<void> {
-  const pageTags = getCurrentPageTags();
   const tagsEl = linkEl.querySelector('.tags')!;
   const creds = getCredentials();
   const currentUser = creds?.username || '';
   const existingTags = (linkEl.dataset.tags || '').split(' ').filter(t => t);
   const newTags = tags.split(' ').filter(t => {
-    if (!t || pageTags.includes(t) || existingTags.includes(t)) return false;
+    if (!t || existingTags.includes(t)) return false;
     if (isUserTag(t) && userTagUsername(t) !== currentUser) return false;
     return true;
   });
@@ -244,7 +249,7 @@ function renameTagGlobally(tagName: string, newTags: string[]): void {
     affectedUrls.push(linkEl.dataset.url!);
     const updatedTags = tags.filter(t => t !== tagName).concat(newTags);
     linkEl.dataset.tags = updatedTags.join(' ');
-    linkEl.querySelector('.tags')!.innerHTML = updatedTags.filter(t => !pageTags.includes(t)).map(t => renderTag(t)).join(' ');
+    linkEl.querySelector('.tags')!.innerHTML = updatedTags.map(t => renderTag(t)).join(' ');
   });
   const visibleLinks: Array<{ url: string; tags: string }> = [];
   document.querySelectorAll<HTMLElement>('#links .link').forEach(linkEl => {

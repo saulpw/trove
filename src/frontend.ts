@@ -106,7 +106,7 @@ let showingHidden = false;
 // - Different year    → "2025"
 // - Same year         → "2026-01"
 // - Same month        → "2026-02-01"
-// - Same day          → "2026-02-02 14:30"
+// - Same day          → "today 14:30"
 const formatDate = (iso: string): string => {
   const d = new Date(iso);
   const now = new Date();
@@ -121,7 +121,7 @@ const formatDate = (iso: string): string => {
   if (d.getDate() !== now.getDate()) {
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
   }
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  return `today ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 };
 
 // Format duration from "M:SS" or "H:MM:SS" to compact form: "45s", "3m", "1h45m"
@@ -178,7 +178,7 @@ function renderLinks(links: Link[]): void {
   const container = document.getElementById('links')!;
   const ratings = getRatings();
   container.innerHTML = links.map(link => {
-    const allTags = parseTags(link.tags).filter(t => !currentPageTags.includes(t));
+    const allTags = parseTags(link.tags);
     const userTags = allTags.filter(t => isUserTag(t)).sort();
     const regularTags = allTags.filter(t => !isUserTag(t)).sort();
     const tags = [...userTags, ...regularTags];
@@ -270,12 +270,11 @@ function getPageConfig(): PageConfig {
   if (tagFilters.length > 0) {
     const crumbs = [`<a href="/" data-nav>trove</a>`];
     tagFilters.forEach(t => {
-      const label = t.startsWith('-') ? `-${t.slice(1)}` : t;
-      crumbs.push(`<a href="/${t}" data-nav>${label}</a>`);
+      crumbs.push(`<a href="/${esc(t)}" data-nav>${esc(t)}</a>`);
     });
     return {
       title: tagFilters.join('/') + ' - trove',
-      heading: crumbs.join(' <span class="breadcrumb-sep">&#x2229;</span> '),
+      heading: crumbs.join(' <span class="breadcrumb-sep">/</span> '),
       filter: tagFilter,
       pageTags: tagFilters,
       tagFilters,
@@ -493,7 +492,7 @@ function handleEditCardClick(event: Event, btn: HTMLElement): void {
     if (titleEl && newTitle) titleEl.textContent = newTitle;
     const tagsEl = linkEl.querySelector('.tags') as HTMLElement | null;
     if (tagsEl) {
-      const displayTags = newTags.split(/\s+/).filter(t => t && !currentPageTags.includes(t)).sort();
+      const displayTags = newTags.split(/\s+/).filter(t => t).sort();
       tagsEl.innerHTML = displayTags.map(t => renderTag(t)).join(' ');
     }
   };

@@ -2,6 +2,25 @@
 
 ## 2026-07-01
 
+URL-syntax UI + design refinement round (from Fable 5 visual design review):
+
+- Breadcrumb heading joins filters with `/` (was `∩`); tag menu options are labeled with the resulting filter path (`games/tag`, `games/-tag`) — one notation everywhere, matching the URL.
+- Cards show their full tag set again, including active-filter tags (which render without a menu — both menu options would be degenerate). Add-tag/edit/rename paths updated to match; `data-tags` now always holds the complete tag set.
+- Rating widget: ❤️/♠️ grayscale at rest (full color on hover); the `0` rating value is hidden until non-zero; positive color moved to `--color-love` var.
+- Tags read as tags: `#` prefix on regular tags (not user tags, via `.tag-user` class), flex gap between tags.
+- `--color-text-light` #888 → #767676 (WCAG AA at meta-line size).
+- Body max-width now `calc(sidebar + gap + main)` = 1032px; removed the `#auth-container` margin hack and its media-query override entirely.
+- Visited link titles render in `--color-link-visited` purple; title `line-height: 1.3`.
+- Resting card borders lightened to `--color-border-light`; blue hover unchanged.
+- `+` add-tag button dimmed to 0.4 opacity, full on card hover.
+- Same-day dates render as `today HH:MM` instead of the full timestamp.
+- help.html updated (breadcrumb, menu labels, full-tagset note, zero-rating note).
+- Bump version to v0.40.
+
+---
+
+## 2026-07-01
+
 Consistency/UI fix round (10 issues from a full-repo review, tracked in `.meta/todo/`, now in `.meta/done/`):
 
 - Hidden-links toggle: `filterAndRender()` reset `showingHidden` on every call, so the "N hidden" / "show visible" links were no-ops everywhere. Hidden-view state now resets only on navigation (new `navigateTo()` helper, used by all tag menus / sidebar / breadcrumbs / popstate — replaces six inline `pushState`+`filterAndRender` pairs).

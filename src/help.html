@@ -40,7 +40,7 @@
         <li><code>/games/retro</code> &mdash; links tagged <em>both</em> "games" <em>and</em> "retro"</li>
         <li><code>/games/retro/free</code> &mdash; links tagged all three</li>
       </ul>
-      <p>The heading shows the active filters joined by <strong>&cap;</strong> (intersection symbol). Click any filter in the heading to navigate to just that tag.</p>
+      <p>The heading shows the active filters joined by <strong>/</strong>, mirroring the URL. Click any filter in the heading to navigate to just that tag.</p>
 
       <h3 id="help-excluding">Excluding tags</h3>
       <p>Prefix a tag with <code>-</code> to exclude it:</p>
@@ -49,11 +49,12 @@
       </ul>
 
       <h3 id="help-menu">The tag menu</h3>
-      <p>Hover over any tag on a link card to see a popup menu with two options:</p>
+      <p>Hover over any tag on a link card to see a popup menu with two options, each labeled with the filter path it navigates to (same syntax as the URL):</p>
       <ul>
-        <li><strong>tag</strong> &mdash; add this tag to the current filter (narrow results)</li>
-        <li><strong>-tag</strong> &mdash; exclude this tag from the current view (same <code>-</code> as in URLs)</li>
+        <li><strong>games/tag</strong> &mdash; add this tag to the current filter (narrow results)</li>
+        <li><strong>games/-tag</strong> &mdash; exclude this tag from the current view</li>
       </ul>
+      <p>Each card shows its full tag set, including tags in the active filter; those have no menu since they're already applied.</p>
       <p>When signed in, the sidebar tag menu includes a <strong>&#x270E; edit</strong> option. This opens a dialog where you can rename the tag and add or change its description. Descriptions appear as tooltips when hovering over sidebar tags.</p>
 
       <h3 id="help-sidebar">The tag sidebar</h3>
@@ -69,7 +70,7 @@
       </ul>
 
       <h3 id="help-rating">Rating links</h3>
-      <p>Each link card has a rating column on its left edge, with ❤️ on top, the current rating in the middle, and ♠️ on the bottom.</p>
+      <p>Each link card has a rating column on its left edge, with ❤️ on top, the current rating in the middle (shown once non-zero), and ♠️ on the bottom.</p>
       <ul>
         <li><strong>❤️</strong> &mdash; click to bump the rating up by 1</li>
         <li><strong>♠️</strong> &mdash; click to bump the rating down by 1</li>
