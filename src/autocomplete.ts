@@ -43,14 +43,16 @@ export function initAutocomplete(
   let activeIdx = -1;
 
   function showSuggestions(): void {
-    const partial = currentPartial(input).toLowerCase();
+    const partialRaw = currentPartial(input);
+    const partial = partialRaw.toLowerCase();
     if (!partial) { dropdown.classList.remove('open'); return; }
     const existing = new Set(existingTags(input));
+    existing.delete(partialRaw);
     const allTags = getTags();
     const matches = allTags.filter(t => !existing.has(t) && t.toLowerCase().includes(partial)).slice(0, maxResults);
     if (matches.length === 0) { dropdown.classList.remove('open'); return; }
-    activeIdx = -1;
-    dropdown.innerHTML = trustedHTML(matches.map(t => `<div class="${itemClass}">${t}</div>`).join('')) as unknown as string;
+    activeIdx = matches.findIndex(t => t.toLowerCase() === partial);
+    dropdown.innerHTML = trustedHTML(matches.map((t, i) => `<div class="${itemClass}${i === activeIdx ? ' active' : ''}">${t}</div>`).join('')) as unknown as string;
     dropdown.classList.add('open');
   }
 
