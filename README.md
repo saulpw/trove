@@ -126,6 +126,17 @@ Issues are labeled `submission` (link/tag operations, processed by the GitHub Ac
 `bookmarklet-problem` (reports from the bookmarklet's "report a problem" link, read by hand).
 GitHub creates a missing label on first use; make one by hand if you want a specific color.
 
+### Anthropic API Key (for auto-tagging)
+
+Checking **auto-tag** in the bookmarklet makes the GitHub Action ask Claude for tags,
+a title, and notes while it processes the submission.
+
+1. Create a key at [console.anthropic.com](https://console.anthropic.com/settings/keys)
+2. Add it as a GitHub Actions secret: `gh secret set ANTHROPIC_API_KEY`
+
+Without the secret the submission is still added, just untagged. Local `make autotag`
+uses the `claude` CLI instead, so it needs no key.
+
 ### Netlify Deployment
 
 The site auto-deploys from the main branch. Environment variables:

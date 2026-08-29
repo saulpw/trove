@@ -1,6 +1,6 @@
 BUILDDIR := _build
 
-.PHONY: setup setup-worktrees serve add build typecheck test test-js test-csp dedup compact compact-fast extract-inbox import process-issues process-local fill-titles add-user remove-user list-users web-extract web-import pull-links push-links create-build-hook normalize-tags autotag rewrite-amazon
+.PHONY: setup setup-worktrees serve add build typecheck test test-js test-csp dedup compact compact-fast extract-inbox import process-issues process-local fill-titles add-user remove-user list-users web-extract web-import pull-links push-links tags create-build-hook normalize-tags autotag rewrite-amazon
 
 COUNT ?= 1
 
@@ -39,15 +39,18 @@ push-links:
 		git commit -m "${MSG}" && echo "Committed to links branch: ${MSG}"; \
 	fi
 
+tags: pull-links
+	mkdir -p ${BUILDDIR}
+	python3 scripts/generate_tags.py > ${BUILDDIR}/tags.jsonl
+
 # Build for Netlify deployment
-build: pull-links
+build: pull-links tags
 	mkdir -p ${BUILDDIR}
 	npx esbuild src/bookmarklet.ts --bundle --minify --outfile=${BUILDDIR}/bookmarklet-code.txt
 	npx esbuild src/frontend.ts --bundle --loader:.txt=text --outfile=${BUILDDIR}/frontend.js
 	npx esbuild src/bookmarklet.ts --bundle --outfile=${BUILDDIR}/bookmarklet.js
 	cp src/help.html src/submit.html src/privacy.html src/style.css ${BUILDDIR}/
 	sed 's/BUILD_TIMESTAMP/$(shell date +%s)/' src/index.html > ${BUILDDIR}/index.html
-	python3 scripts/generate_tags.py > ${BUILDDIR}/tags.jsonl
 	python3 scripts/dedup_trove.py .links/trove-log.jsonl ${BUILDDIR}/trove.jsonl
 
 # Type check TypeScript (no output)

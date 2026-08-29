@@ -5,6 +5,7 @@ export interface SubmitLinkParams {
   title: string;
   tags: string;
   notes: string;
+  autotag?: boolean;
   username: string;
   password: string;
   origin?: string;
@@ -33,7 +34,7 @@ async function postIssue(payload: Record<string, unknown>, origin: string): Prom
  * Submit a link to the trove backend
  */
 export async function submitLink(params: SubmitLinkParams): Promise<SubmitLinkResult> {
-  const { url, title, tags, notes, username, password, origin = '' } = params;
+  const { url, title, tags, notes, autotag, username, password, origin = '' } = params;
 
   if (!username || !password) {
     return { success: false, error: 'Enter credentials' };
@@ -43,7 +44,8 @@ export async function submitLink(params: SubmitLinkParams): Promise<SubmitLinkRe
     return { success: false, error: 'Enter a URL' };
   }
 
-  return postIssue({ url, title: title || undefined, tags, notes, username, password }, origin);
+  return postIssue({ url, title: title || undefined, tags, notes,
+                    autotag: autotag || undefined, username, password }, origin);
 }
 
 /**

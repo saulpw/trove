@@ -30,6 +30,31 @@ def parse_issue_body(body):
     return fields
 
 
+def merge_autotag(link, tags, title, notes):
+    """Fold AI suggestions into a link entry: union tags, fill empty title/notes."""
+    if not tags:
+        return
+    have = link.get("tags", "").split()
+    link["tags"] = " ".join(have + [t for t in tags.split() if t not in have])
+    if title and not link.get("title"):
+        link["title"] = title
+    if notes and not link.get("notes"):
+        link["notes"] = notes
+
+
+def apply_autotag(link):
+    """Tag a link with AI. A failure leaves the entry untouched, never lost."""
+    try:
+        from autotag import autotag_link
+        tags, title, notes = autotag_link(
+            link["url"], link.get("title", ""), link.get("notes", ""))
+    except Exception as e:
+        print(f"  autotag failed: {e}")
+        return
+    merge_autotag(link, tags, title, notes)
+    print(f"  autotag: {tags or '(none)'}")
+
+
 def close_issue(number):
     """Close a GitHub issue. Ignores errors (e.g., already closed)."""
     result = subprocess.run(
@@ -146,6 +171,9 @@ def process_issue_list(issues, trove_path=None, local=False):
             duration=yt_meta.get("duration"), channel=yt_meta.get("channel"),
             thumbnail=yt_meta.get("thumbnail"), op="add",
             submitted_by=submitted_by)
+
+        if fields.get("autotag") == "true" and not local:
+            apply_autotag(link)
 
         links.append(link)
         existing_urls.add(url)

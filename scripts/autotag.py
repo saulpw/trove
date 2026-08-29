@@ -4,6 +4,9 @@
 Finds links with fewest tags, fetches the page, extracts text,
 and asks claude to suggest tags, clean title, and notes.
 
+Uses the Anthropic API when ANTHROPIC_API_KEY is set (as in CI),
+otherwise the local `claude` CLI.
+
 Usage:
     python3 autotag.py           # tag one link
     python3 autotag.py --count 5 # tag up to 5 links
@@ -11,9 +14,11 @@ Usage:
 
 import hashlib
 import json
+import os
 import re
 import subprocess
 import sys
+import urllib.request
 from html.parser import HTMLParser
 from pathlib import Path
 from trove_utils import TROVE_FILE, create_link_entry
@@ -23,6 +28,8 @@ TAGS_FILE = BUILDDIR / "tags.jsonl"
 TROVE_BUILT = BUILDDIR / "trove.jsonl"
 PAGE_CACHE = Path(".meta/page-cache")
 SKIP_LOG = Path(".meta/autotag-skips.jsonl")
+API_URL = "https://api.anthropic.com/v1/messages"
+API_MODEL = "claude-haiku-4-5"
 
 TAG_RULES = """Tags are short, atomic, lowercase words. Each tag is a URL path segment, so brevity matters.
 
@@ -179,14 +186,10 @@ Page content:
 {page_text}"""
 
     try:
-        result = subprocess.run(
-            ["claude", "--print", "--model", "haiku", "-p", prompt],
-            capture_output=True, text=True, timeout=60
-        )
-        if result.returncode != 0:
-            print(f"  claude error: {result.stderr.strip()}", file=sys.stderr)
+        reply = call_model(prompt)
+        if not reply:
             return None, None, None
-        lines = result.stdout.strip().split("\n")
+        lines = reply.strip().split("\n")
         tags = lines[0].strip().lower() if lines else ""
         tags = re.sub(r"[^a-z0-9!\$\s]", "", tags)
         tags = " ".join(tags.split())
@@ -201,6 +204,41 @@ Page content:
     except (subprocess.TimeoutExpired, Exception) as e:
         print(f"  claude error: {e}", file=sys.stderr)
         return None, None, None
+
+
+def call_model(prompt):
+    """Run a prompt through the API when a key is set, else the local claude CLI."""
+    key = os.environ.get("ANTHROPIC_API_KEY")
+    if key:
+        body = json.dumps({"model": API_MODEL, "max_tokens": 256,
+                           "messages": [{"role": "user", "content": prompt}]}).encode()
+        req = urllib.request.Request(API_URL, data=body, headers={
+            "x-api-key": key,
+            "anthropic-version": "2023-06-01",
+            "content-type": "application/json"})
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            data = json.loads(resp.read())
+        return "".join(b.get("text", "") for b in data.get("content", [])
+                       if b.get("type") == "text")
+
+    result = subprocess.run(
+        ["claude", "--print", "--model", "haiku", "-p", prompt],
+        capture_output=True, text=True, timeout=60
+    )
+    if result.returncode != 0:
+        print(f"  claude error: {result.stderr.strip()}", file=sys.stderr)
+        return None
+    return result.stdout
+
+
+def autotag_link(url, title="", notes="", tag_vocab=None):
+    """Suggest (tags, title, notes) for a single link. Returns Nones on any failure."""
+    page_text = get_page_text(url)
+    if not page_text or page_text == "not_html":
+        return None, None, None
+    if tag_vocab is None:
+        tag_vocab = load_tag_vocab()
+    return ask_claude(url, title, notes, page_text, tag_vocab)
 
 
 def log_skip(url, title, reason):

@@ -33,6 +33,7 @@
             title: p.get('title') || undefined,
             tags: p.get('tags') || '',
             notes: p.get('notes') || '',
+            autotag: p.get('autotag') === '1' || undefined,
             username,
             password,
           }),

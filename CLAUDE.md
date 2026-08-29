@@ -37,7 +37,7 @@ A simple static website to share lists of links at a public mnemonic url.  e.g. 
   - `js/` - Frontend TypeScript tests (`node --test`, bundled by esbuild). `domstub.ts` stubs `localStorage`/`document`/`window.location` so `src/frontend.ts` module init runs headless; import it first in every test file.
 - `.links/` - Persistent git worktree for the orphan `links` branch. Contains `trove-log.jsonl` (append-only operation log in JSONL format). Tags are space-separated strings (e.g., `"tags": "games retro"`), not JSON arrays. Use `make push-links MSG="..."` to commit. Processed at build time into `trove.jsonl` (deduplicated links) and `tags.jsonl` (tag list with descriptions).
 - `.meta/` - Persistent git worktree for the orphan `meta` branch. Contains `TODO.md` and project planning files that don't belong in the code branch.
-- `Makefile` - Targets: `setup`, `setup-worktrees`, `serve`, `add`, `build`, `typecheck`, `test`, `test-js`, `compact`, `compact-fast`, `import`, `process-issues`, `process-local`, `add-user`, `remove-user`, `list-users`
+- `Makefile` - Targets: `setup`, `setup-worktrees`, `serve`, `add`, `build`, `typecheck`, `test`, `test-js`, `compact`, `compact-fast`, `import`, `process-issues`, `process-local`, `add-user`, `remove-user`, `list-users`, `tags`, `autotag`
 - `tsconfig.json` - TypeScript config (strict, noEmit — type checking only)
 - `package.json` - devDependencies: esbuild (bundler), typescript (type checker)
 - `netlify.toml` - Netlify config (SPA fallback routing)
