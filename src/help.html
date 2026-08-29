@@ -96,7 +96,9 @@
         <li>If you select text before clicking, it becomes the notes</li>
         <li>Tag autocomplete works the same as on the main site</li>
         <li>If you're signed in on trove when you drag the bookmarklet, your credentials are embedded &mdash; no need to sign in again</li>
+        <li>Keystrokes typed into the panel stay in the panel, so the page's own keyboard shortcuts don't fire (a page that grabs keys at the window level before the bookmarklet loads can still see them)</li>
         <li>On sites with a strict content security policy (e.g. the Wayback Machine), the panel can't reach trove directly, so clicking Add opens the submission in a new tab instead. Tag autocomplete is unavailable on those pages.</li>
+        <li><strong>report a problem</strong> at the bottom of the panel files a GitHub issue with the current page URL, so a page where the bookmarklet misbehaves can be reported without leaving it. Anything typed in Notes is included as the description.</li>
       </ul>
     </div>
   </div>

@@ -80,6 +80,16 @@ make setup
 
 This installs `netlify-cli` (npm) and `pytest` (pip).
 
+### Tests
+
+```bash
+make test      # Python (pytest) + frontend TypeScript
+make test-js   # frontend TypeScript only
+```
+
+The frontend tests live in `tests/js/` and run on Node's built-in test runner
+(`node --test`); esbuild bundles them first, so `npm install` is the only setup.
+
 ### User Authentication
 
 Users authenticate with a username and password. Credentials are stored in the `TROVE_USERS` Netlify environment variable.
@@ -111,6 +121,10 @@ Submissions create GitHub Issues via a Netlify Function.
    GITHUB_TOKEN=ghp_your_token_here
    GITHUB_REPO=saul/26-trove
    ```
+
+Issues are labeled `submission` (link/tag operations, processed by the GitHub Action) or
+`bookmarklet-problem` (reports from the bookmarklet's "report a problem" link, read by hand).
+GitHub creates a missing label on first use; make one by hand if you want a specific color.
 
 ### Netlify Deployment
 

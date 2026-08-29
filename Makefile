@@ -1,6 +1,6 @@
 BUILDDIR := _build
 
-.PHONY: setup setup-worktrees serve add build typecheck test test-csp dedup compact compact-fast import process-issues process-local fill-titles add-user remove-user list-users web-extract web-import pull-links push-links create-build-hook normalize-tags autotag rewrite-amazon
+.PHONY: setup setup-worktrees serve add build typecheck test test-js test-csp dedup compact compact-fast extract-inbox import process-issues process-local fill-titles add-user remove-user list-users web-extract web-import pull-links push-links create-build-hook normalize-tags autotag rewrite-amazon
 
 COUNT ?= 1
 
@@ -21,9 +21,9 @@ setup-worktrees:
 serve:
 	netlify dev
 
-# Add a link: make add URL="https://example.com" TITLE="Example" TAGS="tag1 tag2"
+# Add a link: make add URL="https://example.com" TITLE="Example" TAGS="tag1 tag2" NOTES="note"
 add:
-	python3 scripts/add_link.py ${URL} ${TAGS} $(if ${TITLE},-t "${TITLE}")
+	python3 scripts/add_link.py ${URL} ${TAGS} $(if ${TITLE},-t "${TITLE}") $(if ${NOTES},-n "${NOTES}")
 
 # Ensure .links worktree exists and is up to date
 pull-links:
@@ -56,9 +56,15 @@ typecheck:
 
 
 # Syntax check all Python files, then run tests
-test:
+test: test-js
 	python3 -m py_compile scripts/*.py && echo "Syntax OK"
 	python3 -m pytest tests/ -v
+
+test-js:
+	@mkdir -p ${BUILDDIR}
+	@test -f ${BUILDDIR}/bookmarklet-code.txt || npx esbuild src/bookmarklet.ts --bundle --minify --outfile=${BUILDDIR}/bookmarklet-code.txt
+	npx esbuild tests/js/*.test.ts --bundle --platform=node --format=cjs --loader:.txt=text --outdir=${BUILDDIR}/tests
+	node --test --test-reporter=spec ${BUILDDIR}/tests/*.test.js
 
 # Headless check: bookmarklet new-tab fallback escapes archive.org wombat.js (needs network)
 PLAYWRIGHT_PY ?= ${HOME}/.venvs/claude/bin/python
@@ -131,4 +137,7 @@ compact-fast:
 	python3 scripts/compact_trove.py --no-health-check --no-commit
 
 clean:
-	rm -f ${BUILDDIR}/*
+	rm -rf ${BUILDDIR}/*
+
+extract-inbox:
+	python3 .meta/inbox/extract_dumps.py

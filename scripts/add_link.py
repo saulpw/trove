@@ -93,7 +93,7 @@ def git_commit(url, title):
     try:
         subprocess.run(
             ["make", "push-links", f"MSG={msg}"],
-            check=True, cwd=TROVE_FILE.parent,
+            check=True,
         )
         print(f"Committed to links branch: {msg}")
     except subprocess.CalledProcessError as e:

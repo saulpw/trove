@@ -26,14 +26,14 @@ interface PageConfig {
 
 // Parse path to get tag filters: /foo/bar → ['foo', 'bar']
 // Tags starting with '-' are exclusions: /foo/-bar → include 'foo', exclude 'bar'
-function getTagFilters(): string[] {
+export function getTagFilters(): string[] {
   return window.location.pathname
     .split('/')
     .filter(segment => segment.length > 0 && segment !== 'index.html');
 }
 
 // Filter links by time period based on their added date
-function filterLinksByTime(links: Link[], period: string): Link[] {
+export function filterLinksByTime(links: Link[], period: string): Link[] {
   if (period === 'all') return links;
 
   const now = new Date();
@@ -71,7 +71,9 @@ export const esc = (s: string): string =>
 
 // Ratings stored in localStorage: { url: number }
 const RATINGS_KEY = 'trove_ratings';
-export const getRatings = (): Record<string, number> => JSON.parse(localStorage.getItem(RATINGS_KEY) || '{}');
+export const getRatings = (): Record<string, number> => {
+  try { return JSON.parse(localStorage.getItem(RATINGS_KEY) || '{}'); } catch { return {}; }
+};
 const getRating = (url: string): number => getRatings()[url] || 0;
 const setRating = (url: string, n: number): void => {
   const ratings = getRatings();
@@ -107,7 +109,7 @@ let showingHidden = false;
 // - Same year         → "2026-01"
 // - Same month        → "2026-02-01"
 // - Same day          → "today 14:30"
-const formatDate = (iso: string): string => {
+export const formatDate = (iso: string): string => {
   const d = new Date(iso);
   const now = new Date();
   const pad = (n: number) => String(n).padStart(2, '0');
@@ -125,7 +127,7 @@ const formatDate = (iso: string): string => {
 };
 
 // Format duration from "M:SS" or "H:MM:SS" to compact form: "45s", "3m", "1h45m"
-const formatDuration = (dur: string | undefined): string => {
+export const formatDuration = (dur: string | undefined): string => {
   if (!dur) return '';
   const parts = dur.split(':').map(Number);
   let secs: number, mins: number, hrs: number;
@@ -141,14 +143,14 @@ const formatDuration = (dur: string | undefined): string => {
 };
 
 // Normalize URL: prepend https:// if missing protocol
-const normalizeUrl = (url: string): string => {
+export const normalizeUrl = (url: string): string => {
   if (url && !url.includes('://')) {
     return 'https://' + url;
   }
   return url;
 };
 
-function sortLinks(links: Link[], sortBy: string): Link[] {
+export function sortLinks(links: Link[], sortBy: string): Link[] {
   const sorted = [...links];
   switch (sortBy) {
     case 'oldest':

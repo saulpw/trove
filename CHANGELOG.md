@@ -1,5 +1,21 @@
 # CHANGELOG
 
+## 2026-08-29
+
+Bookmarklet keystroke fix, problem reports, frontend JS tests:
+
+- Bookmarklet: keystrokes typed into the panel no longer reach the host page's capture-phase key listeners (window-capture guard + `composed:false` re-dispatch into the shadow root; guard removed on close). Residual: a page that registered a `window` capture listener before the bookmarklet loaded still sees keys (hungryminds.com lightbox).
+- Bookmarklet: "report a problem" footer link files a `bookmarklet-problem` GitHub issue with the page URL and Notes via the existing submit function (`action: report`); the processing Action ignores that label.
+- Bookmarklet: picking an autocomplete suggestion with Enter no longer also submits the form.
+- Frontend: corrupt `trove_ratings` in localStorage no longer throws during render.
+- `add_link.py`: auto-commit was silently failing (ran `make` from `.links/`); fixed.
+- `make add` accepts `NOTES=`.
+- `make test-js`: frontend TypeScript tests in `tests/js/` on `node --test` (esbuild-bundled, no new deps); `make test` runs both suites. 63 tests over `frontend.ts`, `tags.ts`, `auth.ts`.
+- `make extract-inbox`: phase-1 extraction of `.meta/inbox/` link dumps into review PSVs.
+- help.html, README (labels, tests) updated. Bump version to v0.41.
+
+---
+
 ## 2026-07-01
 
 URL-syntax UI + design refinement round (from Fable 5 visual design review):

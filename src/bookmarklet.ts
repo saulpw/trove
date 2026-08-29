@@ -2,7 +2,7 @@
 // Closure variables (__TROVE_ORIGIN__ etc.) are defined in the wrapping scope
 // constructed by frontend.ts updateBookmarkletHref()
 import { initAutocomplete } from './autocomplete';
-import { submitLink } from './addlink';
+import { submitLink, reportProblem } from './addlink';
 
 declare var trustedTypes: { createPolicy(name: string, rules: { createHTML: (s: string) => string }): { createHTML: (s: string) => string } } | undefined;
 declare var __TROVE_ORIGIN__: string;
@@ -71,6 +71,12 @@ declare var __TROVE_PASS__: string;
     .status { font-size: 13px; text-align: center; min-height: 1.2em; }
     .status.ok { color: #2a2; }
     .status.err { color: #c22; }
+    .footer { text-align: right; }
+    .footer button {
+      background: none; border: none; padding: 0; font-family: inherit;
+      font-size: 11px; color: #999; cursor: pointer; text-decoration: underline;
+    }
+    .footer button:hover { color: #333; }
   `);
   shadow.adoptedStyleSheets = [sheet];
 
@@ -102,19 +108,33 @@ declare var __TROVE_PASS__: string;
       <textarea id="tw-notes" rows="3" placeholder="Select text on page to pull a quote">${selection.replace(/</g, '&lt;')}</textarea>
       <button class="submit" id="tw-submit">Add</button>
       <div class="status" id="tw-status"></div>
+      <div class="footer"><button id="tw-report">report a problem</button></div>
     </div>`) as unknown as string;
   shadow.appendChild(panel);
 
   const $ = (id: string) => shadow.getElementById(id);
   ($('tw-tags') as HTMLInputElement).focus();
 
-  // Stop keyboard events from reaching the host page (e.g. YouTube shortcuts)
-  panel.addEventListener('keydown', (e) => e.stopPropagation());
-  panel.addEventListener('keyup', (e) => e.stopPropagation());
-  panel.addEventListener('keypress', (e) => e.stopPropagation());
+  const keyGuard = new AbortController();
+  const closeWidget = () => { keyGuard.abort(); host.remove(); };
+
+  // window capture runs before page document-capture listeners; composed:false clone stays in the shadow
+  for (const type of ['keydown', 'keyup', 'keypress']) {
+    window.addEventListener(type, (e) => {
+      const ke = e as KeyboardEvent;
+      if (!ke.composedPath().includes(host)) return;
+      ke.stopPropagation();
+      const clone = new KeyboardEvent(ke.type, {
+        key: ke.key, code: ke.code, location: ke.location, repeat: ke.repeat, isComposing: ke.isComposing,
+        ctrlKey: ke.ctrlKey, shiftKey: ke.shiftKey, altKey: ke.altKey, metaKey: ke.metaKey,
+        bubbles: true, cancelable: true, composed: false,
+      });
+      if (!(shadow.activeElement ?? panel).dispatchEvent(clone)) ke.preventDefault();
+    }, { capture: true, signal: keyGuard.signal });
+  }
 
   // Close
-  panel.querySelector('.close')!.addEventListener('click', () => host.remove());
+  panel.querySelector('.close')!.addEventListener('click', closeWidget);
 
   // Tag autocomplete
   let allTags: string[] = [];
@@ -135,31 +155,48 @@ declare var __TROVE_PASS__: string;
 
   // Enter key submits
   panel.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey && !e.defaultPrevented) {
       e.preventDefault();
       ($('tw-submit') as HTMLButtonElement).click();
     }
   });
 
+  const fieldValue = (id: string) => ($(id) as HTMLInputElement | HTMLTextAreaElement | null)?.value.trim() ?? '';
+  const formValues = () => ({
+    url: fieldValue('tw-url'),
+    title: fieldValue('tw-title'),
+    tags: fieldValue('tw-tags'),
+    notes: fieldValue('tw-notes'),
+    username: hasAuth ? username : fieldValue('tw-user'),
+    password: hasAuth ? password : fieldValue('tw-pass'),
+    origin,
+  });
+
+  // Report a problem
+  $('tw-report')!.addEventListener('click', async () => {
+    const status = $('tw-status')!;
+    status.textContent = 'Reporting...';
+    status.className = 'status';
+    const result = await reportProblem(formValues());
+    status.textContent = result.success ? 'Reported, thanks!' : (result.error || 'Failed');
+    status.className = result.success ? 'status ok' : 'status err';
+  });
+
   // Submit
   $('tw-submit')!.addEventListener('click', async () => {
     const status = $('tw-status')!;
-    const url = ($('tw-url') as HTMLInputElement).value.trim();
-    const title = ($('tw-title') as HTMLInputElement).value.trim();
-    const tags = ($('tw-tags') as HTMLInputElement).value.trim();
-    const notes = ($('tw-notes') as HTMLTextAreaElement).value.trim();
-    const user = hasAuth ? username : ($('tw-user') ? ($('tw-user') as HTMLInputElement).value.trim() : '');
-    const pass = hasAuth ? password : ($('tw-pass') ? ($('tw-pass') as HTMLInputElement).value.trim() : '');
+    const values = formValues();
+    const { url, title, tags, notes, username: user, password: pass } = values;
 
     status.textContent = 'Submitting...';
     status.className = 'status';
 
-    const result = await submitLink({ url, title, tags, notes, username: user, password: pass, origin });
+    const result = await submitLink(values);
 
     if (result.success) {
       status.textContent = 'Added!';
       status.className = 'status ok';
-      setTimeout(() => host.remove(), 1200);
+      setTimeout(closeWidget, 1200);
     } else if (result.error === 'Network error') {
       // CSP blocks the cross-origin fetch — open trove /submit in a new tab instead
       const params = new URLSearchParams({ url, title, tags, notes, u: user, p: pass });
@@ -172,7 +209,7 @@ declare var __TROVE_PASS__: string;
       window.open(blobUrl, '_blank');
       status.textContent = 'Opened in new tab...';
       status.className = 'status ok';
-      setTimeout(() => host.remove(), 1500);
+      setTimeout(closeWidget, 1500);
     } else {
       status.textContent = result.error || 'Failed';
       status.className = 'status err';

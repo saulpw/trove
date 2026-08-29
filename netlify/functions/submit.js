@@ -41,9 +41,24 @@ exports.handler = async (event) => {
     return { statusCode: 401, headers: corsHeaders, body: JSON.stringify({ error: 'Invalid credentials' }) };
   }
 
-  let issueTitle, issueBody;
+  let issueTitle, issueBody, issueLabel = 'submission';
 
-  if (action === 'set_tag_desc') {
+  if (action === 'report') {
+    if (!url) {
+      return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'report requires url' }) };
+    }
+    let host;
+    try { host = new URL(url).hostname; } catch { host = url; }
+    issueLabel = 'bookmarklet-problem';
+    issueTitle = `bookmarklet problem on ${host}`;
+    issueBody = [
+      `action: report`,
+      `url: ${url}`,
+      title ? `title: ${title}` : null,
+      notes ? `notes: ${notes}` : null,
+      `submitted_by: ${username}`,
+    ].filter(Boolean).join('\n');
+  } else if (action === 'set_tag_desc') {
     if (!tag) {
       return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'set_tag_desc requires tag' }) };
     }
@@ -98,7 +113,7 @@ exports.handler = async (event) => {
         body: JSON.stringify({
           title: issueTitle,
           body: issueBody,
-          labels: ['submission'],
+          labels: [issueLabel],
         }),
       }
     );

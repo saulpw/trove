@@ -15,6 +15,20 @@ export interface SubmitLinkResult {
   error?: string;
 }
 
+async function postIssue(payload: Record<string, unknown>, origin: string): Promise<SubmitLinkResult> {
+  try {
+    const response = await fetch(`${origin}/.netlify/functions/submit`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const result = await response.json();
+    return response.ok ? { success: true } : { success: false, error: result.error || 'Failed' };
+  } catch (e) {
+    return { success: false, error: 'Network error' };
+  }
+}
+
 /**
  * Submit a link to the trove backend
  */
@@ -29,22 +43,18 @@ export async function submitLink(params: SubmitLinkParams): Promise<SubmitLinkRe
     return { success: false, error: 'Enter a URL' };
   }
 
-  try {
-    const endpoint = origin ? `${origin}/.netlify/functions/submit` : '/.netlify/functions/submit';
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url, title: title || undefined, tags, notes, username, password }),
-    });
+  return postIssue({ url, title: title || undefined, tags, notes, username, password }, origin);
+}
 
-    const result = await response.json();
+/**
+ * File a bookmarklet problem report against the page the user is on
+ */
+export async function reportProblem(params: SubmitLinkParams): Promise<SubmitLinkResult> {
+  const { url, title, notes, username, password, origin = '' } = params;
 
-    if (response.ok) {
-      return { success: true };
-    } else {
-      return { success: false, error: result.error || 'Failed' };
-    }
-  } catch (e) {
-    return { success: false, error: 'Network error' };
+  if (!username || !password) {
+    return { success: false, error: 'Enter credentials' };
   }
+
+  return postIssue({ action: 'report', url, title, notes, username, password }, origin);
 }
