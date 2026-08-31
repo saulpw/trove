@@ -32,6 +32,8 @@ declare var __TROVE_PASS__: string;
   host.id = 'trove-bookmarklet-widget';
   // Force host visible — some sites (e.g. Shopify) set display:none on generic divs
   host.style.cssText = 'display:block!important;visibility:visible!important;';
+  // vimium etc. skip keys only when the retargeted activeElement looks editable
+  host.setAttribute('contenteditable', 'true');
   document.body.appendChild(host);
   const shadow = host.attachShadow({ mode: 'closed' });
 

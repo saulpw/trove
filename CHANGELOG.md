@@ -12,6 +12,7 @@ Bookmarklet keystroke fix, problem reports, frontend JS tests:
 - `make add` accepts `NOTES=`.
 - `make test-js`: frontend TypeScript tests in `tests/js/` on `node --test` (esbuild-bundled, no new deps); `make test` runs both suites. 63 tests over `frontend.ts`, `tags.ts`, `auth.ts`.
 - `make extract-inbox`: phase-1 extraction of `.meta/inbox/` link dumps into review PSVs.
+- Bookmarklet: `contenteditable` on the shadow host so Vimium (and kin) see an editable activeElement and enter insert mode -- previously they ate command-prefix keys typed into the panel, since the closed shadow root hid the real input. Verified headless with the Vimium extension loaded. Bump version to v0.43.
 - Bookmarklet "auto-tag" checkbox: flags the submission (`autotag: true` in the issue); the processing Action runs `autotag.py` on it via the API (`ANTHROPIC_API_KEY` repo secret, `claude-haiku-4-5`), unioning suggested tags with the user's and filling empty title/notes. Any failure adds the link untagged. Local `make autotag` still uses the `claude` CLI.
 - `make tags` split out of `build` (CI needs the vocabulary without esbuild).
 - help.html, README (labels, tests, API key) updated. Bump version to v0.42.
