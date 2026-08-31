@@ -32,7 +32,6 @@ A low-maintenance architecture for a static site where authenticated users submi
 - Runs `process_issues.py` which:
   - Fetches open issues with `submission` label
   - Fetches page titles, triggers archive.org snapshots
-  - Auto-tags submissions marked `autotag: true` (bookmarklet checkbox) via `autotag.py`
   - Appends entries to `trove-log.jsonl`
   - Closes processed issues
   - Commits and pushes changes
@@ -86,7 +85,6 @@ GitHub Actions (cron)
 
 ### GitHub Actions
 - Uses repository's built-in `GITHUB_TOKEN` for issue operations
-- `ANTHROPIC_API_KEY` secret: auto-tagging flagged submissions (optional; without it they are added untagged)
 - Commits using GitHub Actions bot identity
 
 ## Security Considerations

@@ -29,13 +29,9 @@ jobs:
           git fetch origin links
           git worktree add .links links
 
-      - name: Build tag vocabulary
-        run: make tags
-
       - name: Process submissions
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: python scripts/process_issues.py
 
       - name: Commit and push to links branch

@@ -65,8 +65,6 @@ declare var __TROVE_PASS__: string;
     .suggestions .tag-option:hover, .suggestions .tag-option.active { background: #f0f6ff; }
     .auth-row { display: flex; gap: 6px; }
     .auth-row input { flex: 1; }
-    .check { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #666; cursor: pointer; }
-    .check input { width: auto; margin: 0; }
     button.submit {
       padding: 8px; font-size: 14px; cursor: pointer; border: 1px solid #ccc; border-radius: 4px;
       background: #f5f5f5; width: 100%;
@@ -108,7 +106,6 @@ declare var __TROVE_PASS__: string;
         <input type="text" id="tw-tags" placeholder="Tags (space-separated)" autocomplete="off" />
         <div class="suggestions" id="tw-suggestions"></div>
       </div>
-      <label class="check"><input type="checkbox" id="tw-autotag" /> auto-tag</label>
       <label>Notes</label>
       <textarea id="tw-notes" rows="3" placeholder="Select text on page to pull a quote">${selection.replace(/</g, '&lt;')}</textarea>
       <button class="submit" id="tw-submit">Add</button>
@@ -172,7 +169,6 @@ declare var __TROVE_PASS__: string;
     title: fieldValue('tw-title'),
     tags: fieldValue('tw-tags'),
     notes: fieldValue('tw-notes'),
-    autotag: ($('tw-autotag') as HTMLInputElement).checked,
     username: hasAuth ? username : fieldValue('tw-user'),
     password: hasAuth ? password : fieldValue('tw-pass'),
     origin,
@@ -192,7 +188,7 @@ declare var __TROVE_PASS__: string;
   $('tw-submit')!.addEventListener('click', async () => {
     const status = $('tw-status')!;
     const values = formValues();
-    const { url, title, tags, notes, autotag, username: user, password: pass } = values;
+    const { url, title, tags, notes, username: user, password: pass } = values;
 
     status.textContent = 'Submitting...';
     status.className = 'status';
@@ -206,7 +202,6 @@ declare var __TROVE_PASS__: string;
     } else if (result.error === 'Network error') {
       // CSP blocks the cross-origin fetch — open trove /submit in a new tab instead
       const params = new URLSearchParams({ url, title, tags, notes, u: user, p: pass });
-      if (autotag) params.set('autotag', '1');
       const submitUrl = origin + '/submit?' + params.toString();
       // wombat-escape: archive.org rewrites window.open(url); blob popup meta-refreshes itself to live trove
       const esc = submitUrl.replace(/&/g, '&amp;').replace(/"/g, '&quot;');

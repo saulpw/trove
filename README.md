@@ -126,16 +126,13 @@ Issues are labeled `submission` (link/tag operations, processed by the GitHub Ac
 `bookmarklet-problem` (reports from the bookmarklet's "report a problem" link, read by hand).
 GitHub creates a missing label on first use; make one by hand if you want a specific color.
 
-### Anthropic API Key (for auto-tagging)
+### Auto-tagging
 
-Checking **auto-tag** in the bookmarklet makes the GitHub Action ask Claude for tags,
-a title, and notes while it processes the submission.
-
-1. Create a key at [console.anthropic.com](https://console.anthropic.com/settings/keys)
-2. Add it as a GitHub Actions secret: `gh secret set ANTHROPIC_API_KEY`
-
-Without the secret the submission is still added, just untagged. Local `make autotag`
-uses the `claude` CLI instead, so it needs no key.
+`make autotag COUNT=n` tags the least-tagged links (newest first) by fetching each
+page and asking Claude for tags, a cleaned title, and notes.  It runs the `claude`
+CLI off the local subscription, so it needs no API key; if `ANTHROPIC_API_KEY` is
+set it uses the HTTP API instead.  Run it from a regular terminal after submitting
+untagged links, then `make push-links`.
 
 ### Netlify Deployment
 

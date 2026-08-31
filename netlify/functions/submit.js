@@ -24,7 +24,7 @@ exports.handler = async (event) => {
     return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'Invalid JSON' }) };
   }
 
-  const { url, title, tags, notes, autotag, username, password, action, remove_tag, add_tags, urls, tag, description } = body;
+  const { url, title, tags, notes, username, password, action, remove_tag, add_tags, urls, tag, description } = body;
 
   if (!username || !password) {
     return { statusCode: 401, headers: corsHeaders, body: JSON.stringify({ error: 'Authentication required' }) };
@@ -95,7 +95,6 @@ exports.handler = async (event) => {
       title ? `title: ${title}` : null,
       tags ? `tags: ${tags}` : null,
       notes ? `notes: ${notes}` : null,
-      autotag ? `autotag: true` : null,
       `submitted_by: ${username}`,
     ].filter(Boolean).join('\n');
   }

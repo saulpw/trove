@@ -253,8 +253,7 @@ def log_skip(url, title, reason):
 
 
 def find_least_tagged():
-    """Return all links sorted by tag count (fewest first), shuffled within tiers."""
-    import random
+    """Return all links sorted by tag count (fewest first), newest first within tiers."""
     links = []
     for line in TROVE_BUILT.read_text().strip().split("\n"):
         if not line:
@@ -263,18 +262,9 @@ def find_least_tagged():
         tag_count = len(entry.get("tags", "").split()) if entry.get("tags", "").strip() else 0
         links.append((tag_count, entry))
 
-    if not links:
-        return []
-
-    # Group by tag count, shuffle within each tier, return in order
-    from itertools import groupby
+    links.sort(key=lambda x: x[1].get("added", ""), reverse=True)
     links.sort(key=lambda x: x[0])
-    result = []
-    for _, group in groupby(links, key=lambda x: x[0]):
-        tier = [entry for _, entry in group]
-        random.shuffle(tier)
-        result.extend(tier)
-    return result
+    return [entry for _, entry in links]
 
 
 def main():
@@ -294,7 +284,7 @@ def main():
         return
 
     tag_vocab = load_tag_vocab()
-    print(f"Processing up to {count} of {len(candidates)} links (fewest tags first).\n")
+    print(f"Processing up to {count} of {len(candidates)} links (fewest tags first, newest first).\n")
 
     tagged_count = 0
     for entry in candidates:

@@ -3,7 +3,7 @@
 import json
 from pathlib import Path
 
-from process_issues import parse_issue_body, process_issue_list, merge_autotag
+from process_issues import parse_issue_body, process_issue_list
 
 
 def test_parse_issue_body_basic():
@@ -78,42 +78,3 @@ def test_process_local_add_tag(tmp_path):
     assert entries[1]["op"] == "add_tag"
     assert entries[1]["url"] == "https://example.com"
     assert entries[1]["tags"] == "retro"
-
-
-def test_parse_issue_body_autotag():
-    body = "url: https://example.com\ntags: games\nautotag: true\nsubmitted_by: alice"
-    fields = parse_issue_body(body)
-    assert fields["autotag"] == "true"
-    assert fields["tags"] == "games"
-
-
-def test_merge_autotag_unions_tags_keeps_title():
-    link = {"url": "https://example.com", "title": "My Title", "tags": "games"}
-    merge_autotag(link, "retro games tools", "AI Title", "AI notes")
-    assert link["tags"] == "games retro tools"
-    assert link["title"] == "My Title"
-    assert link["notes"] == "AI notes"
-
-
-def test_merge_autotag_fills_empty_title():
-    link = {"url": "https://example.com"}
-    merge_autotag(link, "games", "AI Title", "")
-    assert link["tags"] == "games"
-    assert link["title"] == "AI Title"
-    assert "notes" not in link
-
-
-def test_merge_autotag_no_tags_is_noop():
-    link = {"url": "https://example.com", "tags": "games"}
-    merge_autotag(link, None, "AI Title", "AI notes")
-    assert link == {"url": "https://example.com", "tags": "games"}
-
-
-def test_process_local_skips_autotag(tmp_path):
-    out = tmp_path / "trove.jsonl"
-    body = "url: https://example.com\ntags: games\nautotag: true\nsubmitted_by: alice"
-    process_issue_list([{"number": 9, "body": body}], trove_path=out, local=True)
-    entries = [json.loads(line) for line in out.read_text().strip().split("\n")]
-    assert len(entries) == 1
-    assert entries[0]["tags"] == "games"
-    assert "autotag" not in entries[0]

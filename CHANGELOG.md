@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 2026-08-30
+
+Auto-tagging moved out of CI, local-only:
+
+- The bookmarklet "auto-tag" checkbox and CI autotag path are removed (the repo had no `ANTHROPIC_API_KEY` secret, so flagged submissions silently landed untagged). Submissions are always added as typed.
+- `make autotag COUNT=n` is the way to tag: candidates are ordered fewest-tags-first, newest-first within a tier (was shuffled), so fresh untagged submissions come up first. Runs the `claude` CLI off the subscription; the API path remains when a key is set.
+- README documents the local flow; help.html/ARCHITECTURE.md drop the checkbox. Bump version to v0.44.
+
+---
+
 ## 2026-08-29
 
 Bookmarklet keystroke fix, problem reports, frontend JS tests:
