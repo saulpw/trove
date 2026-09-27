@@ -2,6 +2,10 @@
 
 ## 2026-09-26
 
+- Netlify command failure messages explicitly suggest `netlify link`.
+
+---
+
 - User management now checks Netlify linkage and JSON responses, refuses failed or malformed reads, and verifies saved users before reporting success.
 - Passwords use a hidden prompt rather than positional arguments. Credentials are validated; raw Netlify output is kept out of terminal messages.
 - User operations explicitly target production, preserving other contexts. README documents linking, activation, and remaining subprocess argument exposure.

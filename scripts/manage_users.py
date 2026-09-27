@@ -28,7 +28,7 @@ def netlify_json(*args):
     if result.returncode:
         raise UserError(
             f"Netlify {args[0]} failed (exit {result.returncode}). "
-            "Check Netlify login, project linkage, and permissions."
+            "Check Netlify login and permissions; run netlify link from the project folder."
         )
     try:
         data = json.loads(result.stdout)
