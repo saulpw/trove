@@ -2,6 +2,11 @@
 
 ## 2026-09-26
 
+- Links accept uploader-chosen thumbnail URLs on submission and through thumbnail-only edits. Explicit choices and clears survive re-submission and compaction.
+- Card editing includes a thumbnail URL field. Images display without cropping; broken images fall back to text-only cards. Clearing suppresses automatic thumbnails except for direct image links. Version v0.45.
+
+---
+
 - Netlify command failure messages explicitly suggest `netlify link`.
 
 ---

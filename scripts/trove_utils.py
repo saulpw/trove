@@ -49,7 +49,7 @@ def create_link_entry(url, title=None, tags=None, notes=None, added=None,
         added: ISO timestamp string (defaults to now)
         duration: Video duration string, e.g. "3:45" (optional)
         channel: Video channel/uploader name (optional)
-        thumbnail: URL to video thumbnail image (optional)
+        thumbnail: Image URL, or empty string to suppress automatic thumbnails
         op: Operation type: "add" (default), "set_title", "set_notes",
             "add_tag", "remove_tag" (optional)
         submitted_by: Username who submitted this entry (optional)
@@ -76,7 +76,7 @@ def create_link_entry(url, title=None, tags=None, notes=None, added=None,
         link["duration"] = duration
     if channel:
         link["channel"] = channel
-    if thumbnail:
+    if thumbnail is not None:
         link["thumbnail"] = thumbnail
     if submitted_by:
         link["submitted_by"] = submitted_by

@@ -97,9 +97,9 @@ header h1 a:hover { text-decoration: underline; }
 .card-rating .rating-value.negative { color: var(--color-text-light); }
 .card-rating .rating-value.zero { visibility: hidden; }
 .card-left { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-.card-thumb { flex-shrink: 0; width: 120px; margin: -0.75rem -0.75rem -0.75rem 0; overflow: hidden; border-radius: 0 6px 6px 0; }
+.card-thumb { display: flex; align-items: center; flex-shrink: 0; width: 120px; margin: -0.75rem -0.75rem -0.75rem 0; overflow: hidden; border-radius: 0 6px 6px 0; }
 .card-thumb:has(+ .card-actions) { margin-right: 0; border-radius: 0; }
-.card-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.card-thumb img { width: 100%; height: auto; max-height: 160px; object-fit: contain; }
 .link .title-row { position: relative; }
 .link .title { color: var(--color-link); font-size: var(--text-lg); font-weight: 500; line-height: 1.3; }
 .link-anchor:visited .title { color: var(--color-link-visited); }
@@ -110,7 +110,7 @@ header h1 a:hover { text-decoration: underline; }
 .card-edit-btn, .card-delete-btn { cursor: pointer; font-size: var(--text-sm); }
 .card-edit-btn:hover, .card-delete-btn:hover { opacity: 1; }
 .link.editing .card-actions { display: none; }
-.edit-title-input, .edit-tags-input {
+.edit-title-input, .edit-tags-input, .edit-thumbnail-input {
   font-size: var(--text-md); padding: 0.2rem 0.5rem;
   border: 1px solid var(--color-link); border-radius: 4px;
   width: 80%; max-width: 500px; box-sizing: border-box;

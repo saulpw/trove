@@ -50,6 +50,7 @@ A simple static website to share lists of links at a public mnemonic url.  e.g. 
 ## Design Decisions
 - All link submission (adding new links) goes through the bookmarklet. There is no inline add form on the main page.
 - Tag-filter notation is the URL path syntax everywhere: breadcrumbs join with `/`, tag menus label options `path/tag` and `path/-tag`. No alternate glyphs (`∩`, `~`).
+- Thumbnails: optional public image URLs; `set_thumbnail` edits existing links. `thumbnail_explicit` preserves manual choices and clears through compaction. See ARCHITECTURE.md.
 - Link cards show their full tag set, including tags in the active filter (those render without a menu). The sidebar still excludes active-filter tags.
 - CLI interface (`scripts/add_link.py`) uses positional arguments for tags (not `--tags` flag): `python3 scripts/add_link.py URL tag1 tag2`
 - Use space-separated strings (not lists) for multi-value fields like tags and URLs in Python function interfaces. This matches the trove-log.jsonl storage format and keeps a consistent pattern across the codebase.

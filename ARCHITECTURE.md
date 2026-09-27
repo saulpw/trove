@@ -44,6 +44,27 @@ A low-maintenance architecture for a static site where authenticated users submi
 - Lives on the orphan `links` branch
 - Processed at build time into `trove.jsonl` (deduplicated links) and `tags.jsonl` (tag list)
 
+## Representative thumbnails
+
+Submissions accept an optional `thumbnail` containing a public HTTP(S) image URL,
+without embedded credentials. Omission leaves the current choice unchanged;
+`""` explicitly suppresses automatic thumbnails. An existing link can be edited
+with `action: "set_thumbnail"`, `url`, and `thumbnail`, without re-submitting its
+other fields. This uses the same authenticated issue pipeline as other edits.
+
+The processor marks supplied thumbnails on add operations with
+`thumbnail_explicit: true`. Automatic metadata uses an unmarked `thumbnail`.
+The merger preserves the first explicit add choice against subsequent adds;
+`set_thumbnail` replaces or clears it. Deduplicated output retains both the
+explicit marker and the empty string for clears, so compaction preserves intent.
+Only a deliberate thumbnail edit replaces an existing explicit choice.
+
+The browser uses `thumbnail`, falling back to the link itself for direct image
+URLs. Images are not cropped or copied; they load without a referrer. A failed
+image removes its thumbnail container, leaving a text-only card. Remote images
+can expire or block hotlinking, and their hosts still see viewer network requests.
+There is one representative image per link, independent of tag filters.
+
 ## Data Flow
 
 ```

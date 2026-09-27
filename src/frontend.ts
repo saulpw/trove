@@ -176,6 +176,21 @@ export function sortLinks(links: Link[], sortBy: string): Link[] {
   return sorted;
 }
 
+function isThumbnailUrl(src: string): boolean {
+  try {
+    const url = new URL(src);
+    return /^https?:$/.test(url.protocol) && !url.username && !url.password;
+  } catch {
+    return false;
+  }
+}
+
+export function renderThumbnail(link: Link): string {
+  const src = link.thumbnail || (/\.(jpe?g|png|gif|webp)([?#].*)?$/i.test(link.url) ? link.url : '');
+  if (!isThumbnailUrl(src)) return '';
+  return `<div class="card-thumb"><img src="${esc(src)}" alt="${esc(link.title || '')}" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.remove()"></div>`;
+}
+
 function renderLinks(links: Link[]): void {
   const container = document.getElementById('links')!;
   const ratings = getRatings();
@@ -189,7 +204,6 @@ function renderLinks(links: Link[]): void {
     const escapedUrl = esc(link.url.replace(/\\/g, '\\\\').replace(/'/g, "\\'"));
     const rating = ratings[link.url] || 0;
     const ratingClass = rating > 0 ? 'positive' : rating < 0 ? 'negative' : 'zero';
-    const imgSrc = link.thumbnail || (/\.(jpe?g|png|gif|webp)(\?.*)?$/i.test(link.url) ? link.url : '');
     const metaParts = [domain];
     if (link.added) metaParts.push(formatDate(link.added));
     if (link.duration) metaParts.push(formatDuration(link.duration));
@@ -199,6 +213,7 @@ function renderLinks(links: Link[]): void {
       <div class="link"
            data-url="${esc(link.url)}"
            data-added="${esc(link.added || '')}"
+           data-thumbnail="${esc(link.thumbnail || '')}"
            ${link.title ? `data-title="${esc(link.title)}"` : ''}
            ${tags.length ? `data-tags="${esc(tags.join(' '))}"` : ''}>
         <div class="card-body">
@@ -215,7 +230,7 @@ function renderLinks(links: Link[]): void {
             ${link.notes ? `<div class="notes">${esc(link.notes)}</div>` : ''}
             <div class="card-bottom"><span class="tags">${tags.map(t => renderTag(t)).join(' ')}</span><button class="add-tag-btn" onclick="handleAddTagClick(event, this)">+</button></div>
           </div>
-          ${imgSrc ? `<div class="card-thumb"><img src="${esc(imgSrc)}" alt="${esc(link.title || '')}" loading="lazy"></div>` : ''}
+          ${renderThumbnail(link)}
           ${isSignedIn() ? `<div class="card-actions"><span class="card-edit-btn" onclick="handleEditCardClick(event, this)">✏️</span><span class="card-delete-btn" onclick="handleDeleteClick(event, '${escapedUrl}', this)">🗑️</span></div>` : ''}
         </div>
       </div>
@@ -427,6 +442,7 @@ function handleEditCardClick(event: Event, btn: HTMLElement): void {
   const url = linkEl.dataset.url!;
   const oldTitle = linkEl.dataset.title || '';
   const oldTags = linkEl.dataset.tags || '';
+  const oldThumbnail = linkEl.dataset.thumbnail || '';
 
   // Prevent link navigation while editing
   const anchor = linkEl.closest('.link-anchor') as HTMLAnchorElement;
@@ -448,8 +464,14 @@ function handleEditCardClick(event: Event, btn: HTMLElement): void {
   const tagsInput = cardBottom.querySelector('.edit-tags-input') as HTMLInputElement;
   const tagsDropdown = cardBottom.querySelector('.tag-autocomplete-dropdown') as HTMLElement;
 
-  // Add stacked action buttons between card-left and thumbnail
   const cardLeft = linkEl.querySelector('.card-left') as HTMLElement;
+  const thumbnailInput = document.createElement('input');
+  thumbnailInput.className = 'edit-thumbnail-input';
+  thumbnailInput.type = 'url';
+  thumbnailInput.placeholder = 'Thumbnail image URL (blank to clear)';
+  thumbnailInput.setAttribute('aria-label', 'Thumbnail image URL');
+  thumbnailInput.value = oldThumbnail;
+  cardLeft.append(thumbnailInput);
   const actionsCol = document.createElement('div');
   actionsCol.className = 'edit-card-actions';
   actionsCol.innerHTML = `<button class="vote-delete-btn" title="Vote for deletion">🗑️</button><button class="edit-save-btn">Save</button><button class="edit-cancel-btn">Cancel</button>`;
@@ -460,6 +482,7 @@ function handleEditCardClick(event: Event, btn: HTMLElement): void {
     cardBottom.innerHTML = cardBottomHTML;
     cardBottom.style.position = '';
     actionsCol.remove();
+    thumbnailInput.remove();
     linkEl.classList.remove('editing');
     anchor.removeEventListener('click', blockClick);
   };
@@ -467,6 +490,22 @@ function handleEditCardClick(event: Event, btn: HTMLElement): void {
   const save = () => {
     const newTitle = titleInput.value.trim();
     const newTags = tagsInput.value.trim().split(/\s+/).filter(t => t).join(' ');
+    const newThumbnail = thumbnailInput.value.trim();
+    thumbnailInput.setCustomValidity('');
+    if (newThumbnail && !isThumbnailUrl(newThumbnail)) {
+      thumbnailInput.setCustomValidity('Use an HTTP(S) image URL without credentials.');
+    }
+    if (!thumbnailInput.reportValidity()) return;
+
+    if (newThumbnail !== oldThumbnail) {
+      submitToBackend({ action: 'set_thumbnail', url, thumbnail: newThumbnail });
+      linkEl.dataset.thumbnail = newThumbnail;
+      for (const link of currentLinks) {
+        if (link.url === url) link.thumbnail = newThumbnail;
+      }
+      linkEl.querySelector('.card-thumb')?.remove();
+      cardLeft.insertAdjacentHTML('afterend', renderThumbnail({ url, added: '', title: newTitle, thumbnail: newThumbnail }));
+    }
 
     if (newTitle && newTitle !== oldTitle) {
       linkEl.dataset.title = newTitle;
@@ -511,6 +550,7 @@ function handleEditCardClick(event: Event, btn: HTMLElement): void {
   };
   titleInput.addEventListener('keydown', editKeys);
   tagsInput.addEventListener('keydown', editKeys);
+  thumbnailInput.addEventListener('keydown', editKeys);
   initAutocomplete(tagsInput, tagsDropdown, () => getAllTagNames());
 
   titleInput.focus();

@@ -112,11 +112,11 @@ def process_issue_list(issues, trove_path=None, local=False):
             print(f"Issue #{number}: No URL found, skipping")
             continue
 
-        # For set_title, set_notes, add_tag, remove_tag: just append the op
-        if action in ("set_title", "set_notes", "add_tag", "remove_tag", "delete"):
+        if action in ("set_title", "set_notes", "set_thumbnail", "add_tag", "remove_tag", "delete"):
             entry = create_link_entry(
                 url, title=fields.get("title"), tags=fields.get("tags"),
-                notes=fields.get("notes"), op=action, submitted_by=submitted_by)
+                notes=fields.get("notes"), thumbnail=fields.get("thumbnail"),
+                op=action, submitted_by=submitted_by)
             links.append(entry)
             print(f"Issue #{number}: Appended {action} for {url}")
             if not local:
@@ -144,8 +144,10 @@ def process_issue_list(issues, trove_path=None, local=False):
         link = create_link_entry(
             url, title, fields.get("tags"), fields.get("notes"),
             duration=yt_meta.get("duration"), channel=yt_meta.get("channel"),
-            thumbnail=yt_meta.get("thumbnail"), op="add",
+            thumbnail=fields.get("thumbnail", yt_meta.get("thumbnail")), op="add",
             submitted_by=submitted_by)
+        if "thumbnail" in fields:
+            link["thumbnail_explicit"] = True
 
         links.append(link)
         existing_urls.add(url)

@@ -8,7 +8,8 @@ Treats trove-log.jsonl as an append-only operation log. Each entry has an option
 - Title: last add's title, unless a later set_title exists (sticky)
 - Notes: concatenated from all adds (prefixed with "username: " when
   submitted_by is present); set_notes replaces accumulated notes
-- Other fields (duration, channel, thumbnail): last-write-wins from adds
+- Duration/channel: last-write-wins from adds
+- Thumbnail: explicit choices (including clears) override automatic adds
 - added: earliest timestamp
 
 CLI: python3 dedup_trove.py <input> <output>
@@ -64,6 +65,7 @@ def dedup(entries):
                 "duration": None,
                 "channel": None,
                 "thumbnail": None,
+                "thumbnail_explicit": False,
                 "deleted": False,
             }
             url_order.append(url)
@@ -94,10 +96,20 @@ def dedup(entries):
                 else:
                     state["notes_parts"].append(note)
 
-            # Last-write-wins fields
-            for field in ("duration", "channel", "thumbnail"):
+            for field in ("duration", "channel"):
                 if entry.get(field):
                     state[field] = entry[field]
+            if not state["thumbnail_explicit"]:
+                if entry.get("thumbnail_explicit"):
+                    state["thumbnail"] = entry.get("thumbnail", "")
+                    state["thumbnail_explicit"] = True
+                elif entry.get("thumbnail"):
+                    state["thumbnail"] = entry["thumbnail"]
+
+        elif op == "set_thumbnail":
+            if "thumbnail" in entry:
+                state["thumbnail"] = entry["thumbnail"]
+                state["thumbnail_explicit"] = True
 
         elif op == "set_title":
             if entry.get("title"):
@@ -143,6 +155,9 @@ def dedup(entries):
         for field in ("duration", "channel", "thumbnail"):
             if state[field]:
                 link[field] = state[field]
+        if state["thumbnail_explicit"]:
+            link["thumbnail"] = state["thumbnail"]
+            link["thumbnail_explicit"] = True
         result.append(link)
 
     return result

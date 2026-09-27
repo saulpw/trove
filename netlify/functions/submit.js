@@ -24,7 +24,7 @@ exports.handler = async (event) => {
     return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'Invalid JSON' }) };
   }
 
-  const { url, title, tags, notes, username, password, action, remove_tag, add_tags, urls, tag, description } = body;
+  const { url, title, tags, notes, thumbnail, username, password, action, remove_tag, add_tags, urls, tag, description } = body;
 
   if (!username || !password) {
     return { statusCode: 401, headers: corsHeaders, body: JSON.stringify({ error: 'Authentication required' }) };
@@ -39,6 +39,21 @@ exports.handler = async (event) => {
 
   if (!users[username] || users[username] !== password) {
     return { statusCode: 401, headers: corsHeaders, body: JSON.stringify({ error: 'Invalid credentials' }) };
+  }
+
+  if (thumbnail !== undefined || action === 'set_thumbnail') {
+    let valid = typeof thumbnail === 'string' && !/[\r\n]/.test(thumbnail);
+    if (valid && thumbnail !== '') {
+      try {
+        const imageUrl = new URL(thumbnail);
+        valid = /^https?:$/.test(imageUrl.protocol) && !imageUrl.username && !imageUrl.password;
+      } catch {
+        valid = false;
+      }
+    }
+    if (!valid) {
+      return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: 'thumbnail requires an HTTP(S) image URL or an empty string' }) };
+    }
   }
 
   let issueTitle, issueBody, issueLabel = 'submission';
@@ -95,6 +110,7 @@ exports.handler = async (event) => {
       title ? `title: ${title}` : null,
       tags ? `tags: ${tags}` : null,
       notes ? `notes: ${notes}` : null,
+      thumbnail !== undefined ? `thumbnail: ${thumbnail}` : null,
       `submitted_by: ${username}`,
     ].filter(Boolean).join('\n');
   }
