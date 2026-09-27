@@ -808,3 +808,10 @@
 {"op": "add", "url": "https://mastodon.social/@iskropixel", "added": "2026-09-27T04:26:39.399906+00:00", "submitted_by": "saulbert"}
 {"op": "add", "url": "https://riadev.carrd.co/", "added": "2026-09-27T04:26:40.270133+00:00", "submitted_by": "saulbert"}
 {"op": "add", "url": "https://scruffybrush.ca/", "added": "2026-09-27T04:26:41.322131+00:00", "submitted_by": "saulbert"}
+{"op": "set_thumbnail", "url": "https://dinchenix.carrd.co/", "added": "2026-09-27T04:53:55.437098+00:00", "thumbnail": "https://dinchenix.carrd.co/assets/images/gallery04/45628326_original.jpg?v=c6552e2d", "submitted_by": "saulbert"}
+{"op": "set_thumbnail", "url": "https://mastodon.art/@pixelhoo", "added": "2026-09-27T04:53:56.196287+00:00", "thumbnail": "https://cdn.masto.host/mastodonart/media_attachments/files/117/333/908/589/921/112/original/c57f643124d62a1d.png", "submitted_by": "saulbert"}
+{"op": "set_thumbnail", "url": "https://slime.global/@lunalapin", "added": "2026-09-27T04:53:57.360569+00:00", "thumbnail": "https://pool.jortage.com/slimeglobal/media_attachments/files/117/333/445/867/593/196/original/a45df7b372b809a8.png", "submitted_by": "saulbert"}
+{"op": "set_thumbnail", "url": "https://theblindarcher.carrd.co/", "added": "2026-09-27T04:53:58.469237+00:00", "thumbnail": "https://cdn.masto.host/mastodongamedevplace/media_attachments/files/117/333/846/621/826/281/original/0f8b77c1437e2cf2.png", "submitted_by": "saulbert"}
+{"op": "set_thumbnail", "url": "https://mastodon.social/@iskropixel", "added": "2026-09-27T04:53:59.350073+00:00", "thumbnail": "https://files.mastodon.social/media_attachments/files/117/333/684/420/952/632/original/547a3c1377adbeb7.png", "submitted_by": "saulbert"}
+{"op": "set_thumbnail", "url": "https://riadev.carrd.co/", "added": "2026-09-27T04:54:01.223933+00:00", "thumbnail": "https://riadev.carrd.co/assets/images/gallery02/35e5661b_original.gif?v=03809fd4", "submitted_by": "saulbert"}
+{"op": "set_thumbnail", "url": "https://scruffybrush.ca/", "added": "2026-09-27T04:54:02.260345+00:00", "thumbnail": "https://scruffybrush.ca/images/examples/pixels/gb/Lyxaar_alt.png", "submitted_by": "saulbert"}
