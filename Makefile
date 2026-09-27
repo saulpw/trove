@@ -96,10 +96,10 @@ fill-titles:
 
 # User management: manage TROVE_USERS env var on Netlify
 add-user:
-	python3 scripts/manage_users.py add ${NAME} ${PASS}
+	@python3 scripts/manage_users.py add "${NAME}"
 
 remove-user:
-	python3 scripts/manage_users.py remove ${NAME}
+	@python3 scripts/manage_users.py remove "${NAME}"
 
 list-users:
 	python3 scripts/manage_users.py list

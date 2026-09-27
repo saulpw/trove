@@ -100,12 +100,34 @@ Users authenticate with a username and password. Credentials are stored in the `
    ```
    TROVE_USERS=testuser:testpass
    ```
-3. Manage users via CLI:
-   ```bash
-   make add-user NAME=alice PASS=somepw
-   make remove-user NAME=alice
-   make list-users
+3. Authenticate and link the CLI to the intended Netlify project, from this repository:
+   ```console
+   $ netlify login
+   $ netlify link
    ```
+4. Manage production users via CLI:
+   ```console
+   $ make add-user NAME=alice
+   $ make remove-user NAME=alice
+   $ make list-users
+   ```
+   Adding a user prompts for a hidden password; adding an existing username updates its password.
+   Positional passwords and `PASS=` are no longer used. An interactive terminal is required.
+   Usernames cannot contain colons or commas; passwords cannot contain commas.
+   Neither may be empty, have surrounding whitespace, or contain control characters.
+   Malformed or duplicate existing entries must be repaired in Netlify before using this tool.
+
+   The tool checks project linkage, reads the production Functions value, and writes only the
+   production context. Other contexts are left unchanged. Success requires a matching read-back;
+   a verification failure can mean the write happened, so inspect Netlify before retrying.
+   Redeploy after a verified change to activate it; the tool does not deploy automatically.
+   Removing the last user is refused because Netlify's CLI does not reliably save an empty
+   value. Clear the production value in the dashboard and redeploy instead.
+
+   Hidden input keeps passwords out of shell history. Netlify's `env:set` still receives the
+   full user list in subprocess arguments, visible to processes with sufficient permissions.
+   CLI output is captured and not echoed because it can contain passwords. Use the Netlify
+   dashboard instead when subprocess argument exposure is unacceptable.
 
 ### GitHub Token (for submissions)
 

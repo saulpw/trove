@@ -23,7 +23,7 @@ A simple static website to share lists of links at a public mnemonic url.  e.g. 
   - `process_local_issues.py` - Offline issue processing from local JSON files (for testing)
   - `import_md_links.py` - One-time bulk import from markdown files
   - `import_web_links.py` - Extract/import links from web pages
-  - `manage_users.py` - CLI to add/remove users from Netlify `TROVE_USERS` env var
+  - `manage_users.py` - CLI to manage production Netlify `TROVE_USERS`; hidden password prompt, strict reads, verified writes. Netlify can return exit 0 without a linked project, so require JSON and validate linkage. Clear the last user through the dashboard (CLI empty writes can retain the old value).
   - `compact_trove.py` - Compactor: strips tracking params, deduplicates log, health-checks links, adds archive.org fallback URLs
   - `dedup_trove.py` - Deduplicate trove-log.jsonl
   - `generate_tags.py` - Build tags.jsonl from trove-log.jsonl

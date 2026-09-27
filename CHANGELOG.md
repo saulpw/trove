@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 2026-09-26
+
+- User management now checks Netlify linkage and JSON responses, refuses failed or malformed reads, and verifies saved users before reporting success.
+- Passwords use a hidden prompt rather than positional arguments. Credentials are validated; raw Netlify output is kept out of terminal messages.
+- User operations explicitly target production, preserving other contexts. README documents linking, activation, and remaining subprocess argument exposure.
+- Added mocked regression tests; no live Netlify writes are needed for testing.
+
+---
+
 ## 2026-08-30
 
 Auto-tagging moved out of CI, local-only:
