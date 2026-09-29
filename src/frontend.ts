@@ -144,7 +144,7 @@ export const formatDuration = (dur: string | undefined): string => {
 
 // Normalize URL: prepend https:// if missing protocol
 export const normalizeUrl = (url: string): string => {
-  if (url && !url.includes('://')) {
+  if (url && !url.includes('://') && !/^(mailto|tel|sms|magnet|data):/i.test(url)) {
     return 'https://' + url;
   }
   return url;

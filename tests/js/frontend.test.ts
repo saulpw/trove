@@ -33,6 +33,9 @@ describe('normalizeUrl', () => {
   test('adds https to a bare host', () => assert.equal(normalizeUrl('example.com/a'), 'https://example.com/a'));
   test('keeps http', () => assert.equal(normalizeUrl('http://example.com'), 'http://example.com'));
   test('keeps https', () => assert.equal(normalizeUrl('https://example.com'), 'https://example.com'));
+  test('keeps mailto', () => assert.equal(normalizeUrl('mailto:x@example.com'), 'mailto:x@example.com'));
+  test('keeps magnet', () => assert.equal(normalizeUrl('magnet:?xt=urn:x'), 'magnet:?xt=urn:x'));
+  test('host with port still gets https', () => assert.equal(normalizeUrl('example.com:8080/a'), 'https://example.com:8080/a'));
   test('empty stays empty', () => assert.equal(normalizeUrl(''), ''));
 });
 

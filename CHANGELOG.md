@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2026-09-29
+
+- `normalizeUrl` leaves `mailto:`, `tel:`, `sms:`, `magnet:`, and `data:` URLs alone instead of prefixing `https://`.
+
+---
+
 ## 2026-09-26
 
 - Links accept uploader-chosen thumbnail URLs on submission and through thumbnail-only edits. Explicit choices and clears survive re-submission and compaction.
