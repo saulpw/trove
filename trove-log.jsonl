@@ -823,3 +823,6 @@
 {"op": "set_thumbnail", "url": "https://mastodon.social/@iskropixel", "added": "2026-09-27T05:21:20.959556+00:00", "thumbnail": "https://files.mastodon.social/media_attachments/files/117/277/347/902/476/747/original/8119ec45ca356b76.png", "submitted_by": "saul"}
 {"op": "add", "url": "https://slime.global/@lunalapin", "added": "2026-09-27T05:24:19.045074+00:00", "submitted_by": "saul"}
 {"op": "add", "url": "https://www.withouthotair.com/", "added": "2026-09-29T15:07:55.105985+00:00", "title": "David MacKay FRS: : Contents", "tags": "energy book", "submitted_by": "saul"}
+{"op": "add", "url": "https://www.buzzsprout.com/", "added": "2026-09-29T16:54:38.091267+00:00", "title": "Buzzsprout", "tags": "podcast services", "notes": "Podcast hosting platform.", "submitted_by": "saulbert"}
+{"op": "add", "url": "https://stevestewart.me/find-a-podcast-editor/", "added": "2026-09-29T16:54:39.728259+00:00", "title": "Find a Podcast Editor (Steve Stewart)", "tags": "podcast", "notes": "Directory of freelance podcast editors.", "submitted_by": "saulbert"}
+{"op": "add", "url": "https://podnews.net/", "added": "2026-09-29T16:54:41.238668+00:00", "title": "Podnews", "tags": "podcast news", "notes": "Daily podcast industry newsletter.", "submitted_by": "saulbert"}
