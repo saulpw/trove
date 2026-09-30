@@ -866,3 +866,4 @@
 {"op": "add", "url": "https://adiamond.me/2026/06/software-engineering-in-the-age-of-ai/", "added": "2026-09-29T21:25:02.077587+00:00", "title": "Software Engineering in the Age of AI", "tags": "essay ai dev", "submitted_by": "saulbert"}
 {"op": "add", "url": "https://www.jameshylands.co.uk/2026/06/sortis-paper-empire-game.html", "added": "2026-09-29T21:25:03.405719+00:00", "title": "Sortis - A paper empire game", "tags": "game strategy physical", "submitted_by": "saulbert"}
 {"op": "add", "url": "https://doug.sh/posts/erm-a-local-cli-that-strips-ums-uhs-and-erms-from-speech/", "added": "2026-09-29T21:25:35.231886+00:00", "title": "erm: A Local CLI That Strips Ums, Uhs, and Erms From Speech", "tags": "cli audio oss podcast", "submitted_by": "saulbert"}
+{"op": "add", "url": "https://www.hmdb.org/", "added": "2026-09-30T23:40:30.955867+00:00", "title": "The Historical Marker Database", "tags": "dataset data", "submitted_by": "saul"}
