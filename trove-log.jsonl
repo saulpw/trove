@@ -868,3 +868,4 @@
 {"op": "add", "url": "https://doug.sh/posts/erm-a-local-cli-that-strips-ums-uhs-and-erms-from-speech/", "added": "2026-09-29T21:25:35.231886+00:00", "title": "erm: A Local CLI That Strips Ums, Uhs, and Erms From Speech", "tags": "cli audio oss podcast", "submitted_by": "saulbert"}
 {"op": "add", "url": "https://www.hmdb.org/", "added": "2026-09-30T23:40:30.955867+00:00", "title": "The Historical Marker Database", "tags": "dataset data", "submitted_by": "saul"}
 {"op": "add", "url": "https://geohistory.gg/", "added": "2026-10-01T16:41:34.992145+00:00", "title": "GeoHistory \u2014 Daily history geography game", "tags": "game daily geo", "submitted_by": "saul"}
+{"op": "add", "url": "https://torahmap.org/", "added": "2026-10-01T16:41:50.683965+00:00", "title": "Torahmap", "tags": "torah dataviz", "submitted_by": "saul"}
