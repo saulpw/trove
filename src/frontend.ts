@@ -29,7 +29,8 @@ interface PageConfig {
 export function getTagFilters(): string[] {
   return window.location.pathname
     .split('/')
-    .filter(segment => segment.length > 0 && segment !== 'index.html');
+    .filter(segment => segment.length > 0 && segment !== 'index.html')
+    .map(segment => { try { return decodeURIComponent(segment); } catch { return segment; } });
 }
 
 // Filter links by time period based on their added date

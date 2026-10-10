@@ -124,6 +124,8 @@ describe('getTagFilters', () => {
   test('exclusion keeps its minus', () => { setPath('/games/-retro'); assert.deepEqual(getTagFilters(), ['games', '-retro']); });
   test('trailing slash is ignored', () => { setPath('/games/'); assert.deepEqual(getTagFilters(), ['games']); });
   test('index.html is not a tag', () => { setPath('/index.html'); assert.deepEqual(getTagFilters(), []); });
+  test('percent-encoded segments are decoded', () => { setPath('/ea/%5Ekasey'); assert.deepEqual(getTagFilters(), ['ea', '^kasey']); });
+  test('malformed encoding stays raw', () => { setPath('/%E0'); assert.deepEqual(getTagFilters(), ['%E0']); });
   test('index.html under a tag is not a tag', () => { setPath('/games/index.html'); assert.deepEqual(getTagFilters(), ['games']); });
 });
 

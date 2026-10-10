@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 2026-10-10
+
+- Tag filters in the URL path are percent-decoded, so `/ea/%5Ekasey` matches links tagged `^kasey`.
+
+---
+
 ## 2026-09-29
 
 - `normalizeUrl` leaves `mailto:`, `tel:`, `sms:`, `magnet:`, and `data:` URLs alone instead of prefixing `https://`.
